@@ -2,15 +2,16 @@ package jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory;
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager;
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.RateManager;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
-import jp.aoichaan0513.A_TosoGame_Live.API.Timer.TimerFormat;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Hunter;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Tuho;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,6 +28,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class MainInventory {
 
@@ -46,14 +48,15 @@ public class MainInventory {
         itemMeta1.setDisplayName("" + ChatColor.BLUE + ChatColor.BOLD + ChatColor.UNDERLINE + "あなたの情報");
         itemMeta1.setLore(
                 Arrays.asList(
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "ユーザー名" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + p.getName(),
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "ゲームモード" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + MainAPI.Gamemode.getGamemode(p.getGameMode()).getName(),
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "権限所持者" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (TosoGameAPI.isPermissionHave(p) ? "はい" : "いいえ"),
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "プレイヤー名" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + p.getName(),
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "権限所持者" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (TosoGameAPI.hasPermission(p) ? "はい" : "いいえ"),
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "配信者" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (TosoGameAPI.isBroadCaster(p) ? "はい" : "いいえ"),
+                        "",
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "所持金" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + MoneyManager.formatMoney(PlayerManager.loadConfig(p).getMoney()) + ChatColor.GRAY + "円",
                         "",
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "チーム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + Teams.getTeam(Teams.DisplaySlot.SIDEBAR, p),
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "難易度" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TosoGameAPI.difficultyMap.get(p.getUniqueId()).getDisplayName(),
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "賞金" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + RateManager.getMoney(p) + ChatColor.GRAY + "円 (" + RateManager.getRate(p) + "円/秒)"
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "賞金" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + MoneyManager.formatMoney(MoneyManager.getReward(p)) + ChatColor.GRAY + "円 (" + MoneyManager.getRate(p) + "円/秒)"
                 )
         );
         itemStack1.setItemMeta(itemMeta1);
@@ -63,8 +66,8 @@ public class MainInventory {
             ItemStack itemStack2 = new ItemStack(Item.SETTINGS.getMaterial(), 1);
             ItemMeta itemMeta2 = itemStack2.getItemMeta();
             itemMeta2.addItemFlags(itemFlags);
-            itemMeta2.setDisplayName(ChatColor.BOLD + "設定");
-            itemMeta2.setLore(Arrays.asList(ChatColor.YELLOW + "クリックして\"設定アプリ\"を開きます。"));
+            itemMeta2.setDisplayName("" + ChatColor.BLUE + ChatColor.BOLD + ChatColor.UNDERLINE + "マップ設定");
+            itemMeta2.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.BLUE + ChatColor.BOLD + ChatColor.UNDERLINE + "マップ設定アプリ" + ChatColor.RESET + ChatColor.GRAY + "を開きます。"));
             itemStack2.setItemMeta(itemMeta2);
             inv.setItem(Item.SETTINGS.getIndex(), itemStack2);
         }
@@ -73,7 +76,7 @@ public class MainInventory {
         ItemMeta itemMeta3 = itemStack3.getItemMeta();
         itemMeta3.addItemFlags(itemFlags);
         itemMeta3.setDisplayName("" + ChatColor.BLUE + ChatColor.BOLD + ChatColor.UNDERLINE + "通知");
-        itemMeta3.setLore(Arrays.asList("" + ChatColor.GRAY + ChatColor.BLUE + ChatColor.UNDERLINE + "通知メニュー" + ChatColor.RESET + ChatColor.GRAY + "を開きます。"));
+        itemMeta3.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.BLUE + ChatColor.BOLD + ChatColor.UNDERLINE + "通知メニュー" + ChatColor.RESET + ChatColor.GRAY + "を開きます。"));
         itemStack3.setItemMeta(itemMeta3);
         inv.setItem(Item.NOTIFICATION.getIndex(), itemStack3);
 
@@ -93,7 +96,7 @@ public class MainInventory {
         ItemMeta itemMeta5 = itemStack5.getItemMeta();
         itemMeta5.addItemFlags(itemFlags);
         itemMeta5.setDisplayName("" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "マップ");
-        itemMeta5.setLore(Arrays.asList(ChatColor.YELLOW + "クリックして" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "マップアプリ" + ChatColor.RESET + ChatColor.YELLOW + "を開きます。"));
+        itemMeta5.setLore(Collections.singletonList(ChatColor.YELLOW + "クリックして" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "マップアプリ" + ChatColor.RESET + ChatColor.YELLOW + "を開きます。"));
         itemStack5.setItemMeta(itemMeta5);
         inv.setItem(Item.MAP_APP.getIndex(), itemStack5);
 
@@ -102,7 +105,7 @@ public class MainInventory {
         ItemMeta itemMeta6 = itemStack6.getItemMeta();
         itemMeta6.addItemFlags(itemFlags);
         itemMeta6.setDisplayName("" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ミッション");
-        itemMeta6.setLore(Arrays.asList(ChatColor.YELLOW + "クリックして" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ミッションアプリ" + ChatColor.RESET + ChatColor.YELLOW + "を開きます。"));
+        itemMeta6.setLore(Collections.singletonList(ChatColor.YELLOW + "クリックして" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ミッションアプリ" + ChatColor.RESET + ChatColor.YELLOW + "を開きます。"));
         itemStack6.setItemMeta(itemMeta6);
         inv.setItem(Item.MISSION_APP.getIndex(), itemStack6);
 
@@ -117,7 +120,7 @@ public class MainInventory {
         itemMeta7.setLore(
                 Arrays.asList(
                         ChatColor.YELLOW + "クリックして" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "観戦モード" + ChatColor.RESET + ChatColor.YELLOW + "を切り替えます。",
-                        ChatColor.GRAY + "この機能は" + ChatColor.BOLD + ChatColor.UNDERLINE + TimerFormat.formatJapan(worldConfig.getGameConfig().getRespawnDeny()) + "以下" + ChatColor.RESET + ChatColor.GRAY + "・" + ChatColor.BOLD + ChatColor.UNDERLINE + "牢獄" + ChatColor.RESET + ChatColor.GRAY + "にいる場合のみ使用可能です。"
+                        ChatColor.GRAY + "この機能は" + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(worldConfig.getGameConfig().getRespawnDeny()) + "以下" + ChatColor.RESET + ChatColor.GRAY + "・" + ChatColor.BOLD + ChatColor.UNDERLINE + "牢獄" + ChatColor.RESET + ChatColor.GRAY + "にいる場合のみ使用可能です。"
                 )
         );
         itemStack7.setItemMeta(itemMeta7);
@@ -127,7 +130,7 @@ public class MainInventory {
         ItemStack itemStack8 = new ItemStack(Hunter.num > 0 ? Material.DIAMOND_SWORD : Material.STONE_SWORD, 1);
         ItemMeta itemMeta8 = itemStack8.getItemMeta();
         itemMeta8.addItemFlags(itemFlags);
-        if (Hunter.num > 0 && Main.shuffleList.contains(p))
+        if (Hunter.num > 0 && Main.hunterShuffleSet.contains(p.getUniqueId()))
             itemMeta8.addEnchant(Enchantment.DURABILITY, 1, true);
         itemMeta8.setDisplayName("" + ChatColor.AQUA + ChatColor.BOLD + ChatColor.UNDERLINE + "ハンター抽選に応募");
         itemMeta8.setLore(
@@ -135,7 +138,7 @@ public class MainInventory {
                         ChatColor.YELLOW + "クリックして" + ChatColor.AQUA + ChatColor.BOLD + ChatColor.UNDERLINE + "ハンター抽選" + ChatColor.RESET + ChatColor.YELLOW + "を切り替えます。",
                         ChatColor.GRAY + "この機能は" + ChatColor.BOLD + ChatColor.UNDERLINE + "ハンター抽選が実行" + ChatColor.RESET + ChatColor.GRAY + "されている場合のみ使用可能です。",
                         "",
-                        "" + ChatColor.UNDERLINE + (Hunter.num > 0 ? (Main.shuffleList.contains(p) ? ChatColor.GOLD + "抽選に応募しています。" : ChatColor.YELLOW + "抽選に応募していません。") : ChatColor.RED + "現在使用できません。")
+                        "" + ChatColor.UNDERLINE + (Hunter.num > 0 ? (Main.hunterShuffleSet.contains(p.getUniqueId()) ? ChatColor.GOLD + "抽選に応募しています。" : ChatColor.YELLOW + "抽選に応募していません。") : ChatColor.RED + "現在使用できません。")
                 )
         );
         itemStack8.setItemMeta(itemMeta8);
@@ -145,7 +148,7 @@ public class MainInventory {
         ItemStack itemStack9 = new ItemStack(Tuho.num > 0 ? Material.GOLDEN_SWORD : Material.STONE_SWORD, 1);
         ItemMeta itemMeta9 = itemStack9.getItemMeta();
         itemMeta9.addItemFlags(itemFlags);
-        if (Tuho.num > 0 && Main.shuffleList.contains(p))
+        if (Tuho.num > 0 && Main.tuhoShuffleSet.contains(p.getUniqueId()))
             itemMeta9.addEnchant(Enchantment.DURABILITY, 1, true);
         itemMeta9.setDisplayName("" + ChatColor.AQUA + ChatColor.BOLD + ChatColor.UNDERLINE + "通報部隊抽選に応募");
         itemMeta9.setLore(
@@ -153,14 +156,13 @@ public class MainInventory {
                         ChatColor.YELLOW + "クリックして" + ChatColor.AQUA + ChatColor.BOLD + ChatColor.UNDERLINE + "通報部隊抽選" + ChatColor.RESET + ChatColor.YELLOW + "を切り替えます。",
                         ChatColor.GRAY + "この機能は" + ChatColor.BOLD + ChatColor.UNDERLINE + "通報部隊抽選が実行" + ChatColor.RESET + ChatColor.GRAY + "されている場合のみ使用可能です。",
                         "",
-                        "" + ChatColor.UNDERLINE + (Tuho.num > 0 ? (Main.shuffleList.contains(p) ? ChatColor.GOLD + "抽選に応募しています。" : ChatColor.YELLOW + "抽選に応募していません。") : ChatColor.RED + "現在使用できません。")
+                        "" + ChatColor.UNDERLINE + (Tuho.num > 0 ? (Main.tuhoShuffleSet.contains(p.getUniqueId()) ? ChatColor.GOLD + "抽選に応募しています。" : ChatColor.YELLOW + "抽選に応募していません。") : ChatColor.RED + "現在使用できません。")
                 )
         );
         itemStack9.setItemMeta(itemMeta9);
         inv.setItem(Item.REQUEST_TUHO.getIndex(), itemStack9);
 
         WorldConfig.DifficultyConfig difficultyEasyConfig = worldConfig.getDifficultyConfig(WorldManager.Difficulty.EASY);
-        System.out.println(difficultyEasyConfig.getDifficulty().getName());
         ItemStack itemStackDifficultyEasy = new ItemStack(GameManager.isGame() ? (TosoGameAPI.difficultyMap.containsKey(p.getUniqueId()) && TosoGameAPI.difficultyMap.get(p.getUniqueId()) == WorldManager.Difficulty.EASY ? Item.DIFFICULTY_EASY.getMaterial() : Material.GRAY_CONCRETE) : Item.DIFFICULTY_EASY.getMaterial(), 1);
         ItemMeta itemMetaDifficultyEasy = itemStackDifficultyEasy.getItemMeta();
         itemMetaDifficultyEasy.addItemFlags(itemFlags);
@@ -175,9 +177,9 @@ public class MainInventory {
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "レート" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyEasyConfig.getRate() + ChatColor.GRAY + "円/秒",
                         "",
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "体力システム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyEasyConfig.getHealth() ? "有効" : "無効"),
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "自動復活" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyEasyConfig.getRespawnAutoTime() > -1 ? TimerFormat.formatJapan(difficultyEasyConfig.getRespawnAutoTime()) : "無効"),
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "自動復活" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyEasyConfig.getRespawnAutoTime() > -1 ? TimeFormat.formatJapan(difficultyEasyConfig.getRespawnAutoTime()) : "無効"),
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活可能回数" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyEasyConfig.getRespawnDenyCount() + ChatColor.GRAY + "回",
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活クールタイム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(difficultyEasyConfig.getRespawnCoolTime()) + ChatColor.GRAY + "/回",
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活クールタイム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(difficultyEasyConfig.getRespawnCoolTime()) + ChatColor.GRAY + "/回",
                         "",
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "ゲーム開始時のアイテム",
                         "" + ChatColor.BLUE + "骨 (透明化)" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyEasyConfig.getBone(WorldManager.GameType.START).getCount() + ChatColor.GRAY + "個 (" + difficultyEasyConfig.getBone(WorldManager.GameType.START).getDuration() + "秒)",
@@ -209,9 +211,9 @@ public class MainInventory {
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "レート" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyNormalConfig.getRate() + ChatColor.GRAY + "円/秒",
                         "",
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "体力システム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyNormalConfig.getHealth() ? "有効" : "無効"),
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "自動復活" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyNormalConfig.getRespawnAutoTime() > -1 ? TimerFormat.formatJapan(difficultyNormalConfig.getRespawnAutoTime()) : "無効"),
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "自動復活" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyNormalConfig.getRespawnAutoTime() > -1 ? TimeFormat.formatJapan(difficultyNormalConfig.getRespawnAutoTime()) : "無効"),
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活可能回数" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyNormalConfig.getRespawnDenyCount() + ChatColor.GRAY + "回",
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活クールタイム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(difficultyNormalConfig.getRespawnCoolTime()) + ChatColor.GRAY + "/回",
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活クールタイム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(difficultyNormalConfig.getRespawnCoolTime()) + ChatColor.GRAY + "/回",
                         "",
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "ゲーム開始時のアイテム",
                         "" + ChatColor.BLUE + "骨 (透明化)" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyNormalConfig.getBone(WorldManager.GameType.START).getCount() + ChatColor.GRAY + "個 (" + difficultyNormalConfig.getBone(WorldManager.GameType.START).getDuration() + "秒)",
@@ -243,9 +245,9 @@ public class MainInventory {
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "レート" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyHardConfig.getRate() + ChatColor.GRAY + "円/秒",
                         "",
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "体力システム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyHardConfig.getHealth() ? "有効" : "無効"),
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "自動復活" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyHardConfig.getRespawnAutoTime() > -1 ? TimerFormat.formatJapan(difficultyHardConfig.getRespawnAutoTime()) : "無効"),
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "自動復活" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyHardConfig.getRespawnAutoTime() > -1 ? TimeFormat.formatJapan(difficultyHardConfig.getRespawnAutoTime()) : "無効"),
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活可能回数" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyHardConfig.getRespawnDenyCount() + ChatColor.GRAY + "回",
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活クールタイム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(difficultyHardConfig.getRespawnCoolTime()) + ChatColor.GRAY + "/回",
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活クールタイム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(difficultyHardConfig.getRespawnCoolTime()) + ChatColor.GRAY + "/回",
                         "",
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "ゲーム開始時のアイテム",
                         "" + ChatColor.BLUE + "骨 (透明化)" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyHardConfig.getBone(WorldManager.GameType.START).getCount() + ChatColor.GRAY + "個 (" + difficultyHardConfig.getBone(WorldManager.GameType.START).getDuration() + "秒)",
@@ -276,9 +278,9 @@ public class MainInventory {
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "レート" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyHardCoreConfig.getRate() + ChatColor.GRAY + "円/秒",
                         "",
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "体力システム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyHardCoreConfig.getHealth() ? "有効" : "無効"),
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "自動復活" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyHardCoreConfig.getRespawnAutoTime() > -1 ? TimerFormat.formatJapan(difficultyHardCoreConfig.getRespawnAutoTime()) : "無効"),
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "自動復活" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + (difficultyHardCoreConfig.getRespawnAutoTime() > -1 ? TimeFormat.formatJapan(difficultyHardCoreConfig.getRespawnAutoTime()) : "無効"),
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活可能回数" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyHardCoreConfig.getRespawnDenyCount() + ChatColor.GRAY + "回",
-                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活クールタイム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(difficultyHardCoreConfig.getRespawnCoolTime()) + ChatColor.GRAY + "/回",
+                        "" + ChatColor.BLUE + ChatColor.UNDERLINE + "復活クールタイム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(difficultyHardCoreConfig.getRespawnCoolTime()) + ChatColor.GRAY + "/回",
                         "",
                         "" + ChatColor.BLUE + ChatColor.UNDERLINE + "ゲーム開始時のアイテム",
                         "" + ChatColor.BLUE + "骨 (透明化)" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + difficultyHardCoreConfig.getBone(WorldManager.GameType.START).getCount() + ChatColor.GRAY + "個 (" + difficultyHardCoreConfig.getBone(WorldManager.GameType.START).getDuration() + "秒)",

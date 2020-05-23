@@ -2,7 +2,7 @@ package jp.aoichaan0513.A_TosoGame_Live.Listeners;
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MissionManager;
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.ScoreBoard;
+import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
@@ -15,7 +15,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Scoreboard;
 
 public class onQuit implements Listener {
 
@@ -23,21 +22,18 @@ public class onQuit implements Listener {
     public void onQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
 
-        e.setQuitMessage(ChatColor.YELLOW + "<- " + ChatColor.GOLD + p.getName());
+        e.setQuitMessage(!MainAPI.isHidePlayer(p) ? ChatColor.YELLOW + "<- " + ChatColor.GOLD + p.getName() : "");
 
-        if (Main.shuffleList.contains(p))
-            Main.shuffleList.remove(p);
-        if (Main.playerList.contains(p))
-            Main.playerList.remove(p);
-        if (onMove.zoneList.contains(p))
-            onMove.zoneList.remove(p);
+        Main.hunterShuffleSet.remove(p.getUniqueId());
+        Main.tuhoShuffleSet.remove(p.getUniqueId());
 
-        ScoreBoard.removeBoard(p);
+        Main.opGamePlayerSet.remove(p.getUniqueId());
+        onMove.zoneList.remove(p);
 
-        if (Main.invisibleList.contains(p.getUniqueId())) {
+        if (Main.invisibleSet.contains(p.getUniqueId())) {
             for (Player player : Bukkit.getOnlinePlayers())
                 player.showPlayer(p);
-            Main.invisibleList.remove(p.getUniqueId());
+            Main.invisibleSet.remove(p.getUniqueId());
         }
 
         if (MissionManager.isBossBar())
@@ -57,7 +53,7 @@ public class onQuit implements Listener {
         }
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Scoreboard board = ScoreBoard.getBoard(player);
+            org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(player);
 
             if (!TosoGameAPI.isAdmin(player)) {
                 if (player.getInventory().getItemInMainHand().getType() == Material.BOOK) {

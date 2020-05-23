@@ -1,6 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.Listeners;
 
-import jp.aoichaan0513.A_TosoGame_Live.API.IMission;
+import jp.aoichaan0513.A_TosoGame_Live.API.Interfaces.IMission;
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.ActionBarManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager;
@@ -10,16 +10,16 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory.MainInventory;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory.MapInventory;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory.Right.MissionInventory;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MissionManager;
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.RateManager;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Maps.MapUtility;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
-import jp.aoichaan0513.A_TosoGame_Live.API.Timer.TimerFormat;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Hunter;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Tuho;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -56,7 +56,6 @@ public class onInventoryGui implements Listener {
         ItemStack itemStack = e.getCurrentItem();
         int slot = e.getRawSlot();
 
-        if (inventory == null) return;
         if (inventory.getType() == InventoryType.CHEST) {
             if (inventoryView.getTitle().equals(MainInventory.title)) {
                 WorldConfig worldConfig = Main.getWorldConfig();
@@ -89,26 +88,23 @@ public class onInventoryGui implements Listener {
                         }
                     }
                     p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "現在実行できません。");
-                    return;
                 } else if (MainInventory.Item.getItem(slot) == MainInventory.Item.MISSION_APP) {
-                    ActionBarManager.sendActionBar(p, "" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ミッションアプリ" + ChatColor.RESET + ChatColor.YELLOW + "を開いています…");
-
                     p.openInventory(MissionInventory.getInventory(MissionManager.MissionBookType.MISSION));
                     ActionBarManager.sendActionBar(p, "" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ミッションアプリ" + ChatColor.RESET + ChatColor.YELLOW + "を開きました。");
-                    return;
                 } else if (MainInventory.Item.getItem(slot) == MainInventory.Item.SPEC_MODE) {
                     if (GameManager.isGame(GameManager.GameState.GAME)) {
                         if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, p)) {
                             if (!TosoGameAPI.isRes) {
                                 if (p.getGameMode() == GameMode.ADVENTURE) {
                                     p.setGameMode(GameMode.SPECTATOR);
-                                    TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                    p.getInventory().setHeldItemSlot(0);
+                                    TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
                                     p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "観戦モードになりました。\n" +
                                             MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "\"/spec\"で観戦モードから戻れます。");
                                     return;
                                 } else {
                                     p.setGameMode(GameMode.ADVENTURE);
-                                    TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                    TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
                                     p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "観戦モードから戻りました。");
                                     return;
                                 }
@@ -119,82 +115,72 @@ public class onInventoryGui implements Listener {
                         p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "確保されていないため実行できません。");
                         return;
                     }
-                    p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ゲーム中ではないため実行できません。");
-                    return;
+                    MainAPI.sendMessage(p, MainAPI.ErrorMessage.NOT_GAME);
                 } else if (MainInventory.Item.getItem(slot) == MainInventory.Item.REQUEST_HUNTER) {
                     if (Hunter.num > 0) {
-                        if (!Main.shuffleList.contains(p))
-                            Main.shuffleList.add(p);
+                        if (!Main.hunterShuffleSet.contains(p.getUniqueId()))
+                            Main.hunterShuffleSet.add(p.getUniqueId());
                         else
-                            Main.shuffleList.remove(p);
+                            Main.hunterShuffleSet.remove(p.getUniqueId());
 
                         p.openInventory(MainInventory.getInventory(p));
-                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.UNDERLINE + "ハンター募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (Main.shuffleList.contains(p) ? "に応募" : "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。");
+                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.UNDERLINE + "ハンター募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (Main.hunterShuffleSet.contains(p.getUniqueId()) ? "に応募" : "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。");
                         return;
                     }
                     p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ハンターを募集していないため実行できません。");
-                    return;
                 } else if (MainInventory.Item.getItem(slot) == MainInventory.Item.REQUEST_TUHO) {
                     if (Tuho.num > 0) {
-                        if (!Main.shuffleList.contains(p))
-                            Main.shuffleList.add(p);
+                        if (!Main.tuhoShuffleSet.contains(p.getUniqueId()))
+                            Main.tuhoShuffleSet.add(p.getUniqueId());
                         else
-                            Main.shuffleList.remove(p);
+                            Main.tuhoShuffleSet.remove(p.getUniqueId());
 
                         p.openInventory(MainInventory.getInventory(p));
-                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.UNDERLINE + "通報部隊募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (Main.shuffleList.contains(p) ? "に応募" : "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。");
+                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.UNDERLINE + "通報部隊募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (Main.tuhoShuffleSet.contains(p.getUniqueId()) ? "に応募" : "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。");
                         return;
                     }
                     p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "通報部隊を募集していないため実行できません。");
-                    return;
                 } else if (MainInventory.Item.getItem(slot) == MainInventory.Item.DIFFICULTY_EASY) {
                     if (!GameManager.isGame()) {
                         TosoGameAPI.difficultyMap.put(p.getUniqueId(), WorldManager.Difficulty.EASY);
-                        RateManager.setRate(p);
+                        MoneyManager.setRate(p);
                         p.openInventory(MainInventory.getInventory(p));
                         p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "難易度を" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + ChatColor.stripColor(WorldManager.Difficulty.EASY.getDisplayName()) + ChatColor.RESET + ChatColor.GOLD + "に変更しました。");
                         return;
                     }
                     MainAPI.sendMessage(p, MainAPI.ErrorMessage.GAME);
-                    return;
                 } else if (MainInventory.Item.getItem(slot) == MainInventory.Item.DIFFICULTY_NORMAL) {
                     if (!GameManager.isGame()) {
                         TosoGameAPI.difficultyMap.put(p.getUniqueId(), WorldManager.Difficulty.NORMAL);
-                        RateManager.setRate(p);
+                        MoneyManager.setRate(p);
                         p.openInventory(MainInventory.getInventory(p));
                         p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "難易度を" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + ChatColor.stripColor(WorldManager.Difficulty.NORMAL.getDisplayName()) + ChatColor.RESET + ChatColor.GOLD + "に変更しました。");
                         return;
                     }
                     MainAPI.sendMessage(p, MainAPI.ErrorMessage.GAME);
-                    return;
                 } else if (MainInventory.Item.getItem(slot) == MainInventory.Item.DIFFICULTY_HARD) {
                     if (!GameManager.isGame()) {
                         TosoGameAPI.difficultyMap.put(p.getUniqueId(), WorldManager.Difficulty.HARD);
-                        RateManager.setRate(p);
+                        MoneyManager.setRate(p);
                         p.openInventory(MainInventory.getInventory(p));
                         p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "難易度を" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + ChatColor.stripColor(WorldManager.Difficulty.HARD.getDisplayName()) + ChatColor.RESET + ChatColor.GOLD + "に変更しました。");
                         return;
                     }
                     MainAPI.sendMessage(p, MainAPI.ErrorMessage.GAME);
-                    return;
                 } else if (MainInventory.Item.getItem(slot) == MainInventory.Item.DIFFICULTY_HARDCORE) {
                     if (!GameManager.isGame()) {
                         TosoGameAPI.difficultyMap.put(p.getUniqueId(), WorldManager.Difficulty.HARDCORE);
-                        RateManager.setRate(p);
+                        MoneyManager.setRate(p);
                         p.openInventory(MainInventory.getInventory(p));
                         p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "難易度を" + ChatColor.DARK_RED + ChatColor.BOLD + ChatColor.UNDERLINE + ChatColor.stripColor(WorldManager.Difficulty.HARDCORE.getDisplayName()) + ChatColor.RESET + ChatColor.GOLD + "に変更しました。");
                         return;
                     }
                     MainAPI.sendMessage(p, MainAPI.ErrorMessage.GAME);
-                    return;
                 } else if (MainInventory.Item.getItem(slot) == MainInventory.Item.SETTINGS) {
-                    if (TosoGameAPI.isAdmin(p)) {
-                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.BOLD + ChatColor.UNDERLINE + "設定アプリ" + ChatColor.RESET + ChatColor.YELLOW + "を開いています…");
+                    if (!TosoGameAPI.isAdmin(p)) return;
 
-                        p.openInventory(MapInventory.getEditInventory());
-                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.BOLD + ChatColor.UNDERLINE + "設定アプリ" + ChatColor.RESET + ChatColor.YELLOW + "を開きました。");
-                    }
-                    return;
+                    p.openInventory(MapInventory.getEditInventory());
+                    ActionBarManager.sendActionBar(p, "" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "設定アプリ" + ChatColor.RESET + ChatColor.YELLOW + "を開きました。");
                 }
             }
         }
@@ -208,45 +194,40 @@ public class onInventoryGui implements Listener {
         ItemStack itemStack = e.getCurrentItem();
         int slot = e.getSlot();
 
-        if (inventory == null) return;
         if (inventory.getType() == InventoryType.CHEST) {
             if (inventoryView.getTitle().equals(MissionInventory.missionTitle) || inventoryView.getTitle().equals(MissionInventory.tutatuHintTitle) || inventoryView.getTitle().equals(MissionInventory.endTitle)) {
                 e.setCancelled(true);
-                if (itemStack.getType() == Material.AIR) return;
+                if (itemStack == null || itemStack.getType() == Material.AIR) return;
 
-                if (slot > -1 && slot < 3 && itemStack.getType() == Material.RED_STAINED_GLASS_PANE) {
+                if (slot > -1 && slot < 3 && itemStack.getType() == Material.RED_CONCRETE) {
                     ItemMeta itemMeta = itemStack.getItemMeta();
 
-                    if (itemMeta.getDisplayName().equals("" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + "ミッション")) {
-                        p.openInventory(MissionInventory.getInventory(MissionManager.MissionBookType.MISSION));
+                    if (itemMeta == null || !itemMeta.getDisplayName().equals("" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "ミッション"))
                         return;
-                    }
-                    return;
-                } else if (slot > 2 && slot < 6 && itemStack.getType() == Material.YELLOW_STAINED_GLASS_PANE) {
+
+                    p.openInventory(MissionInventory.getInventory(MissionManager.MissionBookType.MISSION));
+                } else if (slot > 2 && slot < 6 && itemStack.getType() == Material.YELLOW_CONCRETE) {
                     ItemMeta itemMeta = itemStack.getItemMeta();
 
-                    if (itemMeta.getDisplayName().equals("" + ChatColor.RESET + ChatColor.YELLOW + ChatColor.BOLD + "通達・ヒント")) {
-                        p.openInventory(MissionInventory.getInventory(MissionManager.MissionBookType.TUTATU));
+                    if (itemMeta == null || !itemMeta.getDisplayName().equals("" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + "通達・ヒント"))
                         return;
-                    }
-                    return;
-                } else if (slot > 5 && slot < 9 && itemStack.getType() == Material.LIME_STAINED_GLASS_PANE) {
+
+                    p.openInventory(MissionInventory.getInventory(MissionManager.MissionBookType.TUTATU));
+                } else if (slot > 5 && slot < 9 && itemStack.getType() == Material.LIME_CONCRETE) {
                     ItemMeta itemMeta = itemStack.getItemMeta();
 
-                    if (itemMeta.getDisplayName().equals("" + ChatColor.RESET + ChatColor.GREEN + ChatColor.BOLD + "終了したミッション")) {
-                        p.openInventory(MissionInventory.getInventory(MissionManager.MissionBookType.END_MISSION));
+                    if (itemMeta == null || !itemMeta.getDisplayName().equals("" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + "終了したミッション"))
                         return;
-                    }
-                    return;
+
+                    p.openInventory(MissionInventory.getInventory(MissionManager.MissionBookType.END_MISSION));
                 } else if (slot == 49 && itemStack.getType() == Material.WHITE_STAINED_GLASS_PANE) {
                     ItemMeta itemMeta = itemStack.getItemMeta();
 
-                    if (itemMeta.getDisplayName().equals("" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + "ホーム")) {
-                        // p.closeInventory();
-                        p.openInventory(MainInventory.getInventory(p));
-                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ホーム画面を表示しました。");
-                    }
-                    return;
+                    if (itemMeta == null || !itemMeta.getDisplayName().equals("" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ホーム"))
+                        return;
+
+                    p.openInventory(MainInventory.getInventory(p));
+                    ActionBarManager.sendActionBar(p, "" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ホーム画面" + ChatColor.RESET + ChatColor.YELLOW + "を表示しました。");
                 } else {
                     if (inventoryView.getTitle().equals(MissionInventory.missionTitle)) {
                         MissionManager.MissionBookType type = MissionManager.MissionBookType.MISSION;
@@ -260,7 +241,8 @@ public class onInventoryGui implements Listener {
                                     BookMeta bookMeta = (BookMeta) book.getItemMeta();
                                     bookMeta.setTitle("逃走中");
                                     bookMeta.setAuthor("A_TosoGame_Live");
-                                    bookMeta.addPage(ChatColor.DARK_RED + mission.getTitle() + ChatColor.RESET + "\n\n" + mission.getDescription());
+                                    for (int i = 0; i < mission.getDescriptions().size(); i++)
+                                        bookMeta.addPage((i == 0 ? ChatColor.DARK_RED + mission.getTitle() + ChatColor.RESET + "\n\n" : "") + mission.getDescriptions().get(i));
                                     book.setItemMeta(bookMeta);
 
                                     MissionInventory.openBook(book, p);
@@ -281,7 +263,8 @@ public class onInventoryGui implements Listener {
                                     BookMeta bookMeta = (BookMeta) book.getItemMeta();
                                     bookMeta.setTitle("逃走中");
                                     bookMeta.setAuthor("A_TosoGame_Live");
-                                    bookMeta.addPage(ChatColor.DARK_RED + mission.getTitle() + ChatColor.RESET + "\n\n" + mission.getDescription());
+                                    for (int i = 0; i < mission.getDescriptions().size(); i++)
+                                        bookMeta.addPage((i == 0 ? ChatColor.DARK_RED + mission.getTitle() + ChatColor.RESET + "\n\n" : "") + mission.getDescriptions().get(i));
                                     book.setItemMeta(bookMeta);
 
                                     MissionInventory.openBook(book, p);
@@ -303,7 +286,8 @@ public class onInventoryGui implements Listener {
                                     BookMeta bookMeta = (BookMeta) book.getItemMeta();
                                     bookMeta.setTitle("逃走中");
                                     bookMeta.setAuthor("A_TosoGame_Live");
-                                    bookMeta.addPage(ChatColor.DARK_RED + mission.getTitle() + ChatColor.RESET + "\n\n" + mission.getDescription());
+                                    for (int i = 0; i < mission.getDescriptions().size(); i++)
+                                        bookMeta.addPage((i == 0 ? ChatColor.DARK_RED + mission.getTitle() + ChatColor.RESET + "\n\n" : "") + mission.getDescriptions().get(i));
                                     book.setItemMeta(bookMeta);
 
                                     MissionInventory.openBook(book, p);
@@ -326,7 +310,6 @@ public class onInventoryGui implements Listener {
         ItemStack itemStack = e.getCurrentItem();
         int slot = e.getSlot();
 
-        if (inventory == null) return;
         if (inventory.getType() == InventoryType.CHEST) {
             if (inventoryView.getTitle().equals(PlayerListInventory.title)) {
                 e.setCancelled(true);
@@ -430,7 +413,6 @@ public class onInventoryGui implements Listener {
         ItemStack itemStack = e.getCurrentItem();
         int slot = e.getSlot();
 
-        if (inventory == null) return;
         if (inventory.getType() == InventoryType.CHEST) {
             if (inventoryView.getTitle().equals(MapInventory.editTitle)) {
                 WorldConfig worldConfig = Main.getWorldConfig();
@@ -468,7 +450,7 @@ public class onInventoryGui implements Listener {
                             try {
                                 int i = Integer.parseInt(reply);
                                 worldConfig.getGameConfig().setCountDown(i);
-                                player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "カウントダウン" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimerFormat.formatJapan(i) + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。");
+                                player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "カウントダウン" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(i) + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。");
                                 player.openInventory(MapInventory.getEditInventory());
                                 return null;
                             } catch (NumberFormatException err) {
@@ -482,7 +464,7 @@ public class onInventoryGui implements Listener {
                             try {
                                 int i = Integer.parseInt(reply);
                                 worldConfig.getGameConfig().setGame(i);
-                                player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ゲーム時間" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimerFormat.formatJapan(i) + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。");
+                                player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ゲーム時間" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(i) + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。");
                                 player.openInventory(MapInventory.getEditInventory());
                                 return null;
                             } catch (NumberFormatException err) {
@@ -496,7 +478,7 @@ public class onInventoryGui implements Listener {
                             try {
                                 int i = Integer.parseInt(reply);
                                 worldConfig.getGameConfig().setRespawnDeny(i);
-                                player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "復活禁止時間" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimerFormat.formatJapan(i) + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。");
+                                player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "復活禁止時間" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(i) + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。");
                                 player.openInventory(MapInventory.getEditInventory());
                                 return null;
                             } catch (NumberFormatException err) {
@@ -688,19 +670,19 @@ public class onInventoryGui implements Listener {
                     } else if (slot == 19 && itemStack.getType() == Material.PAPER) {
                         int i = 15;
                         worldConfig.getGameConfig().setCountDown(i);
-                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "カウントダウン秒数を" + TimerFormat.formatJapan(i) + "に設定しました。");
+                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "カウントダウン秒数を" + TimeFormat.formatJapan(i) + "に設定しました。");
                         p.openInventory(MapInventory.getEditInventory());
                         return;
                     } else if (slot == 20 && itemStack.getType() == Material.PAPER) {
                         int i = 1200;
                         worldConfig.getGameConfig().setGame(i);
-                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "ゲーム時間を" + TimerFormat.formatJapan(i) + "に設定しました。");
+                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "ゲーム時間を" + TimeFormat.formatJapan(i) + "に設定しました。");
                         p.openInventory(MapInventory.getEditInventory());
                         return;
                     } else if (slot == 21 && itemStack.getType() == Material.PAPER) {
                         int i = 240;
                         worldConfig.getGameConfig().setRespawnDeny(i);
-                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "復活禁止時間を" + TimerFormat.formatJapan(i) + "に設定しました。");
+                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "復活禁止時間を" + TimeFormat.formatJapan(i) + "に設定しました。");
                         p.openInventory(MapInventory.getEditInventory());
                         return;
                     } else if (slot == 23 && (itemStack.getType() == Material.RED_CONCRETE || itemStack.getType() == Material.LIME_CONCRETE)) {
@@ -880,17 +862,27 @@ public class onInventoryGui implements Listener {
         InventoryView inventoryView = e.getView();
         ItemStack itemStack = e.getCurrentItem();
 
-        if (inventory == null) return;
         if (inventory.getType() == InventoryType.CHEST) {
             if (inventoryView.getTitle().equals(MapInventory.listTitle)) {
+                if (itemStack == null || itemStack.getType() == Material.AIR) return;
+
                 e.setCancelled(true);
-                if (itemStack.getType() == Material.AIR) return;
 
                 if (!itemStack.getEnchantments().containsKey(Enchantment.DURABILITY)) {
                     p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "マップを読み込んでいます…");
-                    WorldManager.setWorld(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()));
+
                     World world = Bukkit.createWorld(new WorldCreator(ChatColor.stripColor(itemStack.getItemMeta().getDisplayName())));
+
+                    world.setDifficulty(Difficulty.EASY);
+                    world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+                    world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+                    world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+
+                    WorldManager.setWorld(world);
+                    Main.setWorldConfig(new WorldConfig(world));
+
                     p.teleport(world.getSpawnLocation());
+
                     p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "マップを読み込みました。");
                     return;
                 }
@@ -976,7 +968,7 @@ public class onInventoryGui implements Listener {
                 try {
                     int i = Integer.parseInt(reply);
                     difficultyConfig.setRespawnCoolTime(i);
-                    player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + difficultyName + ChatColor.YELLOW + "の" + ChatColor.GOLD + "復活クールタイム" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimerFormat.formatJapan(i) + "/回" + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。");
+                    player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + difficultyName + ChatColor.YELLOW + "の" + ChatColor.GOLD + "復活クールタイム" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(i) + "/回" + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。");
                     player.openInventory(MapInventory.getEditInventory());
                     return null;
                 } catch (NumberFormatException err) {

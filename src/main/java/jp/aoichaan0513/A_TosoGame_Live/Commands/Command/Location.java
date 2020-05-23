@@ -11,9 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Location extends ICommand {
 
@@ -206,49 +204,20 @@ public class Location extends ICommand {
     public List<String> onPlayerTabComplete(Player sp, Command cmd, String alias, String[] args) {
         if (TosoGameAPI.isAdmin(sp)) {
             if (args.length == 1) {
-                if (args[0].length() == 0) {
-                    return Arrays.asList("opgame", "opg", "gopgame", "gopg", "hunter", "door", "jail", "respawn", "res");
-                } else {
-                    if ("opgame".startsWith(args[0])) {
-                        return Collections.singletonList("opgame");
-                    } else if ("opg".startsWith(args[0])) {
-                        return Collections.singletonList("opg");
-                    } else if ("gopgame".startsWith(args[0])) {
-                        return Collections.singletonList("gopgame");
-                    } else if ("gopg".startsWith(args[0])) {
-                        return Collections.singletonList("gopg");
-                    } else if ("hunter".startsWith(args[0])) {
-                        return Collections.singletonList("hunter");
-                    } else if ("door".startsWith(args[0])) {
-                        return Collections.singletonList("door");
-                    } else if ("jail".startsWith(args[0])) {
-                        return Collections.singletonList("jail");
-                    } else if ("respawn".startsWith(args[0])) {
-                        return Collections.singletonList("respawn");
-                    } else if ("res".startsWith(args[0])) {
-                        return Collections.singletonList("res");
-                    }
-                }
+                return getTabList(args[0], new HashSet<>(Arrays.asList("opgame", "opg", "gopgame", "gopg", "hunter", "door", "jail", "respawn", "res")));
             } else if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("door")) {
-                    if (args[1].length() == 0) {
-                        return Arrays.asList("open");
-                    } else {
-                        if ("open".startsWith(args[1])) {
-                            return Collections.singletonList("open");
-                        }
-                    }
+                    return getTabList(args[1], new HashSet<>(Collections.singletonList("open")));
                 }
             } else if (args.length == 3) {
                 if (args[0].equalsIgnoreCase("door")) {
                     if (args[1].equalsIgnoreCase("open")) {
-                        if (args[2].length() == 0) {
-                            return Arrays.asList("all");
-                        } else {
-                            if ("all".startsWith(args[2])) {
-                                return Collections.singletonList("all");
-                            }
-                        }
+                        WorldConfig worldConfig = Main.getWorldConfig();
+
+                        Set<String> set = new HashSet<>(Collections.singletonList("all"));
+                        for (int i : worldConfig.getHunterDoorConfig().getLocations().keySet())
+                            set.add(String.valueOf(i));
+                        return getTabList(args[2], new HashSet<>(set));
                     }
                 }
             }

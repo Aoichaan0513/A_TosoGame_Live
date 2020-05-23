@@ -1,17 +1,18 @@
 package jp.aoichaan0513.A_TosoGame_Live.Commands.Command;
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerConfig;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
-import jp.aoichaan0513.A_TosoGame_Live.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
 import java.util.*;
 
 public class BroadCaster extends ICommand {
@@ -34,12 +35,7 @@ public class BroadCaster extends ICommand {
                             } else {
                                 Player p = Bukkit.getPlayerExact(args[1]);
                                 if (!TosoGameAPI.isBroadCaster(p)) {
-                                    FileConfiguration config = Main.getMainConfig();
-
-                                    List<String> list = config.getStringList("broadCasters");
-                                    list.add(p.getUniqueId().toString());
-                                    config.set("broadCasters", list);
-                                    Main.setMainConfig();
+                                    PlayerManager.loadConfig(p).setBroadCaster(true);
 
                                     sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + p.getName() + "を配信者に追加しました。");
                                     return;
@@ -59,12 +55,7 @@ public class BroadCaster extends ICommand {
                             } else {
                                 Player p = Bukkit.getPlayerExact(args[1]);
                                 if (TosoGameAPI.isBroadCaster(p)) {
-                                    FileConfiguration config = Main.getMainConfig();
-
-                                    List<String> list = config.getStringList("broadCasters");
-                                    list.remove(p.getUniqueId().toString());
-                                    config.set("broadCasters", list);
-                                    Main.setMainConfig();
+                                    PlayerManager.loadConfig(p).setBroadCaster(false);
 
                                     sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + p.getName() + "を配信者から削除しました。");
                                     return;
@@ -76,13 +67,13 @@ public class BroadCaster extends ICommand {
                         MainAPI.sendMessage(sp, MainAPI.ErrorMessage.ARGS_PLAYER);
                         return;
                     } else if (args[0].equalsIgnoreCase("list")) {
-                        List<String> list = new ArrayList<>();
-
-                        for (String uuid : Main.getMainConfig().getStringList("broadCasters"))
-                            list.add(Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName());
+                        StringBuffer stringBuffer = new StringBuffer();
+                        for (Map.Entry<UUID, PlayerConfig> entry : PlayerManager.getConfigs())
+                            if (entry.getValue().getBroadCaster())
+                                stringBuffer.append(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "\n");
 
                         sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "配信者リスト:\n" +
-                                MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + list.toString().replace("[", "").replace("]", "").replace(", ", "\n" + MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)));
+                                stringBuffer.toString().trim());
                         return;
                     }
                 }
@@ -129,12 +120,7 @@ public class BroadCaster extends ICommand {
                         } else {
                             Player p = Bukkit.getPlayerExact(args[1]);
                             if (!TosoGameAPI.isBroadCaster(p)) {
-                                FileConfiguration config = Main.getMainConfig();
-
-                                List<String> list = config.getStringList("broadCasters");
-                                list.add(p.getUniqueId().toString());
-                                config.set("broadCasters", list);
-                                Main.setMainConfig();
+                                PlayerManager.loadConfig(p).setBroadCaster(true);
 
                                 bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + p.getName() + "を配信者に追加しました。");
                                 return;
@@ -154,12 +140,7 @@ public class BroadCaster extends ICommand {
                         } else {
                             Player p = Bukkit.getPlayerExact(args[1]);
                             if (TosoGameAPI.isBroadCaster(p)) {
-                                FileConfiguration config = Main.getMainConfig();
-
-                                List<String> list = config.getStringList("broadCasters");
-                                list.remove(p.getUniqueId().toString());
-                                config.set("broadCasters", list);
-                                Main.setMainConfig();
+                                PlayerManager.loadConfig(p).setBroadCaster(false);
 
                                 bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + p.getName() + "を配信者から削除しました。");
                                 return;
@@ -171,13 +152,13 @@ public class BroadCaster extends ICommand {
                     MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_PLAYER);
                     return;
                 } else if (args[0].equalsIgnoreCase("list")) {
-                    List<String> list = new ArrayList<>();
-
-                    for (String uuid : Main.getMainConfig().getStringList("broadCasters"))
-                        list.add(Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName());
+                    StringBuffer stringBuffer = new StringBuffer();
+                    for (Map.Entry<UUID, PlayerConfig> entry : PlayerManager.getConfigs())
+                        if (entry.getValue().getBroadCaster())
+                            stringBuffer.append(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "\n");
 
                     bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "配信者リスト:\n" +
-                            MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + list.toString().replace("[", "").replace("]", "").replace(", ", "\n" + MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)));
+                            stringBuffer.toString().trim());
                     return;
                 }
             }
@@ -206,12 +187,7 @@ public class BroadCaster extends ICommand {
                         } else {
                             Player p = Bukkit.getPlayerExact(args[1]);
                             if (!TosoGameAPI.isBroadCaster(p)) {
-                                FileConfiguration config = Main.getMainConfig();
-
-                                List<String> list = config.getStringList("broadCasters");
-                                list.add(p.getUniqueId().toString());
-                                config.set("broadCasters", list);
-                                Main.setMainConfig();
+                                PlayerManager.loadConfig(p).setBroadCaster(true);
 
                                 cs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + p.getName() + "を配信者に追加しました。");
                                 return;
@@ -231,12 +207,7 @@ public class BroadCaster extends ICommand {
                         } else {
                             Player p = Bukkit.getPlayerExact(args[1]);
                             if (TosoGameAPI.isBroadCaster(p)) {
-                                FileConfiguration config = Main.getMainConfig();
-
-                                List<String> list = config.getStringList("broadCasters");
-                                list.remove(p.getUniqueId().toString());
-                                config.set("broadCasters", list);
-                                Main.setMainConfig();
+                                PlayerManager.loadConfig(p).setBroadCaster(false);
 
                                 cs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + p.getName() + "を配信者から削除しました。");
                                 return;
@@ -248,13 +219,13 @@ public class BroadCaster extends ICommand {
                     MainAPI.sendMessage(cs, MainAPI.ErrorMessage.ARGS_PLAYER);
                     return;
                 } else if (args[0].equalsIgnoreCase("list")) {
-                    List<String> list = new ArrayList<>();
-
-                    for (String uuid : Main.getMainConfig().getStringList("broadCasters"))
-                        list.add(Bukkit.getOfflinePlayer(UUID.fromString(uuid)).getName());
+                    StringBuffer stringBuffer = new StringBuffer();
+                    for (Map.Entry<UUID, PlayerConfig> entry : PlayerManager.getConfigs())
+                        if (entry.getValue().getBroadCaster())
+                            stringBuffer.append(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + Bukkit.getOfflinePlayer(entry.getKey()).getName() + "\n");
 
                     cs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "配信者リスト:\n" +
-                            MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + list.toString().replace("[", "").replace("]", "").replace(", ", "\n" + MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)));
+                            stringBuffer.toString().trim());
                     return;
                 }
             }
@@ -272,57 +243,19 @@ public class BroadCaster extends ICommand {
 
     @Override
     public List<String> onPlayerTabComplete(Player sp, Command cmd, String alias, String[] args) {
-        if (TosoGameAPI.isAdmin(sp)) {
-            if (args.length == 1) {
-                if (args[0].length() == 0) {
-                    return Arrays.asList("add", "remove", "list");
-                } else {
-                    if ("add".startsWith(args[0])) {
-                        return Collections.singletonList("add");
-                    } else if ("remove".startsWith(args[0])) {
-                        return Collections.singletonList("remove");
-                    } else if ("list".startsWith(args[0])) {
-                        return Collections.singletonList("list");
-                    }
-                }
-            }
-        }
-        return null;
+        if (!TosoGameAPI.isAdmin(sp) || args.length != 1) return null;
+        return getTabList(args[0], new HashSet<>(Arrays.asList("add", "remove", "list")));
     }
 
     @Override
     public List<String> onBlockTabComplete(BlockCommandSender bs, Command cmd, String alias, String[] args) {
-        if (args.length == 1) {
-            if (args[0].length() == 0) {
-                return Arrays.asList("add", "remove", "list");
-            } else {
-                if ("add".startsWith(args[0])) {
-                    return Collections.singletonList("add");
-                } else if ("remove".startsWith(args[0])) {
-                    return Collections.singletonList("remove");
-                } else if ("list".startsWith(args[0])) {
-                    return Collections.singletonList("list");
-                }
-            }
-        }
-        return null;
+        if (args.length != 1) return null;
+        return getTabList(args[0], new HashSet<>(Arrays.asList("add", "remove", "list")));
     }
 
     @Override
     public List<String> onConsoleTabComplete(ConsoleCommandSender cs, Command cmd, String alias, String[] args) {
-        if (args.length == 1) {
-            if (args[0].length() == 0) {
-                return Arrays.asList("add", "remove", "list");
-            } else {
-                if ("add".startsWith(args[0])) {
-                    return Collections.singletonList("add");
-                } else if ("remove".startsWith(args[0])) {
-                    return Collections.singletonList("remove");
-                } else if ("list".startsWith(args[0])) {
-                    return Collections.singletonList("list");
-                }
-            }
-        }
-        return null;
+        if (args.length != 1) return null;
+        return getTabList(args[0], new HashSet<>(Arrays.asList("add", "remove", "list")));
     }
 }

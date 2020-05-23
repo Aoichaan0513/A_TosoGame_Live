@@ -1,6 +1,7 @@
 package jp.aoichaan0513.A_TosoGame_Live.Commands.Command;
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MissionManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
@@ -12,15 +13,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Tuho extends ICommand {
 
@@ -50,8 +49,7 @@ public class Tuho extends ICommand {
                                         TosoGameAPI.setArmor(p);
                                         TosoGameAPI.removeOp(p);
 
-                                        if (Main.playerList.contains(p))
-                                            Main.playerList.remove(p);
+                                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
                                         p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -78,8 +76,7 @@ public class Tuho extends ICommand {
                                                 TosoGameAPI.setArmor(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -103,8 +100,7 @@ public class Tuho extends ICommand {
                                                 TosoGameAPI.setArmor(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -128,8 +124,7 @@ public class Tuho extends ICommand {
                                                 TosoGameAPI.setArmor(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -153,8 +148,7 @@ public class Tuho extends ICommand {
                                                 TosoGameAPI.setArmor(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -178,8 +172,7 @@ public class Tuho extends ICommand {
                                                 TosoGameAPI.setArmor(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -213,8 +206,7 @@ public class Tuho extends ICommand {
                                         TosoGameAPI.setArmor(p);
                                         TosoGameAPI.removeOp(p);
 
-                                        if (Main.playerList.contains(p))
-                                            Main.playerList.remove(p);
+                                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
                                         p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -252,12 +244,11 @@ public class Tuho extends ICommand {
                                         TosoGameAPI.removeArmor(p);
                                         TosoGameAPI.removeOp(p);
 
-                                        if (Main.playerList.contains(p))
-                                            Main.playerList.remove(p);
+                                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
 
-                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                         if (MissionManager.isBossBar())
                                             MissionManager.getBossBar().addPlayer(p);
@@ -284,12 +275,11 @@ public class Tuho extends ICommand {
                                                 TosoGameAPI.removeArmor(p);
                                                 TosoGameAPI.addOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
 
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -311,11 +301,10 @@ public class Tuho extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -337,11 +326,10 @@ public class Tuho extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -363,11 +351,10 @@ public class Tuho extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
-                                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -389,8 +376,7 @@ public class Tuho extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -425,11 +411,10 @@ public class Tuho extends ICommand {
                                         TosoGameAPI.removeArmor(p);
                                         TosoGameAPI.removeOp(p);
 
-                                        if (Main.playerList.contains(p))
-                                            Main.playerList.remove(p);
+                                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
-                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                         if (MissionManager.isBossBar())
                                             MissionManager.getBossBar().addPlayer(p);
@@ -449,67 +434,8 @@ public class Tuho extends ICommand {
                     return;
                 } else if (args[0].equalsIgnoreCase("random") || args[0].equalsIgnoreCase("rand")) {
                     if (args.length != 1) {
-                        try {
-                            if (num == -1 && Hunter.num == -1) {
-                                Main.shuffleList.clear();
-                                num = Integer.parseInt(args[1]);
-
-                                sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "通報部隊募集を開始しました。");
-                                Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "通報部隊を募集します。\n" +
-                                        MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "通報部隊希望の方は20秒以内に\"/t\"と入力してください。");
-
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "通報部隊募集終了まで残り10秒です。");
-                                    }
-                                }.runTaskLater(Main.getInstance(), 200);
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        if (Main.shuffleList.size() > 0) {
-                                            Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "通報部隊を" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.YELLOW + "選出しています…");
-                                            Collections.shuffle(Main.shuffleList);
-                                            for (int i = 0; i < num && i < Main.shuffleList.size(); i++) {
-                                                Player p = Main.shuffleList.get(i);
-                                                Main.shuffleList.remove(p);
-
-                                                Teams.joinTeam(Teams.OnlineTeam.TOSO_TUHO, p);
-                                                p.setGameMode(GameMode.ADVENTURE);
-
-                                                TosoGameAPI.setArmor(p);
-                                                TosoGameAPI.removeOp(p);
-
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
-
-                                                TosoGameAPI.showPlayers(p);
-                                                p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
-
-                                                if (MissionManager.isBossBar())
-                                                    MissionManager.getBossBar().removePlayer(p);
-
-                                                p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたを通報部隊に追加しました。");
-                                                Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + p.getName() + "が通報部隊になりました。");
-                                            }
-                                            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GREEN + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.GRAY + "を通報部隊に追加しました。");
-                                            Main.shuffleList.clear();
-                                            num = -1;
-                                        } else {
-                                            Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "通報部隊を希望する方がいなかったため選出をキャンセルしました。");
-                                            Main.shuffleList.clear();
-                                            num = -1;
-                                        }
-                                    }
-                                }.runTaskLater(Main.getInstance(), 400);
-                                return;
-                            }
-                            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "通報部隊募集中のため実行できません。");
-                            return;
-                        } catch (NumberFormatException e) {
-                            MainAPI.sendMessage(sp, MainAPI.ErrorMessage.ARGS_INTEGER);
-                            return;
-                        }
+                        random(sp, args[1], worldConfig);
+                        return;
                     }
                     MainAPI.sendMessage(sp, MainAPI.ErrorMessage.ARGS_INTEGER);
                     return;
@@ -554,8 +480,7 @@ public class Tuho extends ICommand {
                                 TosoGameAPI.setPotionEffect(p, true);
                                 TosoGameAPI.removeOp(p);
 
-                                if (Main.playerList.contains(p))
-                                    Main.playerList.remove(p);
+                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                 TosoGameAPI.showPlayers(p);
                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -592,11 +517,10 @@ public class Tuho extends ICommand {
                                 TosoGameAPI.setPotionEffect(p, true);
                                 TosoGameAPI.removeOp(p);
 
-                                if (Main.playerList.contains(p))
-                                    Main.playerList.remove(p);
+                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                 TosoGameAPI.showPlayers(p);
-                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                 if (MissionManager.isBossBar())
                                     MissionManager.getBossBar().addPlayer(p);
@@ -615,68 +539,8 @@ public class Tuho extends ICommand {
                 return;
             } else if (args[0].equalsIgnoreCase("random") || args[0].equalsIgnoreCase("rand")) {
                 if (args.length != 1) {
-                    try {
-                        if (num == -1 && Hunter.num == -1) {
-                            Main.shuffleList.clear();
-                            num = Integer.parseInt(args[1]);
-
-                            bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "通報部隊募集を開始しました。");
-                            Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "通報部隊を募集します。\n" +
-                                    MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "通報部隊希望の方は20秒以内に\"/t\"と入力してください。");
-
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "通報部隊募集終了まで残り10秒です。");
-                                }
-                            }.runTaskLater(Main.getInstance(), 200);
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
-                                    if (Main.shuffleList.size() > 0) {
-                                        Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "通報部隊を" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.YELLOW + "選出しています…");
-                                        Collections.shuffle(Main.shuffleList);
-                                        for (int i = 0; i < num && i < Main.shuffleList.size(); i++) {
-                                            Player p = Main.shuffleList.get(i);
-                                            Main.shuffleList.remove(p);
-
-                                            Teams.joinTeam(Teams.OnlineTeam.TOSO_TUHO, p);
-                                            p.setGameMode(GameMode.ADVENTURE);
-
-                                            TosoGameAPI.setArmor(p);
-                                            TosoGameAPI.setPotionEffect(p, true);
-                                            TosoGameAPI.removeOp(p);
-
-                                            if (Main.playerList.contains(p))
-                                                Main.playerList.remove(p);
-
-                                            TosoGameAPI.showPlayers(p);
-                                            p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
-
-                                            if (MissionManager.isBossBar())
-                                                MissionManager.getBossBar().removePlayer(p);
-
-                                            p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたを通報部隊に追加しました。");
-                                            Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + p.getName() + "が通報部隊になりました。");
-                                        }
-                                        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GREEN + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.GRAY + "を通報部隊に追加しました。");
-                                        Main.shuffleList.clear();
-                                        num = -1;
-                                    } else {
-                                        Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "通報部隊を希望する方がいなかったため選出をキャンセルしました。");
-                                        Main.shuffleList.clear();
-                                        num = -1;
-                                    }
-                                }
-                            }.runTaskLater(Main.getInstance(), 400);
-                            return;
-                        }
-                        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "通報部隊募集中のため実行できません。");
-                        return;
-                    } catch (NumberFormatException e) {
-                        MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_INTEGER);
-                        return;
-                    }
+                    random(bs, args[1], worldConfig);
+                    return;
                 }
                 MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_INTEGER);
                 return;
@@ -704,42 +568,15 @@ public class Tuho extends ICommand {
 
     @Override
     public List<String> onPlayerTabComplete(Player sp, Command cmd, String alias, String[] args) {
-        if (TosoGameAPI.isAdmin(sp)) {
-            if (args.length == 1) {
-                if (args[0].length() == 0) {
-                    return Arrays.asList("join", "leave", "random", "rand");
-                } else {
-                    if ("join".startsWith(args[0])) {
-                        return Collections.singletonList("join");
-                    } else if ("leave".startsWith(args[0])) {
-                        return Collections.singletonList("leave");
-                    } else if ("random".startsWith(args[0])) {
-                        return Collections.singletonList("random");
-                    } else if ("rand".startsWith(args[0])) {
-                        return Collections.singletonList("rand");
-                    }
-                }
-            } else if (args.length == 2) {
-                if (args[0].equalsIgnoreCase("join") || args[0].equalsIgnoreCase("leave")) {
-                    if (args[1].length() == 0) {
-                        ArrayList<String> list = new ArrayList<String>() {{
-                            add("@all");
-                            add("@team:admin");
-                            add("@team:player");
-                            add("@team:success");
-                            add("@team:jail");
-                            add("@team:hunter");
-                        }};
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            list.add(player.getName());
-                        }
-                        return list;
-                    } else {
-                        if ("@".startsWith(args[1])) {
-                            return Arrays.asList("@all", "@team:admin", "@team:player", "@team:success", "@team:jail", "@team:hunter");
-                        }
-                    }
-                }
+        if (!TosoGameAPI.isAdmin(sp)) return null;
+        if (args.length == 1) {
+            return getTabList(args[0], new HashSet<>(Arrays.asList("join", "leave", "random", "rand")));
+        } else if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("join") || args[0].equalsIgnoreCase("leave")) {
+                Set<String> set = new HashSet<>(Arrays.asList("@all", "@team:admin", "@team:player", "@team:success", "@team:jail", "@team:hunter"));
+                for (Player player : Bukkit.getOnlinePlayers())
+                    set.add(player.getName());
+                return getTabList(args[1], new HashSet<>(set));
             }
         }
         return null;
@@ -747,26 +584,87 @@ public class Tuho extends ICommand {
 
     @Override
     public List<String> onBlockTabComplete(BlockCommandSender bs, Command cmd, String alias, String[] args) {
-        if (args.length == 1) {
-            if (args[0].length() == 0) {
-                return Arrays.asList("join", "leave", "random", "rand");
-            } else {
-                if ("join".startsWith(args[0])) {
-                    return Collections.singletonList("join");
-                } else if ("leave".startsWith(args[0])) {
-                    return Collections.singletonList("leave");
-                } else if ("random".startsWith(args[0])) {
-                    return Collections.singletonList("random");
-                } else if ("rand".startsWith(args[0])) {
-                    return Collections.singletonList("rand");
-                }
-            }
-        }
-        return null;
+        if (args.length != 1) return null;
+        return getTabList(args[0], new HashSet<>(Arrays.asList("join", "leave", "random", "rand")));
     }
 
     @Override
     public List<String> onConsoleTabComplete(ConsoleCommandSender cs, Command cmd, String alias, String[] args) {
         return null;
+    }
+
+
+    private void random(CommandSender sender, String count, WorldConfig worldConfig) {
+        try {
+            if (num == -1) {
+                Main.tuhoShuffleSet.clear();
+                num = Integer.parseInt(count);
+
+                sender.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "通報部隊募集を開始しました。");
+                if (GameManager.isGame(GameManager.GameState.GAME)) {
+                    for (Player player : Bukkit.getOnlinePlayers())
+                        if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, player))
+                            player.sendMessage(MainAPI.getPrefix(ChatColor.YELLOW) + "通報部隊を" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.YELLOW + "募集します。\n" +
+                                    MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "通報部隊を希望の方は20秒以内に\"" + ChatColor.UNDERLINE + "/t" + ChatColor.RESET + ChatColor.GRAY + "\"と入力してください。");
+                } else {
+                    Bukkit.broadcastMessage(MainAPI.getPrefix(ChatColor.YELLOW) + "通報部隊を" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.YELLOW + "募集します。\n" +
+                            MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "通報部隊を希望の方は20秒以内に\"" + ChatColor.UNDERLINE + "/t" + ChatColor.RESET + ChatColor.GRAY + "\"と入力してください。");
+                }
+
+                new BukkitRunnable() {
+                    int count = 20;
+
+                    @Override
+                    public void run() {
+                        if (count == 10) {
+                            Bukkit.broadcastMessage(MainAPI.getPrefix(ChatColor.YELLOW) + "通報部隊の募集終了まで" + ChatColor.GOLD + ChatColor.UNDERLINE + "残り10秒" + ChatColor.RESET + ChatColor.YELLOW + "です。");
+                        } else if (count == 0) {
+                            if (!Main.tuhoShuffleSet.isEmpty()) {
+                                List<UUID> tuhoShuffleList = new ArrayList<>(Main.tuhoShuffleSet);
+
+                                Bukkit.broadcastMessage(MainAPI.getPrefix(ChatColor.YELLOW) + "通報部隊を" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.YELLOW + "選出しています…");
+                                Collections.shuffle(tuhoShuffleList);
+                                for (int i = 0; i < num && i < tuhoShuffleList.size(); i++) {
+                                    Player p = Bukkit.getPlayer(tuhoShuffleList.get(i));
+                                    tuhoShuffleList.remove(p);
+
+                                    Teams.joinTeam(Teams.OnlineTeam.TOSO_TUHO, p);
+                                    p.setGameMode(GameMode.ADVENTURE);
+
+                                    TosoGameAPI.setArmor(p);
+                                    TosoGameAPI.removeOp(p);
+
+                                    Main.opGamePlayerSet.remove(p.getUniqueId());
+
+                                    TosoGameAPI.showPlayers(p);
+                                    p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
+
+                                    if (MissionManager.isBossBar())
+                                        MissionManager.getBossBar().removePlayer(p);
+
+                                    p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたを通報部隊に追加しました。");
+                                    Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + p.getName() + "が通報部隊になりました。");
+                                }
+                                sender.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GREEN + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.GRAY + "を通報部隊に追加しました。");
+                                Main.tuhoShuffleSet.clear();
+                                num = -1;
+                            } else {
+                                Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "通報部隊を希望する方がいなかったため選出をキャンセルしました。");
+                                Main.tuhoShuffleSet.clear();
+                                num = -1;
+                            }
+                        }
+
+                        count--;
+                    }
+                }.runTaskTimer(Main.getInstance(), 0, 20);
+                return;
+            }
+            sender.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "通報部隊募集中のため実行できません。");
+            return;
+        } catch (NumberFormatException e) {
+            MainAPI.sendMessage(sender, MainAPI.ErrorMessage.ARGS_INTEGER);
+            return;
+        }
     }
 }

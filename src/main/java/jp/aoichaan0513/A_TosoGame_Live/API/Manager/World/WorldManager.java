@@ -32,30 +32,6 @@ public class WorldManager {
         return;
     }
 
-    public static void setWorld(World world, boolean bool) {
-        if (GameManager.isGame()) return;
-        if (bool) {
-            Main.getMainConfig().set("worldName", world.getName());
-            Main.setMainConfig();
-            return;
-        } else {
-            setWorld(world);
-            return;
-        }
-    }
-
-    public static void setWorld(String world, boolean bool) {
-        if (GameManager.isGame()) return;
-        if (bool) {
-            Main.getMainConfig().set("worldName", world);
-            Main.setMainConfig();
-            return;
-        } else {
-            setWorld(world);
-            return;
-        }
-    }
-
     public enum Difficulty {
         EASY(ChatColor.GREEN + "イージー"),
         NORMAL(ChatColor.YELLOW + "ノーマル"),

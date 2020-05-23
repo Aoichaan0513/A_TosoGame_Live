@@ -2,8 +2,8 @@ package jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory;
 
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
-import jp.aoichaan0513.A_TosoGame_Live.API.Timer.TimerFormat;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -67,10 +67,10 @@ public class MapInventory {
         itemMeta31.setDisplayName(ChatColor.BOLD + "復活クールタイム");
         itemMeta31.setLore(
                 Arrays.asList(
-                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "イージー" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(worldConfig.getDifficultyConfig(WorldManager.Difficulty.EASY).getRespawnCoolTime()) + ChatColor.GRAY + "/回",
-                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "ノーマル" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(worldConfig.getDifficultyConfig(WorldManager.Difficulty.NORMAL).getRespawnCoolTime()) + ChatColor.GRAY + "/回",
-                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "ハード" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(worldConfig.getDifficultyConfig(WorldManager.Difficulty.HARD).getRespawnCoolTime()) + ChatColor.GRAY + "/回",
-                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "ハードコア" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(worldConfig.getDifficultyConfig(WorldManager.Difficulty.HARDCORE).getRespawnCoolTime()) + ChatColor.GRAY + "/回",
+                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "イージー" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(worldConfig.getDifficultyConfig(WorldManager.Difficulty.EASY).getRespawnCoolTime()) + ChatColor.GRAY + "/回",
+                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "ノーマル" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(worldConfig.getDifficultyConfig(WorldManager.Difficulty.NORMAL).getRespawnCoolTime()) + ChatColor.GRAY + "/回",
+                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "ハード" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(worldConfig.getDifficultyConfig(WorldManager.Difficulty.HARD).getRespawnCoolTime()) + ChatColor.GRAY + "/回",
+                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "ハードコア" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(worldConfig.getDifficultyConfig(WorldManager.Difficulty.HARDCORE).getRespawnCoolTime()) + ChatColor.GRAY + "/回",
                         "",
                         ChatColor.GOLD + "クリックで設定変更"
                 )
@@ -112,7 +112,7 @@ public class MapInventory {
         itemMeta2.setDisplayName(ChatColor.BOLD + "カウントダウン");
         itemMeta2.setLore(
                 Arrays.asList(
-                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "設定値" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(worldConfig.getGameConfig().getCountDown()),
+                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "設定値" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(worldConfig.getGameConfig().getCountDown()),
                         ChatColor.GOLD + "左クリックで設定変更",
                         ChatColor.GOLD + "右クリックでリセット"
                 )
@@ -125,7 +125,7 @@ public class MapInventory {
         itemMeta3.setDisplayName(ChatColor.BOLD + "ゲーム時間");
         itemMeta3.setLore(
                 Arrays.asList(
-                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "設定値" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(worldConfig.getGameConfig().getGame()),
+                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "設定値" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(worldConfig.getGameConfig().getGame()),
                         ChatColor.GOLD + "左クリックで設定変更",
                         ChatColor.GOLD + "右クリックでリセット"
                 )
@@ -138,7 +138,7 @@ public class MapInventory {
         itemMeta4.setDisplayName(ChatColor.BOLD + "復活禁止");
         itemMeta4.setLore(
                 Arrays.asList(
-                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "設定値" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimerFormat.formatJapan(worldConfig.getGameConfig().getRespawnDeny()),
+                        "" + ChatColor.GOLD + ChatColor.UNDERLINE + "設定値" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatJapan(worldConfig.getGameConfig().getRespawnDeny()),
                         ChatColor.GOLD + "左クリックで設定変更",
                         ChatColor.GOLD + "右クリックでリセット"
                 )

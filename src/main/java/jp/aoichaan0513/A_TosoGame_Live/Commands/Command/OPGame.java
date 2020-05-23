@@ -40,11 +40,10 @@ public class OPGame extends ICommand {
 
                                 Dice.start();
 
-                                for (Player p : Bukkit.getOnlinePlayers()) {
-                                    if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p)) {
-                                        TosoGameAPI.teleport(p, worldConfig.getOPGameLocationConfig().getGOPLocations());
-                                    }
-                                }
+                                for (Player p : Bukkit.getOnlinePlayers())
+                                    if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p))
+                                        TosoGameAPI.teleport(p, worldConfig.getOPGameLocationConfig().getGOPLocations().values());
+
                                 OPGameManager.player = Dice.getShufflePlayer();
                                 OPGameManager.player.teleport(worldConfig.getOPGameLocationConfig().getOPLocation());
                                 sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "オープニングゲームを開始しました。");
@@ -100,7 +99,7 @@ public class OPGame extends ICommand {
 
                             for (Player p : Bukkit.getOnlinePlayers())
                                 if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p))
-                                    TosoGameAPI.teleport(p, worldConfig.getOPGameLocationConfig().getGOPLocations());
+                                    TosoGameAPI.teleport(p, worldConfig.getOPGameLocationConfig().getGOPLocations().values());
 
                             OPGameManager.player = Dice.getShufflePlayer();
                             OPGameManager.player.teleport(worldConfig.getOPGameLocationConfig().getOPLocation());

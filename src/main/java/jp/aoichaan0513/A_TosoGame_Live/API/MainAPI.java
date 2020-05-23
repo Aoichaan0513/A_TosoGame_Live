@@ -14,20 +14,28 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class MainAPI {
 
     public static int makePositive(int i) {
-        return i < 0 ? 0 : i;
+        return Math.max(i, 0);
+    }
+
+    public static List<Player> getOnlinePlayers(Collection<UUID> collection) {
+        List<Player> list = new ArrayList<>();
+        for (UUID uuid : collection.stream().filter(uuid -> Bukkit.getPlayer(uuid) != null && Bukkit.getPlayer(uuid).isOnline()).collect(Collectors.toList()))
+            list.add(Bukkit.getPlayer(uuid));
+        return list;
     }
 
     /**
      * プレイヤー非表示関連
      */
-    private static List<UUID> hidePlayerList = new ArrayList<>();
+    private static Set<UUID> hidePlayerSet = new HashSet<>();
 
     public static void hidePlayers(Player p) {
-        for (UUID uuid : hidePlayerList) {
+        for (UUID uuid : hidePlayerSet) {
             Player player = Bukkit.getPlayer(uuid);
 
             if (player == null) continue;
@@ -35,12 +43,12 @@ public class MainAPI {
         }
     }
 
-    public static List<UUID> getHidePlayerList() {
-        return hidePlayerList;
+    public static Set<UUID> getHidePlayerSet() {
+        return hidePlayerSet;
     }
 
     public static boolean isHidePlayer(Player p) {
-        return hidePlayerList.contains(p.getUniqueId());
+        return hidePlayerSet.contains(p.getUniqueId());
     }
 
     public static void addHidePlayer(Player p) {
@@ -48,12 +56,11 @@ public class MainAPI {
     }
 
     public static void addHidePlayer(Player p, boolean b) {
-        if (hidePlayerList.contains(p.getUniqueId())) return;
-        hidePlayerList.add(p.getUniqueId());
+        hidePlayerSet.add(p.getUniqueId());
 
-        if (b)
-            for (Player player : Bukkit.getOnlinePlayers())
-                hidePlayers(player);
+        if (!b) return;
+        for (Player player : Bukkit.getOnlinePlayers())
+            hidePlayers(player);
     }
 
     public static void removeHidePlayer(Player p) {
@@ -61,14 +68,12 @@ public class MainAPI {
     }
 
     public static void removeHidePlayer(Player p, boolean b) {
-        if (!hidePlayerList.contains(p.getUniqueId())) return;
-        hidePlayerList.remove(p.getUniqueId());
+        hidePlayerSet.remove(p.getUniqueId());
 
-        if (b) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.showPlayer(p);
-                hidePlayers(player);
-            }
+        if (!b) return;
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.showPlayer(p);
+            hidePlayers(player);
         }
     }
 
@@ -76,16 +81,11 @@ public class MainAPI {
      * 権限関係
      */
     public static boolean isAdmin(CommandSender sender) {
-        if (sender instanceof Player) {
-            Player p = (Player) sender;
-            return isAdmin(p);
-        } else {
-            return true;
-        }
+        return !(sender instanceof Player) || isAdmin((Player) sender);
     }
 
     public static boolean isAdmin(Player p) {
-        return p.isOp() || p.hasPermission("a_core.*");
+        return p.isOp() || p.hasPermission("a_tosogame_live.*");
     }
 
     /**

@@ -1,6 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory.Right;
 
-import jp.aoichaan0513.A_TosoGame_Live.API.IMission;
+import jp.aoichaan0513.A_TosoGame_Live.API.Interfaces.IMission;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -12,15 +12,13 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MissionInventory {
 
-    public static final String missionTitle = ChatColor.DARK_GRAY + "> " + ChatColor.BOLD + "ホーム" + ChatColor.RESET + ChatColor.DARK_GRAY + " > " + ChatColor.BOLD + "ミッションリスト";
-    public static final String tutatuHintTitle = ChatColor.DARK_GRAY + "> " + ChatColor.BOLD + "ホーム" + ChatColor.RESET + ChatColor.DARK_GRAY + " > " + ChatColor.BOLD + "ミッションリスト (通達・ヒント)";
-    public static final String endTitle = ChatColor.DARK_GRAY + "> " + ChatColor.BOLD + "ホーム" + ChatColor.RESET + ChatColor.DARK_GRAY + " > " + ChatColor.BOLD + "ミッションリスト (終了)";
+    public static final String missionTitle = ChatColor.DARK_GRAY + "> " + ChatColor.BOLD + "ホーム" + ChatColor.RESET + ChatColor.DARK_GRAY + " > " + ChatColor.BOLD + "ミッションアプリ";
+    public static final String tutatuHintTitle = ChatColor.DARK_GRAY + "> " + ChatColor.BOLD + "ホーム" + ChatColor.RESET + ChatColor.DARK_GRAY + " > " + ChatColor.BOLD + "ミッションアプリ (通達・ヒント)";
+    public static final String endTitle = ChatColor.DARK_GRAY + "> " + ChatColor.BOLD + "ホーム" + ChatColor.RESET + ChatColor.DARK_GRAY + " > " + ChatColor.BOLD + "ミッションアプリ (終了)";
 
     private static HashMap<Integer, IMission> missionList = new HashMap<>();
 
@@ -62,33 +60,33 @@ public class MissionInventory {
         if (type == MissionManager.MissionBookType.MISSION) {
             Inventory inv = missionInventory;
 
-            ItemStack missionStack = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            ItemStack missionStack = new ItemStack(Material.RED_CONCRETE);
             ItemMeta missionMeta = missionStack.getItemMeta();
             missionMeta.addItemFlags(itemFlags);
             missionMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-            missionMeta.setDisplayName("" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + "ミッション");
-            missionMeta.setLore(Arrays.asList(ChatColor.GRAY + "クリックして" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "現在実行中のミッションリスト", ChatColor.GRAY + "を開きます。"));
+            missionMeta.setDisplayName("" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "ミッション");
+            missionMeta.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "現在実行中のミッションリスト" + ChatColor.GRAY + "を開きます。"));
             missionStack.setItemMeta(missionMeta);
 
 
             for (int i = 0; i < 3; i++)
                 inv.setItem(i, missionStack);
 
-            ItemStack tutatuHintStack = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
+            ItemStack tutatuHintStack = new ItemStack(Material.YELLOW_CONCRETE);
             ItemMeta tutatuHintMeta = tutatuHintStack.getItemMeta();
             tutatuHintMeta.addItemFlags(itemFlags);
-            tutatuHintMeta.setDisplayName("" + ChatColor.RESET + ChatColor.YELLOW + ChatColor.BOLD + "通達・ヒント");
-            tutatuHintMeta.setLore(Arrays.asList(ChatColor.GRAY + "クリックして" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + "通達・ヒントリスト", ChatColor.GRAY + "を開きます。"));
+            tutatuHintMeta.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + "通達・ヒント");
+            tutatuHintMeta.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + "通達・ヒントリスト" + ChatColor.GRAY + "を開きます。"));
             tutatuHintStack.setItemMeta(tutatuHintMeta);
 
             for (int i = 3; i < 6; i++)
                 inv.setItem(i, tutatuHintStack);
 
-            ItemStack endStack = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
+            ItemStack endStack = new ItemStack(Material.LIME_CONCRETE);
             ItemMeta endMeta = endStack.getItemMeta();
             endMeta.addItemFlags(itemFlags);
-            endMeta.setDisplayName("" + ChatColor.RESET + ChatColor.GREEN + ChatColor.BOLD + "終了したミッション");
-            endMeta.setLore(Arrays.asList(ChatColor.GRAY + "クリックして" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + "終了したミッションのリスト", ChatColor.GRAY + "を開きます。"));
+            endMeta.setDisplayName("" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + "終了したミッション");
+            endMeta.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + "終了したミッションのリスト" + ChatColor.GRAY + "を開きます。"));
             endStack.setItemMeta(endMeta);
 
             for (int i = 6; i < 9; i++)
@@ -110,8 +108,8 @@ public class MissionInventory {
             ItemStack homeStack = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
             ItemMeta homeMeta = homeStack.getItemMeta();
             homeMeta.addItemFlags(itemFlags);
-            homeMeta.setDisplayName("" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + "ホーム");
-            homeMeta.setLore(Arrays.asList(ChatColor.YELLOW + "ホーム画面を表示します。"));
+            homeMeta.setDisplayName("" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ホーム");
+            homeMeta.setLore(Collections.singletonList(ChatColor.YELLOW + "クリックして" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ホーム画面" + ChatColor.RESET + ChatColor.YELLOW + "を表示します。"));
             homeStack.setItemMeta(homeMeta);
 
             inv.setItem(49, homeStack);
@@ -120,32 +118,32 @@ public class MissionInventory {
         } else if (type == MissionManager.MissionBookType.TUTATU || type == MissionManager.MissionBookType.HINT) {
             Inventory inv = tutatuHintInventory;
 
-            ItemStack missionStack = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            ItemStack missionStack = new ItemStack(Material.RED_CONCRETE);
             ItemMeta missionMeta = missionStack.getItemMeta();
             missionMeta.addItemFlags(itemFlags);
-            missionMeta.setDisplayName("" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + "ミッション");
-            missionMeta.setLore(Arrays.asList(ChatColor.GRAY + "クリックして" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "現在実行中のミッションリスト", ChatColor.GRAY + "を開きます。"));
+            missionMeta.setDisplayName("" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "ミッション");
+            missionMeta.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "現在実行中のミッションリスト" + ChatColor.GRAY + "を開きます。"));
             missionStack.setItemMeta(missionMeta);
 
             for (int i = 0; i < 3; i++)
                 inv.setItem(i, missionStack);
 
-            ItemStack tutatuHintStack = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
+            ItemStack tutatuHintStack = new ItemStack(Material.YELLOW_CONCRETE);
             ItemMeta tutatuHintMeta = tutatuHintStack.getItemMeta();
             tutatuHintMeta.addItemFlags(itemFlags);
             tutatuHintMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-            tutatuHintMeta.setDisplayName("" + ChatColor.RESET + ChatColor.YELLOW + ChatColor.BOLD + "通達・ヒント");
-            tutatuHintMeta.setLore(Arrays.asList(ChatColor.GRAY + "クリックして" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + "通達・ヒントリスト", ChatColor.GRAY + "を開きます。"));
+            tutatuHintMeta.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + "通達・ヒント");
+            tutatuHintMeta.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + "通達・ヒントリスト" + ChatColor.GRAY + "を開きます。"));
             tutatuHintStack.setItemMeta(tutatuHintMeta);
 
             for (int i = 3; i < 6; i++)
                 inv.setItem(i, tutatuHintStack);
 
-            ItemStack endStack = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
+            ItemStack endStack = new ItemStack(Material.LIME_CONCRETE);
             ItemMeta endMeta = endStack.getItemMeta();
             endMeta.addItemFlags(itemFlags);
-            endMeta.setDisplayName("" + ChatColor.RESET + ChatColor.GREEN + ChatColor.BOLD + "終了したミッション");
-            endMeta.setLore(Arrays.asList(ChatColor.GRAY + "クリックして" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + "終了したミッションのリスト", ChatColor.GRAY + "を開きます。"));
+            endMeta.setDisplayName("" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + "終了したミッション");
+            endMeta.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + "終了したミッションのリスト" + ChatColor.GRAY + "を開きます。"));
             endStack.setItemMeta(endMeta);
 
             for (int i = 6; i < 9; i++)
@@ -167,8 +165,8 @@ public class MissionInventory {
             ItemStack homeStack = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
             ItemMeta homeMeta = homeStack.getItemMeta();
             homeMeta.addItemFlags(itemFlags);
-            homeMeta.setDisplayName("" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + "ホーム");
-            homeMeta.setLore(Arrays.asList(ChatColor.YELLOW + "ホーム画面を表示します。"));
+            homeMeta.setDisplayName("" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ホーム");
+            homeMeta.setLore(Collections.singletonList(ChatColor.YELLOW + "クリックして" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ホーム画面" + ChatColor.RESET + ChatColor.YELLOW + "を表示します。"));
             homeStack.setItemMeta(homeMeta);
 
             inv.setItem(49, homeStack);
@@ -177,32 +175,32 @@ public class MissionInventory {
         } else {
             Inventory inv = endInventory;
 
-            ItemStack missionStack = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            ItemStack missionStack = new ItemStack(Material.RED_CONCRETE);
             ItemMeta missionMeta = missionStack.getItemMeta();
             missionMeta.addItemFlags(itemFlags);
-            missionMeta.setDisplayName("" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + "ミッション");
-            missionMeta.setLore(Arrays.asList(ChatColor.GRAY + "クリックして" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "現在実行中のミッションリスト", ChatColor.GRAY + "を開きます。"));
+            missionMeta.setDisplayName("" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "ミッション");
+            missionMeta.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "現在実行中のミッションリスト" + ChatColor.GRAY + "を開きます。"));
             missionStack.setItemMeta(missionMeta);
 
             for (int i = 0; i < 3; i++)
                 inv.setItem(i, missionStack);
 
-            ItemStack tutatuHintStack = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
+            ItemStack tutatuHintStack = new ItemStack(Material.YELLOW_CONCRETE);
             ItemMeta tutatuHintMeta = tutatuHintStack.getItemMeta();
             tutatuHintMeta.addItemFlags(itemFlags);
-            tutatuHintMeta.setDisplayName("" + ChatColor.RESET + ChatColor.YELLOW + ChatColor.BOLD + "通達・ヒント");
-            tutatuHintMeta.setLore(Arrays.asList(ChatColor.GRAY + "クリックして" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + "通達・ヒントリスト", ChatColor.GRAY + "を開きます。"));
+            tutatuHintMeta.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + "通達・ヒント");
+            tutatuHintMeta.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + "通達・ヒントリスト" + ChatColor.GRAY + "を開きます。"));
             tutatuHintStack.setItemMeta(tutatuHintMeta);
 
             for (int i = 3; i < 6; i++)
                 inv.setItem(i, tutatuHintStack);
 
-            ItemStack endStack = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
+            ItemStack endStack = new ItemStack(Material.LIME_CONCRETE);
             ItemMeta endMeta = endStack.getItemMeta();
             endMeta.addItemFlags(itemFlags);
             endMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-            endMeta.setDisplayName("" + ChatColor.RESET + ChatColor.GREEN + ChatColor.BOLD + "終了したミッション");
-            endMeta.setLore(Arrays.asList(ChatColor.GRAY + "クリックして" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + "終了したミッションのリスト", ChatColor.GRAY + "を開きます。"));
+            endMeta.setDisplayName("" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + "終了したミッション");
+            endMeta.setLore(Collections.singletonList(ChatColor.GRAY + "クリックして" + ChatColor.GREEN + ChatColor.BOLD + ChatColor.UNDERLINE + "終了したミッションのリスト" + ChatColor.GRAY + "を開きます。"));
             endStack.setItemMeta(endMeta);
 
             for (int i = 6; i < 9; i++)
@@ -224,8 +222,8 @@ public class MissionInventory {
             ItemStack homeStack = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
             ItemMeta homeMeta = homeStack.getItemMeta();
             homeMeta.addItemFlags(itemFlags);
-            homeMeta.setDisplayName("" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + "ホーム");
-            homeMeta.setLore(Arrays.asList(ChatColor.YELLOW + "ホーム画面を表示します。"));
+            homeMeta.setDisplayName("" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ホーム");
+            homeMeta.setLore(Collections.singletonList(ChatColor.YELLOW + "クリックして" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + "ホーム画面" + ChatColor.RESET + ChatColor.YELLOW + "を表示します。"));
             homeStack.setItemMeta(homeMeta);
 
             inv.setItem(49, homeStack);
@@ -258,27 +256,24 @@ public class MissionInventory {
     }
 
     public static HashMap<Integer, IMission> getMissions(MissionManager.MissionBookType type) {
-        HashMap<Integer, IMission> list = new HashMap<>();
+        HashMap<Integer, IMission> hashMap = new HashMap<>();
 
         for (Map.Entry<Integer, IMission> entry : missionList.entrySet()) {
             IMission mission = entry.getValue();
 
             if (type == MissionManager.MissionBookType.MISSION) {
-                if (mission.getType() == MissionManager.MissionBookType.MISSION) {
-                    list.put(entry.getKey(), mission);
-                }
+                if (mission.getType() == MissionManager.MissionBookType.MISSION)
+                    hashMap.put(entry.getKey(), mission);
             } else if (type == MissionManager.MissionBookType.TUTATU || type == MissionManager.MissionBookType.HINT) {
-                if (mission.getType() == MissionManager.MissionBookType.TUTATU || mission.getType() == MissionManager.MissionBookType.HINT) {
-                    list.put(entry.getKey(), mission);
-                }
+                if (mission.getType() == MissionManager.MissionBookType.TUTATU || mission.getType() == MissionManager.MissionBookType.HINT)
+                    hashMap.put(entry.getKey(), mission);
             } else {
                 if (mission.getType() == MissionManager.MissionBookType.END_MISSION
-                        || mission.getType() == MissionManager.MissionBookType.END_TUTATU || mission.getType() == MissionManager.MissionBookType.END_HINT) {
-                    list.put(entry.getKey(), mission);
-                }
+                        || mission.getType() == MissionManager.MissionBookType.END_TUTATU || mission.getType() == MissionManager.MissionBookType.END_HINT)
+                    hashMap.put(entry.getKey(), mission);
             }
         }
-        return list;
+        return hashMap;
     }
 
     private static void addItem(String name, String[] lore, MissionManager.MissionBookType type, Material material) {
@@ -313,21 +308,19 @@ public class MissionInventory {
     }
 
     public static ItemStack getItem(MissionManager.MissionBookType type, Material material, int amount) {
-        for (ItemStack itemStack : getInventory(type).getContents()) {
-            if (itemStack.getType() == material && itemStack.getAmount() == amount) {
+        for (ItemStack itemStack : getInventory(type).getContents())
+            if (itemStack.getType() == material && itemStack.getAmount() == amount)
                 return itemStack;
-            }
-        }
         return null;
     }
 
-    public static void addMission(String title, String description, MissionManager.MissionBookType type, Material material) {
+    public static void addMission(String title, List<String> descriptions, MissionManager.MissionBookType type, Material material) {
         int amount = getAmount(type);
         int slot = getSlot(type);
 
         if (slot < 45) {
             addItem(ChatColor.BOLD + title, new String[]{ChatColor.YELLOW + "続きはこちら"}, type, material);
-            missionList.put((type.getId() + (amount * slot)), new IMission(title, description, type, material, amount));
+            missionList.put((type.getId() + (amount * slot)), new IMission(title, descriptions, type, material, amount));
             return;
         }
         return;
@@ -338,12 +331,18 @@ public class MissionInventory {
         Inventory endInv = getInventory(MissionManager.MissionBookType.END_MISSION);
 
         for (int i = 18; i < 44; i++) {
+            int amount = getAmount(MissionManager.MissionBookType.END_MISSION);
+            int slot = getSlot(MissionManager.MissionBookType.END_MISSION);
+
             ItemStack itemStack = missionInv.getItem(i);
 
             if (itemStack == null) continue;
 
             endInv.addItem(itemStack);
             missionInv.remove(itemStack);
+
+            setSlot(slot + 1, MissionManager.MissionBookType.END_MISSION);
+            setAmount(amount + 1, MissionManager.MissionBookType.END_MISSION);
         }
 
         setInventory(missionInv, MissionManager.MissionBookType.MISSION);
@@ -370,7 +369,7 @@ public class MissionInventory {
         */
     }
 
-    private static int getAmount(MissionManager.MissionBookType type) {
+    public static int getAmount(MissionManager.MissionBookType type) {
         if (type == MissionManager.MissionBookType.MISSION) {
             return missionAmount;
         } else if (type == MissionManager.MissionBookType.TUTATU || type == MissionManager.MissionBookType.HINT) {
@@ -390,7 +389,7 @@ public class MissionInventory {
         }
     }
 
-    private static int getSlot(MissionManager.MissionBookType type) {
+    public static int getSlot(MissionManager.MissionBookType type) {
         if (type == MissionManager.MissionBookType.MISSION) {
             return missionSlot;
         } else if (type == MissionManager.MissionBookType.TUTATU || type == MissionManager.MissionBookType.HINT) {

@@ -27,11 +27,12 @@ public class Btp extends ICommand {
     public void onPlayerCommand(Player sp, Command cmd, String label, String[] args) {
         if (TosoGameAPI.isAdmin(sp)) {
             if (!GameManager.isGame()) {
-                if (onInteract.loc != null) {
+                if (onInteract.successBlockLoc != null) {
+                    Location loc = onInteract.successBlockLoc;
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         if (!Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, p)) {
                             p.setGameMode(GameMode.SPECTATOR);
-                            p.teleport(new Location(onInteract.loc.getWorld(), onInteract.loc.getBlockX() + 0.5, onInteract.loc.getBlockY(), onInteract.loc.getBlockZ() + 0.5));
+                            p.teleport(new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5));
                         }
                     }
                     sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GREEN + ChatColor.UNDERLINE + (Bukkit.getOnlinePlayers().size() - Teams.getOnlineCount(Teams.OnlineTeam.TOSO_ADMIN)) + "人" + ChatColor.RESET + ChatColor.GRAY + "を生存ブロックの位置にテレポートしました。");

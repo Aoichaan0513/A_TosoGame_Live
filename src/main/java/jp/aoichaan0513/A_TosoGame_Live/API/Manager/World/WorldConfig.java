@@ -1,8 +1,10 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Manager.World;
 
+import jp.aoichaan0513.A_TosoGame_Live.API.Interfaces.IConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.ParseUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,72 +17,72 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class WorldConfig {
 
-    private World world;
+    private static World world;
 
-    private File file;
-    private YamlConfiguration yamlConfiguration;
+    private static File file;
+    private static YamlConfiguration yamlConfiguration;
 
     // private EnumMap<WorldManager.Difficulty, DifficultyConfig> difficultyConfigMap = new EnumMap<>(WorldManager.Difficulty.class);
-    private HashMap<WorldManager.Difficulty, DifficultyConfig> difficultyConfigMap = new HashMap<>();
+    private final HashMap<WorldManager.Difficulty, DifficultyConfig> difficultyConfigMap = new HashMap<>();
 
-    private MapConfig mapConfig;
-    private GameConfig gameConfig;
+    private static MapConfig mapConfig;
+    private static GameConfig gameConfig;
 
-    private OPGameConfig opGameConfig;
+    private static OPGameConfig opGameConfig;
 
-    private OPGameLocationConfig opGameLocationConfig;
-    private HunterLocationConfig hunterLocationConfig;
-    private JailLocationConfig jailLocationConfig;
-    private RespawnLocationConfig respawnLocationConfig;
+    private static OPGameLocationConfig opGameLocationConfig;
+    private static HunterLocationConfig hunterLocationConfig;
+    private static JailLocationConfig jailLocationConfig;
+    private static RespawnLocationConfig respawnLocationConfig;
 
-    private HunterDoorConfig hunterDoorConfig;
+    private static HunterDoorConfig hunterDoorConfig;
 
-    private MapBorderConfig mapBorderConfig;
-    private OPGameBorderConfig opGameBorderConfig;
-    private HunterZoneBorderConfig hunterZoneBorderConfig;
+    private static MapBorderConfig mapBorderConfig;
+    private static OPGameBorderConfig opGameBorderConfig;
+    private static HunterZoneBorderConfig hunterZoneBorderConfig;
 
     public WorldConfig(World world) {
         String fileName = "map.yml";
 
-        this.world = world;
+        WorldConfig.world = world;
 
-        this.file = new File(world.getName() + Main.FILE_SEPARATOR + fileName);
-        if (this.file.exists()) {
-            this.yamlConfiguration = YamlConfiguration.loadConfiguration(file);
+        file = new File(world.getName() + Main.FILE_SEPARATOR + fileName);
+        if (file.exists()) {
+            yamlConfiguration = YamlConfiguration.loadConfiguration(file);
         } else {
             try {
                 Files.copy(Main.getInstance().getResource(fileName), Paths.get(world.getName() + Main.FILE_SEPARATOR + fileName));
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            this.yamlConfiguration = YamlConfiguration.loadConfiguration(file);
+            yamlConfiguration = YamlConfiguration.loadConfiguration(file);
         }
 
-        this.mapConfig = new MapConfig(this);
-        this.gameConfig = new GameConfig(this);
+        mapConfig = new MapConfig(file, yamlConfiguration);
+        gameConfig = new GameConfig(file, yamlConfiguration);
 
-        this.opGameConfig = new OPGameConfig(this);
+        opGameConfig = new OPGameConfig(file, yamlConfiguration);
 
-        this.opGameLocationConfig = new OPGameLocationConfig(this);
-        this.hunterLocationConfig = new HunterLocationConfig(this);
-        this.jailLocationConfig = new JailLocationConfig(this);
-        this.respawnLocationConfig = new RespawnLocationConfig(this);
+        opGameLocationConfig = new OPGameLocationConfig(file, yamlConfiguration);
+        hunterLocationConfig = new HunterLocationConfig(file, yamlConfiguration);
+        jailLocationConfig = new JailLocationConfig(file, yamlConfiguration);
+        respawnLocationConfig = new RespawnLocationConfig(file, yamlConfiguration);
 
-        this.hunterDoorConfig = new HunterDoorConfig(this);
+        hunterDoorConfig = new HunterDoorConfig(file, yamlConfiguration);
 
-        this.mapBorderConfig = new MapBorderConfig(this);
-        this.opGameBorderConfig = new OPGameBorderConfig(this);
-        this.hunterZoneBorderConfig = new HunterZoneBorderConfig(this);
+        mapBorderConfig = new MapBorderConfig();
+        opGameBorderConfig = new OPGameBorderConfig();
+        hunterZoneBorderConfig = new HunterZoneBorderConfig();
 
-        for (String name : this.yamlConfiguration.getConfigurationSection("difficulty").getKeys(false)) {
+        for (String name : yamlConfiguration.getConfigurationSection("difficulty").getKeys(false)) {
             WorldManager.Difficulty difficulty = WorldManager.Difficulty.getDifficulty(name);
-            this.difficultyConfigMap.put(difficulty, new DifficultyConfig(difficulty, this));
+            this.difficultyConfigMap.put(difficulty, new DifficultyConfig(difficulty));
         }
     }
 
@@ -104,8 +106,8 @@ public class WorldConfig {
         return mapConfig;
     }
 
-    private void setMapConfig(MapConfig mapConfig) {
-        this.mapConfig = mapConfig;
+    private static void setMapConfig(MapConfig mapConfig) {
+        WorldConfig.mapConfig = mapConfig;
     }
 
     /**
@@ -115,8 +117,8 @@ public class WorldConfig {
         return gameConfig;
     }
 
-    private void setGameConfig(GameConfig gameConfig) {
-        this.gameConfig = gameConfig;
+    private static void setGameConfig(GameConfig gameConfig) {
+        WorldConfig.gameConfig = gameConfig;
     }
 
 
@@ -127,8 +129,8 @@ public class WorldConfig {
         return opGameConfig;
     }
 
-    public void setOPGameConfig(OPGameConfig opGameConfig) {
-        this.opGameConfig = opGameConfig;
+    private static void setOPGameConfig(OPGameConfig opGameConfig) {
+        WorldConfig.opGameConfig = opGameConfig;
     }
 
 
@@ -139,8 +141,8 @@ public class WorldConfig {
         return opGameLocationConfig;
     }
 
-    public void setOPGameLocationConfig(OPGameLocationConfig opGameLocationConfig) {
-        this.opGameLocationConfig = opGameLocationConfig;
+    public static void setOPGameLocationConfig(OPGameLocationConfig opGameLocationConfig) {
+        WorldConfig.opGameLocationConfig = opGameLocationConfig;
     }
 
     /**
@@ -150,8 +152,8 @@ public class WorldConfig {
         return hunterLocationConfig;
     }
 
-    public void setHunterLocationConfig(HunterLocationConfig hunterLocationConfig) {
-        this.hunterLocationConfig = hunterLocationConfig;
+    public static void setHunterLocationConfig(HunterLocationConfig hunterLocationConfig) {
+        WorldConfig.hunterLocationConfig = hunterLocationConfig;
     }
 
     /**
@@ -161,8 +163,8 @@ public class WorldConfig {
         return jailLocationConfig;
     }
 
-    public void setJailLocationConfig(JailLocationConfig jailLocationConfig) {
-        this.jailLocationConfig = jailLocationConfig;
+    public static void setJailLocationConfig(JailLocationConfig jailLocationConfig) {
+        WorldConfig.jailLocationConfig = jailLocationConfig;
     }
 
     /**
@@ -172,8 +174,8 @@ public class WorldConfig {
         return respawnLocationConfig;
     }
 
-    public void setRespawnLocationConfig(RespawnLocationConfig respawnLocationConfig) {
-        this.respawnLocationConfig = respawnLocationConfig;
+    public static void setRespawnLocationConfig(RespawnLocationConfig respawnLocationConfig) {
+        WorldConfig.respawnLocationConfig = respawnLocationConfig;
     }
 
 
@@ -184,8 +186,8 @@ public class WorldConfig {
         return hunterDoorConfig;
     }
 
-    public void setHunterDoorConfig(HunterDoorConfig hunterDoorConfig) {
-        this.hunterDoorConfig = hunterDoorConfig;
+    public static void setHunterDoorConfig(HunterDoorConfig hunterDoorConfig) {
+        WorldConfig.hunterDoorConfig = hunterDoorConfig;
     }
 
 
@@ -196,8 +198,8 @@ public class WorldConfig {
         return mapBorderConfig;
     }
 
-    public void setMapBorderConfig(MapBorderConfig mapBorderConfig) {
-        this.mapBorderConfig = mapBorderConfig;
+    public static void setMapBorderConfig(MapBorderConfig mapBorderConfig) {
+        WorldConfig.mapBorderConfig = mapBorderConfig;
     }
 
     /**
@@ -207,8 +209,8 @@ public class WorldConfig {
         return opGameBorderConfig;
     }
 
-    public void setOPGameBorderConfig(OPGameBorderConfig opGameBorderConfig) {
-        this.opGameBorderConfig = opGameBorderConfig;
+    public static void setOPGameBorderConfig(OPGameBorderConfig opGameBorderConfig) {
+        WorldConfig.opGameBorderConfig = opGameBorderConfig;
     }
 
     /**
@@ -218,23 +220,25 @@ public class WorldConfig {
         return hunterZoneBorderConfig;
     }
 
-    public void setHunterZoneBorderConfig(HunterZoneBorderConfig hunterZoneBorderConfig) {
-        this.hunterZoneBorderConfig = hunterZoneBorderConfig;
+    public static void setHunterZoneBorderConfig(HunterZoneBorderConfig hunterZoneBorderConfig) {
+        WorldConfig.hunterZoneBorderConfig = hunterZoneBorderConfig;
     }
 
 
     /**
      * 難易度
      */
-    public DifficultyConfig getDifficultyConfig(Player p) {
-        WorldManager.Difficulty difficulty = TosoGameAPI.difficultyMap.containsKey(p.getUniqueId()) ? TosoGameAPI.difficultyMap.get(p.getUniqueId()) : TosoGameAPI.difficultyMap.put(p.getUniqueId(), WorldManager.Difficulty.NORMAL);
-        System.out.println(difficultyConfigMap.get(difficulty).getDifficulty().getName());
+    public DifficultyConfig getDifficultyConfig(WorldManager.Difficulty difficulty) {
+        return difficultyConfigMap.containsKey(difficulty) ? difficultyConfigMap.get(difficulty) : difficultyConfigMap.put(difficulty, new DifficultyConfig(difficulty));
+    }
+
+    public DifficultyConfig getDifficultyConfig(UUID uuid) {
+        WorldManager.Difficulty difficulty = TosoGameAPI.difficultyMap.containsKey(uuid) ? TosoGameAPI.difficultyMap.get(uuid) : TosoGameAPI.difficultyMap.put(uuid, WorldManager.Difficulty.NORMAL);
         return difficultyConfigMap.get(difficulty);
     }
 
-    public DifficultyConfig getDifficultyConfig(WorldManager.Difficulty difficulty) {
-        // System.out.println(new DifficultyConfig(difficulty, this).getDifficulty().getName());
-        return difficultyConfigMap.containsKey(difficulty) ? difficultyConfigMap.get(difficulty) : difficultyConfigMap.put(difficulty, new DifficultyConfig(difficulty, this));
+    public DifficultyConfig getDifficultyConfig(Player p) {
+        return getDifficultyConfig(p.getUniqueId());
     }
 
 
@@ -248,8 +252,8 @@ public class WorldConfig {
 
         private final String PATH = WorldManager.PathType.MAP.getPath();
 
-        public MapConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public MapConfig(File file, YamlConfiguration yamlConfiguration) {
+            super(file, yamlConfiguration);
         }
 
         /**
@@ -307,8 +311,8 @@ public class WorldConfig {
         private final String PATH_TIME = WorldManager.PathType.GAME_TIME.getPath();
         private final String PATH_OTHER = WorldManager.PathType.GAME_TIME.getPath();
 
-        public GameConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public GameConfig(File file, YamlConfiguration yamlConfiguration) {
+            super(file, yamlConfiguration);
         }
 
         /**
@@ -428,7 +432,11 @@ public class WorldConfig {
         @Override
         public void save() {
             super.save();
-            worldConfig.setGameConfig(this);
+
+            WorldConfig.file = this.file;
+            WorldConfig.yamlConfiguration = this.yamlConfiguration;
+
+            setGameConfig(this);
         }
     }
 
@@ -440,8 +448,8 @@ public class WorldConfig {
 
         private final String PATH_DICE = WorldManager.PathType.OPGAME_DICE.getPath();
 
-        public OPGameConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public OPGameConfig(File file, YamlConfiguration yamlConfiguration) {
+            super(file, yamlConfiguration);
         }
 
         /**
@@ -466,7 +474,11 @@ public class WorldConfig {
         @Override
         public void save() {
             super.save();
-            worldConfig.setOPGameConfig(this);
+
+            WorldConfig.file = this.file;
+            WorldConfig.yamlConfiguration = this.yamlConfiguration;
+
+            setOPGameConfig(this);
         }
     }
 
@@ -479,8 +491,8 @@ public class WorldConfig {
         private final String PATH_OPGAME = WorldManager.PathType.LOCATION_OPGAME.getPath();
         private final String PATH_GOPGAME = WorldManager.PathType.LOCATION_GOPGAME.getPath();
 
-        public OPGameLocationConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public OPGameLocationConfig(File file, YamlConfiguration yamlConfiguration) {
+            super(file, yamlConfiguration);
         }
 
         /**
@@ -495,7 +507,7 @@ public class WorldConfig {
             int yaw = yamlConfiguration.getInt(PATH_OPGAME + ".yaw");
             int pitch = yamlConfiguration.getInt(PATH_OPGAME + ".pitch");
 
-            return new Location(worldConfig.getWorld(), x, y, z, yaw, pitch);
+            return new Location(world, x, y, z, yaw, pitch);
         }
 
         /**
@@ -517,24 +529,27 @@ public class WorldConfig {
          *
          * @return 設定されている位置 (ミュータブルリスト)
          */
-        public List<Location> getGOPLocations() {
-            List<Location> list = new ArrayList<>();
+        public Map<Integer, Location> getGOPLocations() {
+            Map<Integer, Location> hashMap = new HashMap<>();
 
-            for (String key : yamlConfiguration.getConfigurationSection(PATH_GOPGAME).getKeys(false)) {
-                String path = PATH_GOPGAME + "." + key;
+            if (yamlConfiguration.contains(PATH_GOPGAME)) {
+                for (String key : yamlConfiguration.getConfigurationSection(PATH_GOPGAME).getKeys(false)) {
+                    if (!ParseUtil.isInt(key.substring(1))) continue;
 
-                double x = yamlConfiguration.getDouble(path + ".x");
-                double y = yamlConfiguration.getDouble(path + ".y");
-                double z = yamlConfiguration.getDouble(path + ".z");
-                int yaw = yamlConfiguration.getInt(path + ".yaw");
-                int pitch = yamlConfiguration.getInt(path + ".pitch");
-                list.add(new Location(worldConfig.getWorld(), x, y, z, yaw, pitch));
+                    String path = PATH_GOPGAME + "." + key;
+
+                    double x = yamlConfiguration.getDouble(path + ".x");
+                    double y = yamlConfiguration.getDouble(path + ".y");
+                    double z = yamlConfiguration.getDouble(path + ".z");
+                    int yaw = yamlConfiguration.getInt(path + ".yaw");
+                    int pitch = yamlConfiguration.getInt(path + ".pitch");
+
+                    hashMap.put(ParseUtil.toInt(key.substring(1)), new Location(world, x, y, z, yaw, pitch));
+                }
+            } else {
+                hashMap.put(0, world.getSpawnLocation());
             }
-
-            if (list.isEmpty())
-                list.add(worldConfig.getWorld().getSpawnLocation());
-
-            return list;
+            return hashMap;
         }
 
         /**
@@ -555,9 +570,9 @@ public class WorldConfig {
                 int yaw = yamlConfiguration.getInt(path + ".yaw");
                 int pitch = yamlConfiguration.getInt(path + ".pitch");
 
-                return new Location(worldConfig.getWorld(), x, y, z, yaw, pitch);
+                return new Location(world, x, y, z, yaw, pitch);
             } else {
-                return worldConfig.getWorld().getSpawnLocation();
+                return world.getSpawnLocation();
             }
         }
 
@@ -583,7 +598,11 @@ public class WorldConfig {
         @Override
         public void save() {
             super.save();
-            worldConfig.setOPGameLocationConfig(this);
+
+            WorldConfig.file = this.file;
+            WorldConfig.yamlConfiguration = this.yamlConfiguration;
+
+            setOPGameLocationConfig(this);
         }
     }
 
@@ -594,8 +613,8 @@ public class WorldConfig {
 
         private final String PATH = WorldManager.PathType.LOCATION_HUNTER.getPath();
 
-        public HunterLocationConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public HunterLocationConfig(File file, YamlConfiguration yamlConfiguration) {
+            super(file, yamlConfiguration);
         }
 
         /**
@@ -616,9 +635,9 @@ public class WorldConfig {
                 int yaw = yamlConfiguration.getInt(path + ".yaw");
                 int pitch = yamlConfiguration.getInt(path + ".pitch");
 
-                return new Location(worldConfig.getWorld(), x, y, z, yaw, pitch);
+                return new Location(world, x, y, z, yaw, pitch);
             } else {
-                return worldConfig.getWorld().getSpawnLocation();
+                return world.getSpawnLocation();
             }
         }
 
@@ -644,7 +663,11 @@ public class WorldConfig {
         @Override
         public void save() {
             super.save();
-            worldConfig.setHunterLocationConfig(this);
+
+            WorldConfig.file = this.file;
+            WorldConfig.yamlConfiguration = this.yamlConfiguration;
+
+            setHunterLocationConfig(this);
         }
     }
 
@@ -655,8 +678,8 @@ public class WorldConfig {
 
         private final String PATH = WorldManager.PathType.LOCATION_JAIL.getPath();
 
-        public JailLocationConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public JailLocationConfig(File file, YamlConfiguration yamlConfiguration) {
+            super(file, yamlConfiguration);
         }
 
         /**
@@ -664,24 +687,27 @@ public class WorldConfig {
          *
          * @return 設定されている位置 (ミュータブルリスト)
          */
-        public List<Location> getLocations() {
-            List<Location> list = new ArrayList<>();
+        public Map<Integer, Location> getLocations() {
+            Map<Integer, Location> hashMap = new HashMap<>();
 
-            for (String key : yamlConfiguration.getConfigurationSection(PATH).getKeys(false)) {
-                String path = PATH + "." + key;
+            if (yamlConfiguration.contains(PATH)) {
+                for (String key : yamlConfiguration.getConfigurationSection(PATH).getKeys(false)) {
+                    if (!ParseUtil.isInt(key.substring(1))) continue;
 
-                double x = yamlConfiguration.getDouble(path + ".x");
-                double y = yamlConfiguration.getDouble(path + ".y");
-                double z = yamlConfiguration.getDouble(path + ".z");
-                int yaw = yamlConfiguration.getInt(path + ".yaw");
-                int pitch = yamlConfiguration.getInt(path + ".pitch");
-                list.add(new Location(worldConfig.getWorld(), x, y, z, yaw, pitch));
+                    String path = PATH + "." + key;
+
+                    double x = yamlConfiguration.getDouble(path + ".x");
+                    double y = yamlConfiguration.getDouble(path + ".y");
+                    double z = yamlConfiguration.getDouble(path + ".z");
+                    int yaw = yamlConfiguration.getInt(path + ".yaw");
+                    int pitch = yamlConfiguration.getInt(path + ".pitch");
+
+                    hashMap.put(ParseUtil.toInt(key.substring(1)), new Location(world, x, y, z, yaw, pitch));
+                }
+            } else {
+                hashMap.put(0, world.getSpawnLocation());
             }
-
-            if (list.isEmpty())
-                list.add(worldConfig.getWorld().getSpawnLocation());
-
-            return list;
+            return hashMap;
         }
 
         /**
@@ -702,9 +728,9 @@ public class WorldConfig {
                 int yaw = yamlConfiguration.getInt(path + ".yaw");
                 int pitch = yamlConfiguration.getInt(path + ".pitch");
 
-                return new Location(worldConfig.getWorld(), x, y, z, yaw, pitch);
+                return new Location(world, x, y, z, yaw, pitch);
             } else {
-                return worldConfig.getWorld().getSpawnLocation();
+                return world.getSpawnLocation();
             }
         }
 
@@ -730,7 +756,11 @@ public class WorldConfig {
         @Override
         public void save() {
             super.save();
-            worldConfig.setJailLocationConfig(this);
+
+            WorldConfig.file = this.file;
+            WorldConfig.yamlConfiguration = this.yamlConfiguration;
+
+            setJailLocationConfig(this);
         }
     }
 
@@ -741,8 +771,8 @@ public class WorldConfig {
 
         private final String PATH = WorldManager.PathType.LOCATION_RESPAWN.getPath();
 
-        public RespawnLocationConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public RespawnLocationConfig(File file, YamlConfiguration yamlConfiguration) {
+            super(file, yamlConfiguration);
         }
 
         /**
@@ -750,25 +780,27 @@ public class WorldConfig {
          *
          * @return 設定されている位置 (ミュータブルリスト)
          */
-        public List<Location> getLocations() {
-            List<Location> list = new ArrayList<>();
+        public Map<Integer, Location> getLocations() {
+            Map<Integer, Location> hashMap = new HashMap<>();
 
-            for (String key : yamlConfiguration.getConfigurationSection(PATH).getKeys(false)) {
-                String path = PATH + "." + key;
+            if (yamlConfiguration.contains(PATH)) {
+                for (String key : yamlConfiguration.getConfigurationSection(PATH).getKeys(false)) {
+                    if (!ParseUtil.isInt(key.substring(1))) continue;
 
-                double x = yamlConfiguration.getDouble(path + ".x");
-                double y = yamlConfiguration.getDouble(path + ".y");
-                double z = yamlConfiguration.getDouble(path + ".z");
-                int yaw = yamlConfiguration.getInt(path + ".yaw");
-                int pitch = yamlConfiguration.getInt(path + ".pitch");
+                    String path = PATH + "." + key;
 
-                list.add(new Location(worldConfig.getWorld(), x, y, z, yaw, pitch));
+                    double x = yamlConfiguration.getDouble(path + ".x");
+                    double y = yamlConfiguration.getDouble(path + ".y");
+                    double z = yamlConfiguration.getDouble(path + ".z");
+                    int yaw = yamlConfiguration.getInt(path + ".yaw");
+                    int pitch = yamlConfiguration.getInt(path + ".pitch");
+
+                    hashMap.put(ParseUtil.toInt(key.substring(1)), new Location(world, x, y, z, yaw, pitch));
+                }
+            } else {
+                hashMap.put(0, world.getSpawnLocation());
             }
-
-            if (list.isEmpty())
-                list.add(worldConfig.getWorld().getSpawnLocation());
-
-            return list;
+            return hashMap;
         }
 
         /**
@@ -789,9 +821,9 @@ public class WorldConfig {
                 int yaw = yamlConfiguration.getInt(path + ".yaw");
                 int pitch = yamlConfiguration.getInt(path + ".pitch");
 
-                return new Location(worldConfig.getWorld(), x, y, z, yaw, pitch);
+                return new Location(world, x, y, z, yaw, pitch);
             } else {
-                return worldConfig.getWorld().getSpawnLocation();
+                return world.getSpawnLocation();
             }
         }
 
@@ -817,7 +849,11 @@ public class WorldConfig {
         @Override
         public void save() {
             super.save();
-            worldConfig.setRespawnLocationConfig(this);
+
+            WorldConfig.file = this.file;
+            WorldConfig.yamlConfiguration = this.yamlConfiguration;
+
+            setRespawnLocationConfig(this);
         }
     }
 
@@ -829,8 +865,8 @@ public class WorldConfig {
 
         private final String PATH = WorldManager.PathType.DOOR_HUNTER.getPath();
 
-        public HunterDoorConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public HunterDoorConfig(File file, YamlConfiguration yamlConfiguration) {
+            super(file, yamlConfiguration);
         }
 
         /**
@@ -846,7 +882,7 @@ public class WorldConfig {
                 double y = yamlConfiguration.getDouble(path + ".y");
                 double z = yamlConfiguration.getDouble(path + ".z");
 
-                Location loc = new Location(worldConfig.getWorld(), x, y, z);
+                Location loc = new Location(world, x, y, z);
                 Block block = loc.getBlock();
                 if (block.getType() == Material.IRON_DOOR)
                     block.setType(Material.AIR);
@@ -868,7 +904,7 @@ public class WorldConfig {
                 double y = yamlConfiguration.getDouble(path + ".y");
                 double z = yamlConfiguration.getDouble(path + ".z");
 
-                Location loc = new Location(worldConfig.getWorld(), x, y, z);
+                Location loc = new Location(world, x, y, z);
                 Block block = loc.getBlock();
                 if (block.getType() == Material.IRON_DOOR)
                     block.setType(Material.AIR);
@@ -881,23 +917,24 @@ public class WorldConfig {
          *
          * @return 設定されている位置 (ミュータブルリスト)
          */
-        public List<Location> getLocations() {
-            List<Location> list = new ArrayList<>();
+        public Map<Integer, Location> getLocations() {
+            Map<Integer, Location> hashMap = new HashMap<>();
 
             if (yamlConfiguration.contains(PATH)) {
                 for (String key : yamlConfiguration.getConfigurationSection(PATH).getKeys(false)) {
+                    if (!ParseUtil.isInt(key.substring(1))) continue;
                     String path = PATH + "." + key;
 
                     double x = yamlConfiguration.getDouble(path + ".x");
                     double y = yamlConfiguration.getDouble(path + ".y");
                     double z = yamlConfiguration.getDouble(path + ".z");
-                    list.add(new Location(worldConfig.getWorld(), x, y, z));
+
+                    hashMap.put(ParseUtil.toInt(key.substring(1)), new Location(world, x, y, z));
                 }
             } else {
-                list.add(worldConfig.getWorld().getSpawnLocation());
+                hashMap.put(0, world.getSpawnLocation());
             }
-
-            return list;
+            return hashMap;
         }
 
         /**
@@ -916,9 +953,9 @@ public class WorldConfig {
                 double y = yamlConfiguration.getDouble(path + ".y");
                 double z = yamlConfiguration.getDouble(path + ".z");
 
-                return new Location(worldConfig.getWorld(), x, y, z);
+                return new Location(world, x, y, z);
             } else {
-                return worldConfig.getWorld().getSpawnLocation();
+                return world.getSpawnLocation();
             }
         }
 
@@ -942,7 +979,11 @@ public class WorldConfig {
         @Override
         public void save() {
             super.save();
-            worldConfig.setHunterDoorConfig(this);
+
+            WorldConfig.file = this.file;
+            WorldConfig.yamlConfiguration = this.yamlConfiguration;
+
+            setHunterDoorConfig(this);
         }
     }
 
@@ -954,8 +995,8 @@ public class WorldConfig {
 
         private final String PATH = WorldManager.PathType.BORDER_MAP.getPath();
 
-        public MapBorderConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public MapBorderConfig() {
+            super();
         }
 
         /**
@@ -983,9 +1024,9 @@ public class WorldConfig {
                 double y = yamlConfiguration.getDouble(path + ".y");
                 double z = yamlConfiguration.getDouble(path + ".z");
 
-                return new Location(worldConfig.getWorld(), x, y, z);
+                return new Location(world, x, y, z);
             } else {
-                return worldConfig.getWorld().getSpawnLocation();
+                return world.getSpawnLocation();
             }
         }
 
@@ -1007,7 +1048,7 @@ public class WorldConfig {
         @Override
         public void save() {
             super.save();
-            worldConfig.setMapBorderConfig(this);
+            setMapBorderConfig(this);
         }
     }
 
@@ -1018,8 +1059,8 @@ public class WorldConfig {
 
         private final String PATH = WorldManager.PathType.BORDER_OPGAME.getPath();
 
-        public OPGameBorderConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public OPGameBorderConfig() {
+            super();
         }
 
         /**
@@ -1047,9 +1088,9 @@ public class WorldConfig {
                 double y = yamlConfiguration.getDouble(path + ".y");
                 double z = yamlConfiguration.getDouble(path + ".z");
 
-                return new Location(worldConfig.getWorld(), x, y, z);
+                return new Location(world, x, y, z);
             } else {
-                return worldConfig.getWorld().getSpawnLocation();
+                return world.getSpawnLocation();
             }
         }
 
@@ -1071,7 +1112,7 @@ public class WorldConfig {
         @Override
         public void save() {
             super.save();
-            worldConfig.setOPGameBorderConfig(this);
+            setOPGameBorderConfig(this);
         }
     }
 
@@ -1082,8 +1123,8 @@ public class WorldConfig {
 
         private final String PATH = WorldManager.PathType.BORDER_HUNTERZONE.getPath();
 
-        public HunterZoneBorderConfig(WorldConfig worldConfig) {
-            super(worldConfig);
+        public HunterZoneBorderConfig() {
+            super();
         }
 
         /**
@@ -1111,9 +1152,9 @@ public class WorldConfig {
                 double y = yamlConfiguration.getDouble(path + ".y");
                 double z = yamlConfiguration.getDouble(path + ".z");
 
-                return new Location(worldConfig.getWorld(), x, y, z);
+                return new Location(world, x, y, z);
             } else {
-                return worldConfig.getWorld().getSpawnLocation();
+                return world.getSpawnLocation();
             }
         }
 
@@ -1135,7 +1176,7 @@ public class WorldConfig {
         @Override
         public void save() {
             super.save();
-            worldConfig.setHunterZoneBorderConfig(this);
+            setHunterZoneBorderConfig(this);
         }
     }
 
@@ -1145,18 +1186,18 @@ public class WorldConfig {
      */
     public static class DifficultyConfig {
 
-        private static WorldManager.Difficulty difficulty;
-        private static String configPath;
+        private final WorldManager.Difficulty difficulty;
+        private final String configPath;
 
-        private static File file;
-        private static YamlConfiguration yamlConfiguration;
+        private final File file;
+        private final YamlConfiguration yamlConfiguration;
 
-        public DifficultyConfig(WorldManager.Difficulty difficulty, WorldConfig worldConfig) {
+        public DifficultyConfig(WorldManager.Difficulty difficulty) {
             this.difficulty = difficulty;
             this.configPath = "difficulty." + difficulty.getName() + ".";
 
-            this.file = worldConfig.getFile();
-            this.yamlConfiguration = worldConfig.getConfig();
+            this.file = WorldConfig.file;
+            this.yamlConfiguration = WorldConfig.yamlConfiguration;
         }
 
         public WorldManager.Difficulty getDifficulty() {
@@ -1174,11 +1215,7 @@ public class WorldConfig {
 
         public void setHealth(boolean health) {
             yamlConfiguration.set(configPath + "health", health);
-            try {
-                yamlConfiguration.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            save();
         }
 
         // 自動復活秒数
@@ -1188,11 +1225,7 @@ public class WorldConfig {
 
         public void setRespawnAutoTime(int time) {
             yamlConfiguration.set(configPath + "respawn.auto", time);
-            try {
-                yamlConfiguration.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            save();
         }
 
         // 復活可能回数
@@ -1202,11 +1235,7 @@ public class WorldConfig {
 
         public void setRespawnDenyCount(int count) {
             yamlConfiguration.set(configPath + "respawn.count", count);
-            try {
-                yamlConfiguration.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            save();
         }
 
         // 復活するまでの一回あたりのクールタイム
@@ -1216,11 +1245,7 @@ public class WorldConfig {
 
         public void setRespawnCoolTime(int time) {
             yamlConfiguration.set(configPath + "respawn.coolTime", time);
-            try {
-                yamlConfiguration.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            save();
         }
 
         // レート
@@ -1230,11 +1255,7 @@ public class WorldConfig {
 
         public void setRate(int rate) {
             yamlConfiguration.set(configPath + "rate", rate);
-            try {
-                yamlConfiguration.save(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            save();
         }
 
         // 骨の数
@@ -1242,12 +1263,9 @@ public class WorldConfig {
             ItemType itemType = ItemType.BONE;
             String path = configPath + "item." + gameType.name().toLowerCase() + "." + itemType.getName();
 
-            System.out.println(gameType == WorldManager.GameType.START);
-            System.out.println(path);
-
             int defaultCount = gameType == WorldManager.GameType.START ? 8 : 5;
 
-            return new IItem(gameType, itemType, yamlConfiguration.getInt(path + ".count", defaultCount), yamlConfiguration.getInt(path + ".duration", 10));
+            return new IItem(difficulty, gameType, itemType, yamlConfiguration.getInt(path + ".count", defaultCount), yamlConfiguration.getInt(path + ".duration", 10));
         }
 
         // 羽の数
@@ -1255,12 +1273,9 @@ public class WorldConfig {
             ItemType itemType = ItemType.FEATHER;
             String path = configPath + "item." + gameType.name().toLowerCase() + "." + itemType.getName();
 
-            System.out.println(gameType == WorldManager.GameType.START);
-            System.out.println(path);
-
             int defaultCount = gameType == WorldManager.GameType.START ? 8 : 5;
 
-            return new IItem(gameType, itemType, yamlConfiguration.getInt(path + ".count", defaultCount), yamlConfiguration.getInt(path + ".duration", 10));
+            return new IItem(difficulty, gameType, itemType, yamlConfiguration.getInt(path + ".count", defaultCount), yamlConfiguration.getInt(path + ".duration", 10));
         }
 
         // 卵の数
@@ -1268,23 +1283,35 @@ public class WorldConfig {
             ItemType itemType = ItemType.EGG;
             String path = configPath + "item." + gameType.name().toLowerCase() + "." + itemType.getName();
 
-            System.out.println(gameType == WorldManager.GameType.START);
-            System.out.println(path);
-
             int defaultCount = gameType == WorldManager.GameType.START ? 8 : 5;
 
-            return new IItem(gameType, itemType, yamlConfiguration.getInt(path + ".count", defaultCount), yamlConfiguration.getInt(path + ".duration", 10));
+            return new IItem(difficulty, gameType, itemType, yamlConfiguration.getInt(path + ".count", defaultCount), yamlConfiguration.getInt(path + ".duration", 10));
+        }
+
+        public void save() {
+            try {
+                yamlConfiguration.save(file);
+
+                WorldConfig.file = this.file;
+                WorldConfig.yamlConfiguration = this.yamlConfiguration;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         public static class IItem {
 
-            private WorldManager.GameType gameType;
-            private ItemType itemType;
+            private final String configPath;
+
+            private final WorldManager.GameType gameType;
+            private final ItemType itemType;
 
             private int count;
             private int duration;
 
-            public IItem(WorldManager.GameType gameType, ItemType itemType, int count, int duration) {
+            public IItem(WorldManager.Difficulty difficulty, WorldManager.GameType gameType, ItemType itemType, int count, int duration) {
+                this.configPath = "difficulty." + difficulty.getName() + ".";
+
                 this.gameType = gameType;
                 this.itemType = itemType;
 
@@ -1302,9 +1329,9 @@ public class WorldConfig {
 
             public void setCount(int count) {
                 this.count = count;
-                yamlConfiguration.set(configPath + "item." + gameType.name().toLowerCase() + "." + itemType.getName() + ".count", count);
+                WorldConfig.yamlConfiguration.set(configPath + "item." + gameType.name().toLowerCase() + "." + itemType.getName() + ".count", count);
                 try {
-                    yamlConfiguration.save(file);
+                    WorldConfig.yamlConfiguration.save(WorldConfig.file);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -1312,9 +1339,9 @@ public class WorldConfig {
 
             public void setDuration(int duration) {
                 this.duration = duration;
-                yamlConfiguration.set(configPath + "item." + gameType.name().toLowerCase() + "." + itemType.getName() + ".duration", duration);
+                WorldConfig.yamlConfiguration.set(configPath + "item." + gameType.name().toLowerCase() + "." + itemType.getName() + ".duration", duration);
                 try {
-                    yamlConfiguration.save(file);
+                    WorldConfig.yamlConfiguration.save(WorldConfig.file);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -1333,41 +1360,14 @@ public class WorldConfig {
     }
 
 
-    public abstract static class IConfig {
-
-        public WorldConfig worldConfig;
-
-        public File file;
-        public YamlConfiguration yamlConfiguration;
-
-        public IConfig(WorldConfig worldConfig) {
-            this.worldConfig = worldConfig;
-            this.file = worldConfig.file;
-            this.yamlConfiguration = worldConfig.yamlConfiguration;
-        }
-
-        public void save() {
-            try {
-                yamlConfiguration.save(file);
-            } catch (IOException e) {
-                Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "予期しないエラーが発生しました。\n" +
-                        MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "位置: " + Main.PACKAGE_PATH + ".API.Manager.World.WorldConfig.IConfig (継承元・先クラス)");
-                e.printStackTrace();
-            }
-        }
-    }
-
     public abstract static class IBorderConfig {
 
-        public WorldConfig worldConfig;
-
         public File file;
         public YamlConfiguration yamlConfiguration;
 
-        public IBorderConfig(WorldConfig worldConfig) {
-            this.worldConfig = worldConfig;
-            this.file = worldConfig.file;
-            this.yamlConfiguration = worldConfig.yamlConfiguration;
+        public IBorderConfig() {
+            this.file = WorldConfig.file;
+            this.yamlConfiguration = WorldConfig.yamlConfiguration;
         }
 
         public abstract boolean isLocation(BorderType borderType);
@@ -1379,6 +1379,9 @@ public class WorldConfig {
         public void save() {
             try {
                 yamlConfiguration.save(file);
+
+                WorldConfig.file = this.file;
+                WorldConfig.yamlConfiguration = this.yamlConfiguration;
             } catch (IOException e) {
                 Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "予期しないエラーが発生しました。\n" +
                         MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "位置: " + Main.PACKAGE_PATH + ".API.Manager.World.WorldConfig.IBorderConfig (継承元・先クラス)");

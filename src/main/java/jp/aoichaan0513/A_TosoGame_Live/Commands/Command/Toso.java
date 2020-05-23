@@ -1,14 +1,16 @@
 package jp.aoichaan0513.A_TosoGame_Live.Commands.Command;
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.RateManager;
-import jp.aoichaan0513.A_TosoGame_Live.API.Timer.TimerFormat;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
-import jp.aoichaan0513.A_TosoGame_Live.Timer.TimerRunnable;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import jp.aoichaan0513.A_TosoGame_Live.Runnable.GameRunnable;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat;
+import org.bukkit.*;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -38,6 +40,17 @@ public class Toso extends ICommand {
                     Main.getInstance().reloadConfig();
                     Main.loadConfig();
 
+                    PlayerManager.reloadConfig();
+
+                    World world = WorldManager.getWorld();
+
+                    world.setDifficulty(Difficulty.EASY);
+                    world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+                    world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+                    world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+
+                    Main.setWorldConfig(new WorldConfig(world));
+
                     sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "設定ファイルを読み込みました。");
                     return;
                 } else if (args[0].equalsIgnoreCase("time")) {
@@ -47,9 +60,9 @@ public class Toso extends ICommand {
                                 try {
                                     int i = Integer.parseInt(args[2]);
 
-                                    TimerRunnable.addGameTime(i);
-                                    sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimerFormat.formatJapan(TimerRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
-                                            MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + TimerFormat.formatJapan(i) + "追加");
+                                    GameRunnable.addGameTime(i);
+                                    sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimeFormat.formatJapan(GameRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
+                                            MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + TimeFormat.formatJapan(i) + "追加");
                                     return;
                                 } catch (NumberFormatException err) {
                                     MainAPI.sendMessage(sp, MainAPI.ErrorMessage.ARGS_INTEGER);
@@ -63,9 +76,9 @@ public class Toso extends ICommand {
                                 try {
                                     int i = Integer.parseInt(args[2]);
 
-                                    TimerRunnable.removeGameTime(i);
-                                    sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimerFormat.formatJapan(TimerRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
-                                            MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + TimerFormat.formatJapan(i) + "削除");
+                                    GameRunnable.removeGameTime(i);
+                                    sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimeFormat.formatJapan(GameRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
+                                            MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + TimeFormat.formatJapan(i) + "削除");
                                     return;
                                 } catch (NumberFormatException err) {
                                     MainAPI.sendMessage(sp, MainAPI.ErrorMessage.ARGS_INTEGER);
@@ -77,8 +90,8 @@ public class Toso extends ICommand {
                         } else if (args[1].equalsIgnoreCase("set")) {
                             if (args.length != 2) {
                                 try {
-                                    TimerRunnable.setGameTime(Integer.parseInt(args[2]));
-                                    sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimerFormat.formatJapan(TimerRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。");
+                                    GameRunnable.setGameTime(Integer.parseInt(args[2]));
+                                    sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimeFormat.formatJapan(GameRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。");
                                     return;
                                 } catch (NumberFormatException err) {
                                     MainAPI.sendMessage(sp, MainAPI.ErrorMessage.ARGS_INTEGER);
@@ -111,8 +124,8 @@ public class Toso extends ICommand {
                                         try {
                                             int i = Integer.parseInt(args[3]);
 
-                                            RateManager.addRate(p, i);
-                                            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + RateManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
+                                            MoneyManager.addRate(p, i);
+                                            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + MoneyManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
                                                     MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + i + "円追加");
                                             return;
                                         } catch (NumberFormatException err) {
@@ -136,8 +149,8 @@ public class Toso extends ICommand {
                                         try {
                                             int i = Integer.parseInt(args[3]);
 
-                                            RateManager.removeRate(p, i);
-                                            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + RateManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
+                                            MoneyManager.removeRate(p, i);
+                                            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + MoneyManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
                                                     MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + i + "円削除");
                                             return;
                                         } catch (NumberFormatException err) {
@@ -159,8 +172,8 @@ public class Toso extends ICommand {
                                     if (Bukkit.getOfflinePlayer(args[2]).isOnline()) {
                                         Player p = Bukkit.getPlayerExact(args[2]);
                                         try {
-                                            RateManager.setRate(p, Integer.parseInt(args[3]));
-                                            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + RateManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。");
+                                            MoneyManager.setRate(p, Integer.parseInt(args[3]));
+                                            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + MoneyManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。");
                                             return;
                                         } catch (NumberFormatException err) {
                                             MainAPI.sendMessage(sp, MainAPI.ErrorMessage.ARGS_INTEGER);
@@ -226,7 +239,6 @@ public class Toso extends ICommand {
             return;
         }
         MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS);
-        return;
     }
 
     @Override
@@ -241,6 +253,17 @@ public class Toso extends ICommand {
                 Main.getInstance().reloadConfig();
                 Main.loadConfig();
 
+                PlayerManager.reloadConfig();
+
+                World world = WorldManager.getWorld();
+
+                world.setDifficulty(Difficulty.EASY);
+                world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+                world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+                world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+
+                Main.setWorldConfig(new WorldConfig(world));
+
                 bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "設定ファイルを読み込みました。");
                 return;
             } else if (args[0].equalsIgnoreCase("time")) {
@@ -250,9 +273,9 @@ public class Toso extends ICommand {
                             try {
                                 int i = Integer.parseInt(args[2]);
 
-                                TimerRunnable.addGameTime(i);
-                                bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimerFormat.formatJapan(TimerRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
-                                        MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + TimerFormat.formatJapan(i) + "追加");
+                                GameRunnable.addGameTime(i);
+                                bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimeFormat.formatJapan(GameRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
+                                        MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + TimeFormat.formatJapan(i) + "追加");
                                 return;
                             } catch (NumberFormatException err) {
                                 MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_INTEGER);
@@ -266,9 +289,9 @@ public class Toso extends ICommand {
                             try {
                                 int i = Integer.parseInt(args[2]);
 
-                                TimerRunnable.removeGameTime(i);
-                                bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimerFormat.formatJapan(TimerRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
-                                        MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + TimerFormat.formatJapan(i) + "削除");
+                                GameRunnable.removeGameTime(i);
+                                bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimeFormat.formatJapan(GameRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
+                                        MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + TimeFormat.formatJapan(i) + "削除");
                                 return;
                             } catch (NumberFormatException err) {
                                 MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_INTEGER);
@@ -280,8 +303,8 @@ public class Toso extends ICommand {
                     } else if (args[1].equalsIgnoreCase("set")) {
                         if (args.length != 2) {
                             try {
-                                TimerRunnable.setGameTime(Integer.parseInt(args[2]));
-                                bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimerFormat.formatJapan(TimerRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。");
+                                GameRunnable.setGameTime(Integer.parseInt(args[2]));
+                                bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimeFormat.formatJapan(GameRunnable.getGameTime()) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。");
                                 return;
                             } catch (NumberFormatException err) {
                                 MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_INTEGER);
@@ -314,8 +337,8 @@ public class Toso extends ICommand {
                                     try {
                                         int i = Integer.parseInt(args[3]);
 
-                                        RateManager.addRate(p, i);
-                                        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + RateManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
+                                        MoneyManager.addRate(p, i);
+                                        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + MoneyManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
                                                 MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + i + "円追加");
                                         return;
                                     } catch (NumberFormatException err) {
@@ -339,8 +362,8 @@ public class Toso extends ICommand {
                                     try {
                                         int i = Integer.parseInt(args[3]);
 
-                                        RateManager.removeRate(p, i);
-                                        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + RateManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
+                                        MoneyManager.removeRate(p, i);
+                                        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + MoneyManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。\n" +
                                                 MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + i + "円削除");
                                         return;
                                     } catch (NumberFormatException err) {
@@ -362,8 +385,8 @@ public class Toso extends ICommand {
                                 if (Bukkit.getOfflinePlayer(args[2]).isOnline()) {
                                     Player p = Bukkit.getPlayerExact(args[2]);
                                     try {
-                                        RateManager.setRate(p, Integer.parseInt(args[3]));
-                                        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + RateManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。");
+                                        MoneyManager.setRate(p, Integer.parseInt(args[3]));
+                                        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + args[2] + "のレートを" + ChatColor.GREEN + ChatColor.UNDERLINE + MoneyManager.getRate(p) + "円" + ChatColor.RESET + ChatColor.GRAY + "に設定しました。");
                                         return;
                                     } catch (NumberFormatException err) {
                                         MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_INTEGER);
@@ -397,13 +420,36 @@ public class Toso extends ICommand {
             return;
         }
         sendHelpMessage(bs);
-        return;
     }
 
     @Override
     public void onConsoleCommand(ConsoleCommandSender cs, Command cmd, String label, String[] args) {
-        MainAPI.sendMessage(cs, MainAPI.ErrorMessage.NOT_PLAYER);
-        return;
+        if (args.length != 0) {
+            if (args[0].equalsIgnoreCase("help")) {
+                sendHelpMessage(cs);
+                return;
+            } else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
+                cs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "設定ファイルを読み込んでいます…");
+
+                Main.getInstance().reloadConfig();
+                Main.loadConfig();
+
+                PlayerManager.reloadConfig();
+
+                World world = WorldManager.getWorld();
+
+                world.setDifficulty(Difficulty.EASY);
+                world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+                world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+                world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+
+                Main.setWorldConfig(new WorldConfig(world));
+
+                cs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "設定ファイルを読み込みました。");
+                return;
+            }
+        }
+        sendHelpMessage(cs);
     }
 
     @Override
@@ -482,6 +528,19 @@ public class Toso extends ICommand {
 
     @Override
     public List<String> onConsoleTabComplete(ConsoleCommandSender cs, Command cmd, String alias, String[] args) {
+        if (args.length == 1) {
+            if (args[0].length() == 0) {
+                return Arrays.asList("help", "reload", "rl");
+            } else {
+                if ("help".startsWith(args[0])) {
+                    return Collections.singletonList("help");
+                } else if ("reload".startsWith(args[0])) {
+                    return Collections.singletonList("reload");
+                } else if ("rl".startsWith(args[0])) {
+                    return Collections.singletonList("rl");
+                }
+            }
+        }
         return null;
     }
 
@@ -526,7 +585,7 @@ public class Toso extends ICommand {
                 MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GOLD + "script" + ChatColor.GRAY + ": " + ChatColor.YELLOW + "スクリプトを実行します。\n" +
                 MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GOLD + "特に意味がないコマンド\n" +
                 MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GOLD + "nick" + ChatColor.GRAY + ": " + ChatColor.YELLOW + "ニックネームを変更します。(ラグが起きるので非推奨です)\n" +
-                MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GOLD + "ride" + ChatColor.GRAY + ": " + ChatColor.YELLOW + "プレイヤーに乗ります。");
-        return;
+                MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GOLD + "ride" + ChatColor.GRAY + ": " + ChatColor.YELLOW + "プレイヤーに乗ります。"
+        );
     }
 }

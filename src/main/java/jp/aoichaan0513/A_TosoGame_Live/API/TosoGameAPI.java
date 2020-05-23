@@ -2,11 +2,13 @@ package jp.aoichaan0513.A_TosoGame_Live.API;
 
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MissionManager;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Maps.MapUtility;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -48,7 +50,7 @@ public class TosoGameAPI {
                         ItemStack editStack = new ItemStack(Material.COMPASS);
                         ItemMeta editMeta = editStack.getItemMeta();
                         editMeta.setDisplayName(ChatColor.GREEN + "コンパス (WorldEdit)");
-                        editMeta.setLore(Arrays.asList(ChatColor.YELLOW + "右クリックした方向にテレポートが出来ます。"));
+                        editMeta.setLore(Arrays.asList(ChatColor.YELLOW + "右クリックした方向にテレポートができます。"));
                         editStack.setItemMeta(editMeta);
 
                         i.setItem(2, editStack);
@@ -89,16 +91,30 @@ public class TosoGameAPI {
                         }
                     }
 
-                    ItemStack boneStack = new ItemStack(Material.BONE, difficultyConfig.getBone(type).getCount());
+                    WorldConfig.DifficultyConfig.IItem boneItem = difficultyConfig.getBone(type);
+                    ItemStack boneStack = new ItemStack(Material.BONE, boneItem.getCount());
                     ItemMeta boneMeta = boneStack.getItemMeta();
                     boneMeta.setDisplayName(ChatColor.GREEN + "骨 (透明化)");
-                    boneMeta.setLore(Arrays.asList(ChatColor.YELLOW + "右クリックして10秒間透明化します。"));
+                    boneMeta.setLore(
+                            Arrays.asList(
+                                    ChatColor.YELLOW + "クリックで" + TimeFormat.formatSec(boneItem.getDuration()) + "秒間透明になります。",
+                                    "",
+                                    "" + ChatColor.BLUE + ChatColor.UNDERLINE + "クールタイム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatSec(boneItem.getDuration() + 5) + ChatColor.GRAY + "秒"
+                            )
+                    );
                     boneStack.setItemMeta(boneMeta);
 
-                    ItemStack featherStack = new ItemStack(Material.FEATHER, difficultyConfig.getFeather(type).getCount());
+                    WorldConfig.DifficultyConfig.IItem featherItem = difficultyConfig.getFeather(type);
+                    ItemStack featherStack = new ItemStack(Material.FEATHER, featherItem.getCount());
                     ItemMeta featherMeta = featherStack.getItemMeta();
                     featherMeta.setDisplayName(ChatColor.GREEN + "羽 (移動速度上昇)");
-                    featherMeta.setLore(Arrays.asList(ChatColor.YELLOW + "右クリックして10秒間移動速度が上昇します。"));
+                    featherMeta.setLore(
+                            Arrays.asList(
+                                    ChatColor.YELLOW + "クリックで" + TimeFormat.formatSec(featherItem.getDuration()) + "秒間移動速度が上昇します。",
+                                    "",
+                                    "" + ChatColor.BLUE + ChatColor.UNDERLINE + "クールタイム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TimeFormat.formatSec(featherItem.getDuration() + 5) + ChatColor.GRAY + "秒"
+                            )
+                    );
                     featherStack.setItemMeta(featherMeta);
 
                     ItemStack eggStack = new ItemStack(Material.EGG, difficultyConfig.getEgg(type).getCount());
@@ -132,7 +148,7 @@ public class TosoGameAPI {
                     ItemStack editStack = new ItemStack(Material.COMPASS);
                     ItemMeta editMeta = editStack.getItemMeta();
                     editMeta.setDisplayName(ChatColor.GREEN + "コンパス (WorldEdit)");
-                    editMeta.setLore(Arrays.asList(ChatColor.YELLOW + "右クリックした方向にテレポートが出来ます。"));
+                    editMeta.setLore(Arrays.asList(ChatColor.YELLOW + "クリックした方向にテレポートができます。"));
                     editStack.setItemMeta(editMeta);
 
                     i.setItem(2, editStack);
@@ -146,7 +162,6 @@ public class TosoGameAPI {
                 return;
             }
         }
-        return;
     }
 
     public static void setArmor(Player p) {
@@ -156,16 +171,14 @@ public class TosoGameAPI {
             p.getInventory().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
             p.getInventory().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
             p.getInventory().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-            return;
         } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, p)) {
             p.getInventory().clear();
-            p.getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
+            // p.getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
+            p.getInventory().setHelmet(new ItemStack(Material.HONEY_BLOCK));
             p.getInventory().setChestplate(new ItemStack(Material.GOLDEN_CHESTPLATE));
             p.getInventory().setLeggings(new ItemStack(Material.GOLDEN_LEGGINGS));
             p.getInventory().setBoots(new ItemStack(Material.GOLDEN_BOOTS));
-            return;
         }
-        return;
     }
 
     public static void removeArmor(Player p) {
@@ -173,7 +186,6 @@ public class TosoGameAPI {
         p.getInventory().setChestplate(new ItemStack(Material.AIR));
         p.getInventory().setLeggings(new ItemStack(Material.AIR));
         p.getInventory().setBoots(new ItemStack(Material.AIR));
-        return;
     }
 
     public static void setPotionEffect(Player p) {
@@ -181,8 +193,6 @@ public class TosoGameAPI {
     }
 
     public static void setPotionEffect(Player p, boolean isRemove) {
-        if (!GameManager.isGame()) return;
-
         if (isRemove)
             for (PotionEffect effect : p.getActivePotionEffects())
                 p.removePotionEffect(effect.getType());
@@ -190,12 +200,13 @@ public class TosoGameAPI {
         p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 200000, 1, false, false));
 
         if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)) {
-            p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 200, 1, false, false));
-            p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1, false, false));
+            if (GameManager.isGame(GameManager.GameState.READY) && GameManager.isGame(GameManager.GameState.GAME)) {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 200, 1, false, false));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1, false, false));
+            }
         } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, p)) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200000, 0, false, false));
         }
-        return;
     }
 
     public static void showPlayers(Player p) {
@@ -218,15 +229,11 @@ public class TosoGameAPI {
 
         // 逃走者が透明を使用した時
         if (!Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, p)) {
-            for (UUID uuid : Main.invisibleList) {
-                if (Bukkit.getPlayer(uuid) == null) continue;
-                p.hidePlayer(Bukkit.getPlayer(uuid));
-            }
+            for (Player player : MainAPI.getOnlinePlayers(Main.invisibleSet))
+                p.hidePlayer(player);
         } else {
-            for (UUID uuid : Main.invisibleList) {
-                if (Bukkit.getPlayer(uuid) == null) continue;
-                p.showPlayer(Bukkit.getPlayer(uuid));
-            }
+            for (Player player : MainAPI.getOnlinePlayers(Main.invisibleSet))
+                p.showPlayer(player);
         }
     }
 
@@ -235,33 +242,32 @@ public class TosoGameAPI {
     }
 
     public static boolean isAdmin(Player p) {
-        return p.isOp() && (isBroadCaster(p) || isPermissionHave(p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, p));
+        return p.isOp() && (isBroadCaster(p) || hasPermission(p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, p));
+    }
+
+    public static boolean hasPermission(Player p) {
+        return PlayerManager.loadConfig(p).getPermission();
     }
 
     public static boolean isBroadCaster(Player p) {
-        return Main.getMainConfig().getStringList("broadCasters").contains(p.getUniqueId().toString());
-    }
-
-    public static boolean isPermissionHave(Player p) {
-        return Main.getMainConfig().getStringList("permissionHaves").contains(p.getUniqueId().toString());
+        return PlayerManager.loadConfig(p).getBroadCaster();
     }
 
     public static void toggleOp(Player p) {
-        if (TosoGameAPI.isBroadCaster(p) || TosoGameAPI.isPermissionHave(p)) {
-            if (p.isOp())
-                removeOp(p);
-            else
-                addOp(p);
-        }
+        if (!isBroadCaster(p) && !hasPermission(p)) return;
+        if (p.isOp())
+            removeOp(p);
+        else
+            addOp(p);
     }
 
     public static void addOp(Player p) {
-        if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, p) || TosoGameAPI.isBroadCaster(p) || TosoGameAPI.isPermissionHave(p))
+        if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, p) || hasPermission(p) || isBroadCaster(p))
             p.setOp(true);
     }
 
     public static void removeOp(Player p) {
-        if (!Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, p) || TosoGameAPI.isBroadCaster(p) || TosoGameAPI.isPermissionHave(p))
+        if (!Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, p) || hasPermission(p) || isBroadCaster(p))
             p.setOp(false);
     }
 
@@ -269,8 +275,9 @@ public class TosoGameAPI {
         Bukkit.getScheduler().runTask(Main.getInstance(), () -> p.teleport(location));
     }
 
-    public static void teleport(Player p, List<Location> list) {
+    public static void teleport(Player p, Collection<Location> collection) {
         Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+            List<Location> list = new ArrayList<>(collection);
             Collections.shuffle(list, ThreadLocalRandom.current());
             p.teleport(list.get(0));
         });

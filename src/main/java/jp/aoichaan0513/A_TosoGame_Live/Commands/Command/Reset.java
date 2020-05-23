@@ -4,9 +4,11 @@ import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.*;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory.Left.Call;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory.Right.MissionInventory;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerConfig;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.ScoreBoard;
+import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
@@ -32,9 +34,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class Reset extends ICommand {
 
@@ -49,7 +52,7 @@ public class Reset extends ICommand {
                 reset(sp);
                 return;
             }
-            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ゲーム中のため実行できません。");
+            MainAPI.sendMessage(sp, MainAPI.ErrorMessage.GAME);
             return;
         }
         MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS);
@@ -62,7 +65,7 @@ public class Reset extends ICommand {
             reset(bs);
             return;
         }
-        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ゲーム中のため実行できません。");
+        MainAPI.sendMessage(bs, MainAPI.ErrorMessage.GAME);
         return;
     }
 
@@ -71,6 +74,22 @@ public class Reset extends ICommand {
         MainAPI.sendMessage(cs, MainAPI.ErrorMessage.NOT_PLAYER);
         return;
     }
+
+    @Override
+    public List<String> onPlayerTabComplete(Player sp, Command cmd, String alias, String[] args) {
+        return null;
+    }
+
+    @Override
+    public List<String> onBlockTabComplete(BlockCommandSender bs, Command cmd, String alias, String[] args) {
+        return null;
+    }
+
+    @Override
+    public List<String> onConsoleTabComplete(ConsoleCommandSender cs, Command cmd, String alias, String[] args) {
+        return null;
+    }
+
 
     private void reset(CommandSender sender) {
         WorldConfig worldConfig = Main.getWorldConfig();
@@ -83,15 +102,16 @@ public class Reset extends ICommand {
 
         Call.reset();
 
-        Main.playerList.clear();
-        Main.shuffleList.clear();
-        Main.invisibleList.clear();
+        Main.opGamePlayerSet.clear();
+        Main.hunterShuffleSet.clear();
+        Main.tuhoShuffleSet.clear();
+        Main.invisibleSet.clear();
 
         // TosoGameAPI.respawnCoolTimeMap.clear();
         RespawnRunnable.reset();
         TosoGameAPI.difficultyMap.clear();
         onMove.zoneList.clear();
-        onDamage.hashMap.clear();
+        onDamage.hunterMap.clear();
         HunterZone.codeList.clear();
 
         for (Player player : Bukkit.getOnlinePlayers())
@@ -106,8 +126,13 @@ public class Reset extends ICommand {
         MissionManager.resetMission();
         MissionInventory.reset();
 
-        RateManager.resetMoney();
-        RateManager.resetRate();
+        for (Map.Entry<UUID, Long> entry : MoneyManager.getRewardMap().entrySet()) {
+            PlayerConfig playerConfig = PlayerManager.reloadConfig(entry.getKey());
+            playerConfig.setMoney(playerConfig.getMoney() + MoneyManager.getReward(entry.getKey()));
+        }
+
+        MoneyManager.resetReward();
+        MoneyManager.resetRate();
 
         for (Entity entity : WorldManager.getWorld().getEntities())
             if (entity.getType() == EntityType.ZOMBIE)
@@ -115,42 +140,41 @@ public class Reset extends ICommand {
 
         onInventory.isAllowOpen = false;
         TosoGameAPI.isRes = true;
-        onInteract.loc = null;
-        onInteract.loc2 = null;
+        onInteract.successBlockLoc = null;
+        onInteract.hunterZoneBlockLoc = null;
         HunterZone.code = "";
 
         List<Player> list = (List<Player>) Bukkit.getOnlinePlayers();
         for (int i = 0; i < list.size(); i++) {
-            double d = i / 20;
-            Player player = list.get(0);
+            long l = i / 20;
+            Player player = list.get(i);
 
-            player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたのデータは" + d + "秒後にリセットが行われます。");
+            player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたのデータは" + l + "秒後にリセットが行われます。");
 
             new BukkitRunnable() {
 
                 @Override
                 public void run() {
+                    player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたのデータをリセットしています…");
+
                     Teams.setTeamOption(player);
                     TosoGameAPI.showPlayers(player);
 
                     if (!Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, player)) {
-                        player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたのデータをリセットしています…");
-
                         TosoGameAPI.removeArmor(player);
                         player.getInventory().clear();
 
                         Teams.joinTeam(Teams.OnlineTeam.TOSO_PLAYER, player);
                         player.setGameMode(GameMode.ADVENTURE);
 
-                        if (!Main.playerList.contains(player))
-                            Main.playerList.add(player);
+                        Main.opGamePlayerSet.add(player.getUniqueId());
 
                         MissionManager.reloadBook(player);
 
                         for (PotionEffect effect : player.getActivePotionEffects())
                             player.removePotionEffect(effect.getType());
 
-                        Scoreboard board = ScoreBoard.getBoard(player);
+                        org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(player);
 
                         if (player.getInventory().getItemInMainHand().getType() == Material.BOOK) {
                             ItemMeta itemMeta = player.getInventory().getItemInMainHand().getItemMeta();
@@ -173,35 +197,23 @@ public class Reset extends ICommand {
                         }
 
                         player.teleport(worldConfig.getRespawnLocationConfig().getLocation(1));
-                        player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "あなたのデータをリセットしました。");
                     } else {
-                        Scoreboard board = ScoreBoard.getBoard(player);
+                        org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(player);
                         board.getObjective(TosoGameAPI.Objective.SIDEBAR.getName()).setDisplaySlot(DisplaySlot.SIDEBAR);
                     }
+
+                    player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "あなたのデータをリセットしました。\n" +
+                            MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "現在のチームは" + ChatColor.BOLD + ChatColor.UNDERLINE + Teams.getJoinedTeam(player).getDisplayName() + ChatColor.RESET + ChatColor.GRAY + "に設定されています。\n" +
+                            MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "現在の難易度は" + ChatColor.BOLD + ChatColor.UNDERLINE + TosoGameAPI.difficultyMap.get(player.getUniqueId()).getDisplayName() + ChatColor.RESET + ChatColor.GRAY + "に設定されています。");
                 }
-            }.runTaskLater(Main.getInstance(), i + 1);
+            }.runTaskLater(Main.getInstance(), l);
         }
 
         Teams.setTeamOptions();
 
         BossBarManager.showBar();
 
-        sender.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + (Bukkit.getOnlinePlayers().size() - Teams.getOnlineCount(Teams.OnlineTeam.TOSO_ADMIN)) + "人のデータをリセットしました。");
+        Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> sender.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + Bukkit.getOnlinePlayers().size() + "人のデータをリセットしました。"), (list.size() - 1) / 20);
         return;
-    }
-
-    @Override
-    public List<String> onPlayerTabComplete(Player sp, Command cmd, String alias, String[] args) {
-        return null;
-    }
-
-    @Override
-    public List<String> onBlockTabComplete(BlockCommandSender bs, Command cmd, String alias, String[] args) {
-        return null;
-    }
-
-    @Override
-    public List<String> onConsoleTabComplete(ConsoleCommandSender cs, Command cmd, String alias, String[] args) {
-        return null;
     }
 }

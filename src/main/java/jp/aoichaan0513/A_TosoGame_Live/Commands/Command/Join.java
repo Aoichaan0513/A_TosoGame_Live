@@ -26,7 +26,7 @@ public class Join extends ICommand {
 
     @Override
     public void onPlayerCommand(Player sp, Command cmd, String label, String[] args) {
-        if (TosoGameAPI.isBroadCaster(sp) || TosoGameAPI.isPermissionHave(sp)) {
+        if (TosoGameAPI.isBroadCaster(sp) || TosoGameAPI.hasPermission(sp)) {
             if (args.length != 0) {
                 if (TosoGameAPI.isBroadCaster(sp) || TosoGameAPI.isAdmin(sp)) {
                     for (String name : args) {
@@ -44,8 +44,7 @@ public class Join extends ICommand {
                                 TosoGameAPI.setPotionEffect(p);
                                 TosoGameAPI.removeOp(p);
 
-                                if (!Main.playerList.contains(p))
-                                    Main.playerList.add(p);
+                                Main.opGamePlayerSet.add(p.getUniqueId());
 
                                 TosoGameAPI.showPlayers(p);
                                 TosoGameAPI.hidePlayers(p);
@@ -78,8 +77,7 @@ public class Join extends ICommand {
                     TosoGameAPI.setPotionEffect(sp);
                     TosoGameAPI.removeOp(sp);
 
-                    if (!Main.playerList.contains(sp))
-                        Main.playerList.add(sp);
+                    Main.opGamePlayerSet.add(sp.getUniqueId());
 
                     TosoGameAPI.showPlayers(sp);
                     TosoGameAPI.hidePlayers(sp);
@@ -120,8 +118,7 @@ public class Join extends ICommand {
                         TosoGameAPI.setPotionEffect(p);
                         TosoGameAPI.removeOp(p);
 
-                        if (!Main.playerList.contains(p))
-                            Main.playerList.add(p);
+                        Main.opGamePlayerSet.add(p.getUniqueId());
 
                         TosoGameAPI.showPlayers(p);
                         TosoGameAPI.hidePlayers(p);
@@ -165,8 +162,7 @@ public class Join extends ICommand {
                         TosoGameAPI.setPotionEffect(p);
                         TosoGameAPI.removeOp(p);
 
-                        if (!Main.playerList.contains(p))
-                            Main.playerList.add(p);
+                        Main.opGamePlayerSet.add(p.getUniqueId());
 
                         TosoGameAPI.showPlayers(p);
                         TosoGameAPI.hidePlayers(p);

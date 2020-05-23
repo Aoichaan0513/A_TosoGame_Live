@@ -5,18 +5,23 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory.MainInventory;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory.Right.MissionInventory;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MissionManager;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
-import jp.aoichaan0513.A_TosoGame_Live.API.Timer.TimerFormat;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
 import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone;
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.type.Stairs;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,17 +31,17 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Button;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 
 public class onInteract implements Listener {
 
-    public static Location loc;
-    public static Location loc2;
+    public static Location successBlockLoc;
+    public static Location hunterZoneBlockLoc;
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
@@ -60,23 +65,22 @@ public class onInteract implements Listener {
                                 TosoGameAPI.setItem(WorldManager.GameType.RESPAWN, p);
                                 TosoGameAPI.setPotionEffect(p);
 
-                                if (!Main.playerList.contains(p))
-                                    Main.playerList.add(p);
+                                Main.opGamePlayerSet.add(p.getUniqueId());
 
                                 TosoGameAPI.showPlayers(p);
-                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                 p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたを逃走者に追加しました。\n" +
                                         MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたはあと" + (difficultyConfig.getRespawnDenyCount() - RespawnRunnable.getCount(p)) + "回復活できます。");
                                 Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + p.getName() + "が復活しました。(" + ChatColor.UNDERLINE + "残り" + (Teams.getOnlineCount(Teams.OnlineTeam.TOSO_PLAYER) + Teams.getOnlineCount(Teams.OnlineTeam.TOSO_SUCCESS)) + "人" + ChatColor.RESET + ChatColor.GRAY + ")");
                                 return;
                             } else {
-                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
                                 p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたは" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "復活クールタイム中" + ChatColor.RESET + ChatColor.GRAY + "のため復活できません。");
                                 return;
                             }
                         } else {
-                            TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                            TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
                             p.setGameMode(GameMode.ADVENTURE);
                             p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたは" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + difficultyConfig.getRespawnDenyCount() + "回復活" + ChatColor.RESET + ChatColor.GRAY + "したためこれ以上は復活できません。");
                             return;
@@ -94,8 +98,10 @@ public class onInteract implements Listener {
                                     TosoGameAPI.setItem(WorldManager.GameType.RESPAWN, p);
                                     TosoGameAPI.setPotionEffect(p);
 
-                                    if (!Main.playerList.contains(p))
-                                        Main.playerList.add(p);
+
+
+                                        if (!Main.opGamePlayerList.contains(p.getUniqueId()))
+                                            Main.opGamePlayerList.add(p.getUniqueId());
 
                                     TosoGameAPI.showPlayers(p);
                                     TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
@@ -124,8 +130,10 @@ public class onInteract implements Listener {
                             TosoGameAPI.setItem(WorldManager.GameType.RESPAWN, p);
                             TosoGameAPI.setPotionEffect(p);
 
-                            if (!Main.playerList.contains(p))
-                                Main.playerList.add(p);
+
+
+                                        if (!Main.opGamePlayerList.contains(p.getUniqueId()))
+                                            Main.opGamePlayerList.add(p.getUniqueId());
 
                             TosoGameAPI.showPlayers(p);
                             TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
@@ -137,15 +145,16 @@ public class onInteract implements Listener {
                         }
                         */
                     } else {
-                        TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                        TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
                         p.setGameMode(GameMode.ADVENTURE);
-                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム終了まで" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "残り" + TimerFormat.formatJapan(worldConfig.getGameConfig().getRespawnDeny()) + "以下" + ChatColor.RESET + ChatColor.GRAY + "になったため復活できません。");
+                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム終了まで" + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "残り" + TimeFormat.formatJapan(worldConfig.getGameConfig().getRespawnDeny()) + "以下" + ChatColor.RESET + ChatColor.GRAY + "になったため復活できません。");
                         return;
                     }
                 }
             }
         } else {
-            if (p.getInventory().getItemInMainHand().getType() == Material.BOOK || p.getInventory().getItemInOffHand().getType() == Material.BOOK && p.getInventory().getItemInMainHand().getType() == Material.AIR) {
+            if (p.getInventory().getItemInMainHand().getType() == Material.BOOK && (p.getInventory().getItemInOffHand().getType() == Material.AIR || p.getInventory().getItemInOffHand().getType() == Material.FILLED_MAP)
+                    || p.getInventory().getItemInOffHand().getType() == Material.BOOK && (p.getInventory().getItemInMainHand().getType() == Material.AIR || p.getInventory().getItemInMainHand().getType() == Material.FILLED_MAP)) {
                 if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
                     if (p.getInventory().getItemInMainHand().getType() == Material.BOOK) {
                         ItemMeta meta = p.getInventory().getItemInMainHand().getItemMeta();
@@ -227,15 +236,14 @@ public class onInteract implements Listener {
                                     || e.getClickedBlock().getType() == Material.BIRCH_BUTTON || e.getClickedBlock().getType() == Material.JUNGLE_BUTTON
                                     || e.getClickedBlock().getType() == Material.ACACIA_BUTTON || e.getClickedBlock().getType() == Material.DARK_OAK_BUTTON
                                     || e.getClickedBlock().getType() == Material.STONE_BUTTON) {
-                                Button button = (Button) e.getClickedBlock().getState().getData();
-                                BlockFace bf = button.getAttachedFace();
-                                Block block = e.getClickedBlock().getRelative(bf);
+                                Directional directional = (Directional) e.getClickedBlock().getBlockData();
+                                Block block = e.getClickedBlock().getRelative(directional.getFacing());
 
                                 if (block.getType() == Material.EMERALD_BLOCK) {
                                     if (GameManager.isGame(GameManager.GameState.GAME) && TosoGameAPI.isAdmin(p)) {
                                         if (worldConfig.getGameConfig().getSuccessMission()) {
                                             if (MissionManager.getMission() == MissionManager.MissionType.MISSION_SUCCESS || !MissionManager.isMission()) {
-                                                loc = block.getLocation();
+                                                successBlockLoc = block.getLocation();
 
                                                 if (!MissionManager.isMission()) {
                                                     MissionManager.sendFileMission(MissionManager.MissionType.MISSION_SUCCESS.getId(), p);
@@ -258,7 +266,7 @@ public class onInteract implements Listener {
                                 } else if (block.getType() == Material.BONE_BLOCK) {
                                     if (GameManager.isGame(GameManager.GameState.GAME) && TosoGameAPI.isAdmin(p)) {
                                         if (MissionManager.getMission() == MissionManager.MissionType.MISSION_HUNTER_ZONE || !MissionManager.isMission()) {
-                                            loc2 = block.getLocation();
+                                            hunterZoneBlockLoc = block.getLocation();
 
                                             if (!MissionManager.isMission()) {
                                                 MissionManager.sendFileMission(MissionManager.MissionType.MISSION_HUNTER_ZONE.getId(), p);
@@ -289,7 +297,7 @@ public class onInteract implements Listener {
 
                         p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, duration, 1, false, false));
 
-                        Main.invisibleList.add(p.getUniqueId());
+                        Main.invisibleSet.add(p.getUniqueId());
                         for (Player player : Bukkit.getOnlinePlayers())
                             TosoGameAPI.showPlayers(player);
 
@@ -305,7 +313,7 @@ public class onInteract implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                Main.invisibleList.remove(p.getUniqueId());
+                                Main.invisibleSet.remove(p.getUniqueId());
                                 for (Player player : Bukkit.getOnlinePlayers())
                                     TosoGameAPI.showPlayers(player);
                             }
@@ -321,7 +329,7 @@ public class onInteract implements Listener {
 
                         p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, duration, 1, false, false));
 
-                        Main.invisibleList.add(p.getUniqueId());
+                        Main.invisibleSet.add(p.getUniqueId());
                         for (Player player : Bukkit.getOnlinePlayers())
                             TosoGameAPI.showPlayers(player);
 
@@ -337,7 +345,7 @@ public class onInteract implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                Main.invisibleList.remove(p.getUniqueId());
+                                Main.invisibleSet.remove(p.getUniqueId());
                                 for (Player player : Bukkit.getOnlinePlayers())
                                     TosoGameAPI.showPlayers(player);
                             }
@@ -454,56 +462,103 @@ public class onInteract implements Listener {
         }
 
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)) {
-                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p)) {
-                    if (e.getClickedBlock().getType() == Material.OAK_SIGN || e.getClickedBlock().getType() == Material.SPRUCE_SIGN
-                            || e.getClickedBlock().getType() == Material.BIRCH_SIGN || e.getClickedBlock().getType() == Material.JUNGLE_SIGN
-                            || e.getClickedBlock().getType() == Material.ACACIA_SIGN || e.getClickedBlock().getType() == Material.DARK_OAK_SIGN
-                            || e.getClickedBlock().getType() == Material.OAK_WALL_SIGN || e.getClickedBlock().getType() == Material.SPRUCE_WALL_SIGN
-                            || e.getClickedBlock().getType() == Material.BIRCH_WALL_SIGN || e.getClickedBlock().getType() == Material.JUNGLE_WALL_SIGN
-                            || e.getClickedBlock().getType() == Material.ACACIA_WALL_SIGN || e.getClickedBlock().getType() == Material.DARK_OAK_WALL_SIGN) {
-                        Sign sign = (Sign) e.getClickedBlock().getState();
+            if (p.getInventory().getItemInMainHand().getType() == Material.AIR && e.getClickedBlock().getBlockData() instanceof Stairs
+                    && ((Stairs) e.getClickedBlock().getBlockData()).getHalf() == Bisected.Half.BOTTOM
+                    && e.getClickedBlock().getLocation().clone().add(0, -1, 0).getBlock().getType() == Material.BEDROCK) {
+                Location loc = e.getClickedBlock().getLocation().clone().add(0.5, 0, 0.5);
+                if (!Main.arrowSet.stream().anyMatch(arrow -> arrow.getLocation().getBlockX() == loc.getBlockX() && arrow.getLocation().getBlockY() == loc.getBlockY() && arrow.getLocation().getBlockZ() == loc.getBlockZ())) {
+                    Arrow arrow = p.getWorld().spawnArrow(loc, new Vector(0, 1, 0), 0, 0);
+                    arrow.setPassenger(p);
+                    Main.arrowSet.add(arrow);
+                }
+            } else {
+                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)) {
+                    if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p)) {
+                        if (e.getClickedBlock().getType() == Material.OAK_SIGN || e.getClickedBlock().getType() == Material.SPRUCE_SIGN
+                                || e.getClickedBlock().getType() == Material.BIRCH_SIGN || e.getClickedBlock().getType() == Material.JUNGLE_SIGN
+                                || e.getClickedBlock().getType() == Material.ACACIA_SIGN || e.getClickedBlock().getType() == Material.DARK_OAK_SIGN
+                                || e.getClickedBlock().getType() == Material.OAK_WALL_SIGN || e.getClickedBlock().getType() == Material.SPRUCE_WALL_SIGN
+                                || e.getClickedBlock().getType() == Material.BIRCH_WALL_SIGN || e.getClickedBlock().getType() == Material.JUNGLE_WALL_SIGN
+                                || e.getClickedBlock().getType() == Material.ACACIA_WALL_SIGN || e.getClickedBlock().getType() == Material.DARK_OAK_WALL_SIGN) {
+                            Sign sign = (Sign) e.getClickedBlock().getState();
 
-                        if (sign.getLine(0).equalsIgnoreCase(MainAPI.getPrefix()) && ChatColor.stripColor(sign.getLine(1)).equalsIgnoreCase("自首") && ChatColor.stripColor(sign.getLine(3)).equalsIgnoreCase("クリック")) {
-                            Location loc = p.getLocation();
+                            if (sign.getLine(0).equalsIgnoreCase(MainAPI.getPrefix()) && ChatColor.stripColor(sign.getLine(1)).equalsIgnoreCase("自首") && ChatColor.stripColor(sign.getLine(3)).equalsIgnoreCase("クリック")) {
+                                Location loc = p.getLocation();
 
-                            p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.GRAY + "");
+                                p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.GRAY + "");
 
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
 
+                                    }
+                                }.runTaskLater(Main.getInstance(), 20 * 10);
+
+                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
+
+                                Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p);
+                                p.setGameMode(GameMode.SPECTATOR);
+                                p.getInventory().clear();
+                                p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたを生存者 (自首)に追加しました。");
+                                Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + p.getName() + "が自首しました。");
+                                return;
+                            }
+                        } else {
+                            if (MissionManager.getMission() == MissionManager.MissionType.MISSION_SUCCESS) {
+                                if (e.getClickedBlock().getType() == Material.OAK_BUTTON || e.getClickedBlock().getType() == Material.SPRUCE_BUTTON
+                                        || e.getClickedBlock().getType() == Material.BIRCH_BUTTON || e.getClickedBlock().getType() == Material.JUNGLE_BUTTON
+                                        || e.getClickedBlock().getType() == Material.ACACIA_BUTTON || e.getClickedBlock().getType() == Material.DARK_OAK_BUTTON
+                                        || e.getClickedBlock().getType() == Material.STONE_BUTTON) {
+                                    if (!GameManager.isGame(GameManager.GameState.GAME)) return;
+
+                                    Directional directional = (Directional) e.getClickedBlock().getBlockData();
+                                    Block block = e.getClickedBlock().getRelative(directional.getFacing());
+
+                                    if (block.getType() == Material.EMERALD_BLOCK) {
+                                        if (block.getLocation().getBlockX() == successBlockLoc.getBlockX()
+                                                && block.getLocation().getBlockY() == successBlockLoc.getBlockY()
+                                                && block.getLocation().getBlockZ() == successBlockLoc.getBlockZ()) {
+                                            Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p);
+                                            p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたを生存者に追加しました。\n" +
+                                                    MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "サーバーから退出した場合は逃走者になります。");
+                                        }
+                                    }
                                 }
-                            }.runTaskLater(Main.getInstance(), 20 * 10);
+                            } else if (MissionManager.getMission() == MissionManager.MissionType.MISSION_AREA) {
+                                if (e.getClickedBlock().getType() == Material.GOLD_BLOCK) {
+                                    if (p.getInventory().getItemInMainHand().getType() == Material.STONE_PRESSURE_PLATE || p.getInventory().getItemInOffHand().getType() == Material.STONE_PRESSURE_PLATE) {
+                                        Location loc = e.getClickedBlock().getLocation().clone();
+                                        loc.add(0, 1, 0);
+                                        loc.getBlock().setType(Material.STONE_PRESSURE_PLATE);
+                                        Inventory i = p.getInventory();
+                                        i.removeItem(new ItemStack(Material.STONE_PRESSURE_PLATE, 1));
+                                        return;
+                                    }
+                                }
+                            } else if (MissionManager.getMission() == MissionManager.MissionType.MISSION_HUNTER_ZONE) {
+                                if (e.getClickedBlock().getType() == Material.OAK_BUTTON || e.getClickedBlock().getType() == Material.SPRUCE_BUTTON
+                                        || e.getClickedBlock().getType() == Material.BIRCH_BUTTON || e.getClickedBlock().getType() == Material.JUNGLE_BUTTON
+                                        || e.getClickedBlock().getType() == Material.ACACIA_BUTTON || e.getClickedBlock().getType() == Material.DARK_OAK_BUTTON
+                                        || e.getClickedBlock().getType() == Material.STONE_BUTTON) {
+                                    if (!GameManager.isGame(GameManager.GameState.GAME)) return;
 
-                            TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                    Directional directional = (Directional) e.getClickedBlock().getBlockData();
+                                    Block block = e.getClickedBlock().getRelative(directional.getFacing());
 
-                            Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p);
-                            p.setGameMode(GameMode.SPECTATOR);
-                            p.getInventory().clear();
-                            p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたを生存者 (自首)に追加しました。");
-                            Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + p.getName() + "が自首しました。");
-                            return;
-                        }
-                    } else {
-                        if (MissionManager.getMission() == MissionManager.MissionType.MISSION_SUCCESS) {
-                            if (e.getClickedBlock().getType() == Material.OAK_BUTTON || e.getClickedBlock().getType() == Material.SPRUCE_BUTTON
-                                    || e.getClickedBlock().getType() == Material.BIRCH_BUTTON || e.getClickedBlock().getType() == Material.JUNGLE_BUTTON
-                                    || e.getClickedBlock().getType() == Material.ACACIA_BUTTON || e.getClickedBlock().getType() == Material.DARK_OAK_BUTTON
-                                    || e.getClickedBlock().getType() == Material.STONE_BUTTON) {
-                                if (!GameManager.isGame(GameManager.GameState.GAME)) return;
-                                Button button = (Button) e.getClickedBlock().getState().getData();
-                                BlockFace bf = button.getAttachedFace();
-                                Block b = e.getClickedBlock().getRelative(bf);
-                                if (b.getType() == Material.EMERALD_BLOCK) {
-                                    if (b.getLocation().getBlockX() == loc.getBlockX() && b.getLocation().getBlockY() == loc.getBlockY() && b.getLocation().getBlockZ() == loc.getBlockZ()) {
-                                        Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p);
-                                        p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたを生存者に追加しました。\n" +
-                                                MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "サーバーから退出した場合は逃走者になります。");
+                                    if (block.getType() == Material.BONE_BLOCK) {
+                                        if (block.getLocation().getBlockX() == hunterZoneBlockLoc.getBlockX()
+                                                && block.getLocation().getBlockY() == hunterZoneBlockLoc.getBlockY()
+                                                && block.getLocation().getBlockZ() == hunterZoneBlockLoc.getBlockZ()) {
+                                            p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ハンターゾーンミッションのコード: " + HunterZone.code + "\n" +
+                                                    MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "\"/code " + HunterZone.code + "\"と入力してミッションを完了してください。\n" +
+                                                    MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "このコードを他の逃走者に教えるかどうかはあなた次第です。");
+                                        }
                                     }
                                 }
                             }
-                        } else if (MissionManager.getMission() == MissionManager.MissionType.MISSION_AREA) {
+                        }
+                    } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)) {
+                        if (MissionManager.getMission() == MissionManager.MissionType.MISSION_AREA) {
                             if (e.getClickedBlock().getType() == Material.GOLD_BLOCK) {
                                 if (p.getInventory().getItemInMainHand().getType() == Material.STONE_PRESSURE_PLATE || p.getInventory().getItemInOffHand().getType() == Material.STONE_PRESSURE_PLATE) {
                                     Location loc = e.getClickedBlock().getLocation().clone();
@@ -520,47 +575,18 @@ public class onInteract implements Listener {
                                     || e.getClickedBlock().getType() == Material.ACACIA_BUTTON || e.getClickedBlock().getType() == Material.DARK_OAK_BUTTON
                                     || e.getClickedBlock().getType() == Material.STONE_BUTTON) {
                                 if (!GameManager.isGame(GameManager.GameState.GAME)) return;
-                                Button button = (Button) e.getClickedBlock().getState().getData();
-                                BlockFace bf = button.getAttachedFace();
-                                Block b = e.getClickedBlock().getRelative(bf);
 
-                                if (b.getType() == Material.BONE_BLOCK) {
-                                    if (b.getLocation().getBlockX() == loc2.getBlockX() && b.getLocation().getBlockY() == loc2.getBlockY() && b.getLocation().getBlockZ() == loc2.getBlockZ()) {
+                                Directional directional = (Directional) e.getClickedBlock().getBlockData();
+                                Block block = e.getClickedBlock().getRelative(directional.getFacing());
+
+                                if (block.getType() == Material.BONE_BLOCK) {
+                                    if (block.getLocation().getBlockX() == hunterZoneBlockLoc.getBlockX()
+                                            && block.getLocation().getBlockY() == hunterZoneBlockLoc.getBlockY()
+                                            && block.getLocation().getBlockZ() == hunterZoneBlockLoc.getBlockZ()) {
                                         p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ハンターゾーンミッションのコード: " + HunterZone.code + "\n" +
                                                 MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "\"/code " + HunterZone.code + "\"と入力してミッションを完了してください。\n" +
                                                 MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "このコードを他の逃走者に教えるかどうかはあなた次第です。");
                                     }
-                                }
-                            }
-                        }
-                    }
-                } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)) {
-                    if (MissionManager.getMission() == MissionManager.MissionType.MISSION_AREA) {
-                        if (e.getClickedBlock().getType() == Material.GOLD_BLOCK) {
-                            if (p.getInventory().getItemInMainHand().getType() == Material.STONE_PRESSURE_PLATE || p.getInventory().getItemInOffHand().getType() == Material.STONE_PRESSURE_PLATE) {
-                                Location loc = e.getClickedBlock().getLocation().clone();
-                                loc.add(0, 1, 0);
-                                loc.getBlock().setType(Material.STONE_PRESSURE_PLATE);
-                                Inventory i = p.getInventory();
-                                i.removeItem(new ItemStack(Material.STONE_PRESSURE_PLATE, 1));
-                                return;
-                            }
-                        }
-                    } else if (MissionManager.getMission() == MissionManager.MissionType.MISSION_HUNTER_ZONE) {
-                        if (e.getClickedBlock().getType() == Material.OAK_BUTTON || e.getClickedBlock().getType() == Material.SPRUCE_BUTTON
-                                || e.getClickedBlock().getType() == Material.BIRCH_BUTTON || e.getClickedBlock().getType() == Material.JUNGLE_BUTTON
-                                || e.getClickedBlock().getType() == Material.ACACIA_BUTTON || e.getClickedBlock().getType() == Material.DARK_OAK_BUTTON
-                                || e.getClickedBlock().getType() == Material.STONE_BUTTON) {
-                            if (!GameManager.isGame(GameManager.GameState.GAME)) return;
-                            Button button = (Button) e.getClickedBlock().getState().getData();
-                            BlockFace bf = button.getAttachedFace();
-                            Block b = e.getClickedBlock().getRelative(bf);
-
-                            if (b.getType() == Material.BONE_BLOCK) {
-                                if (b.getLocation().getBlockX() == loc2.getBlockX() && b.getLocation().getBlockY() == loc2.getBlockY() && b.getLocation().getBlockZ() == loc2.getBlockZ()) {
-                                    p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ハンターゾーンミッションのコード: " + HunterZone.code + "\n" +
-                                            MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "\"/code " + HunterZone.code + "\"と入力してミッションを完了してください。\n" +
-                                            MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "このコードを他の逃走者に教えるかどうかはあなた次第です。");
                                 }
                             }
                         }
@@ -572,17 +598,23 @@ public class onInteract implements Listener {
 
     @EventHandler
     public void onInteractEntity(PlayerInteractEntityEvent e) {
-        if (e.getRightClicked() instanceof Player) {
-            Player damager = e.getPlayer();
+        Player damager = e.getPlayer();
+
+        if (e.getRightClicked() instanceof ItemFrame) {
+            if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) return;
+            e.setCancelled(true);
+        } else if (e.getRightClicked() instanceof Player) {
             Player player = (Player) e.getRightClicked();
 
             if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
                 if (damager.getInventory().getItemInMainHand().getType() == Material.GOLD_NUGGET || damager.getInventory().getItemInOffHand().getType() == Material.GOLD_NUGGET) {
                     e.setCancelled(true);
                     damager.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + player.getName() + "の情報\n" +
-                            MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "所属チーム" + ChatColor.GRAY + ": " + (Teams.getTeam(Teams.DisplaySlot.SIDEBAR, player).equals("") ? "不明" : Teams.getTeam(Teams.DisplaySlot.SIDEBAR, player)) + "\n" +
-                            MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "権限所持者" + ChatColor.GRAY + ": " + (TosoGameAPI.isPermissionHave(player) ? "はい" : "いいえ") + "\n" +
-                            MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "配信者" + ChatColor.GRAY + ": " + (TosoGameAPI.isBroadCaster(player) ? "はい" : "いいえ"));
+                            MainAPI.getPrefix(MainAPI.PrefixType.PRIMARY) + ChatColor.UNDERLINE + "権限所持者" + ChatColor.GRAY + ": " + (TosoGameAPI.hasPermission(player) ? "はい" : "いいえ") + "\n" +
+                            MainAPI.getPrefix(MainAPI.PrefixType.PRIMARY) + ChatColor.UNDERLINE + "配信者" + ChatColor.GRAY + ": " + (TosoGameAPI.isBroadCaster(player) ? "はい" : "いいえ") + "\n" +
+                            MainAPI.getPrefix(MainAPI.PrefixType.PRIMARY) + ChatColor.UNDERLINE + "チーム" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + Teams.getTeam(Teams.DisplaySlot.SIDEBAR, player) + "\n" +
+                            MainAPI.getPrefix(MainAPI.PrefixType.PRIMARY) + ChatColor.UNDERLINE + "難易度" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + TosoGameAPI.difficultyMap.get(player.getUniqueId()).getDisplayName() + "\n" +
+                            MainAPI.getPrefix(MainAPI.PrefixType.PRIMARY) + ChatColor.UNDERLINE + "賞金" + ChatColor.RESET + ChatColor.GRAY + ": " + ChatColor.YELLOW + MoneyManager.getReward(player) + ChatColor.GRAY + "円 (" + MoneyManager.getRate(player) + "円/秒)");
                     return;
                 }
             }

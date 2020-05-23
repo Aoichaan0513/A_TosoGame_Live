@@ -7,7 +7,6 @@ import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Script;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -29,11 +28,12 @@ public class onCommand implements Listener {
         String cmdName = e.getMessage().split(" ")[0].split(":").length > 1 ? e.getMessage().split(" ")[0].split(":")[1] : e.getMessage().split(" ")[0].substring(1);
         String[] args = e.getMessage().split(" ").length > 1 ? e.getMessage().substring(cmdName.length() + 1).split(" ") : new String[0];
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (TosoGameAPI.isAdmin(player)) {
+        if (!TosoGameAPI.isAdmin(p))
+            p.sendMessage(ChatColor.GRAY + "> " + e.getPlayer().getName() + ": " + e.getMessage());
+
+        for (Player player : Bukkit.getOnlinePlayers())
+            if (TosoGameAPI.isAdmin(player))
                 player.sendMessage(ChatColor.GRAY + "> " + e.getPlayer().getName() + ": " + e.getMessage());
-            }
-        }
 
         if (list.contains("/" + cmdName)) {
             if (!TosoGameAPI.isAdmin(p)) {
@@ -60,10 +60,12 @@ public class onCommand implements Listener {
     @EventHandler
     public void onServerCommand(ServerCommandEvent e) {
         if (e.getSender() instanceof BlockCommandSender) {
+            /*
             Block b = ((BlockCommandSender) e.getSender()).getBlock();
 
             Bukkit.getConsoleSender().sendMessage(ChatColor.GRAY + "> Command Block: /" + e.getCommand() + "\n" +
                     ChatColor.GRAY + "X: " + b.getX() + ", Y: " + b.getY() + ", Z:" + b.getZ());
+            */
         } else if (e.getSender() instanceof ConsoleCommandSender) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.GRAY + "> Console: /" + e.getCommand());
         }

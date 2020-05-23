@@ -24,10 +24,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class onDamage implements Listener {
 
-    public static HashMap<Player, Integer> hashMap = new HashMap<>();
+    public static HashMap<UUID, Integer> hunterMap = new HashMap<>();
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent e) {
@@ -55,11 +56,7 @@ public class onDamage implements Listener {
                     if (!player.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                         e.setCancelled(false);
 
-                        if (hashMap.containsKey(damager)) {
-                            hashMap.replace(damager, hashMap.get(damager), hashMap.get(damager) + 1);
-                        } else {
-                            hashMap.put(damager, 1);
-                        }
+                        hunterMap.put(damager.getUniqueId(), hunterMap.containsKey(damager.getUniqueId()) ? hunterMap.get(damager.getUniqueId()) + 1 : 1);
 
                         damager.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + player.getName() + "を確保しました。");
                         player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたを牢獄に追加しました。\n" +
@@ -69,23 +66,22 @@ public class onDamage implements Listener {
                         TosoGameAPI.setItem(WorldManager.GameType.RESPAWN, player);
                         TosoGameAPI.setPotionEffect(player);
 
-                        if (Main.playerList.contains(player))
-                            Main.playerList.remove(player);
+                        Main.opGamePlayerSet.remove(player);
                         if (onMove.zoneList.contains(player))
                             onMove.zoneList.remove(player);
 
                         TosoGameAPI.showPlayers(player);
                         TosoGameAPI.hidePlayers(player);
 
-                        if (Main.invisibleList.contains(player.getUniqueId())) {
-                            Main.invisibleList.remove(player.getUniqueId());
+                        if (Main.invisibleSet.contains(player.getUniqueId())) {
+                            Main.invisibleSet.remove(player.getUniqueId());
                             for (Player p : Bukkit.getOnlinePlayers())
                                 p.showPlayer(player);
                         }
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                TosoGameAPI.teleport(player, worldConfig.getJailLocationConfig().getLocations());
+                                TosoGameAPI.teleport(player, worldConfig.getJailLocationConfig().getLocations().values());
 
                                 RespawnRunnable.addCoolTime(player);
                                 /*
@@ -128,11 +124,11 @@ public class onDamage implements Listener {
                 } else {
                     e.setCancelled(true);
                     if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                        TosoGameAPI.teleport(player, worldConfig.getRespawnLocationConfig().getLocations());
+                        TosoGameAPI.teleport(player, worldConfig.getRespawnLocationConfig().getLocations().values());
                     } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                        TosoGameAPI.teleport(player, worldConfig.getRespawnLocationConfig().getLocations());
+                        TosoGameAPI.teleport(player, worldConfig.getRespawnLocationConfig().getLocations().values());
                     } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                        TosoGameAPI.teleport(player, worldConfig.getJailLocationConfig().getLocations());
+                        TosoGameAPI.teleport(player, worldConfig.getJailLocationConfig().getLocations().values());
                     } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
                         TosoGameAPI.teleport(player, worldConfig.getHunterLocationConfig().getLocation(1));
                     } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
@@ -142,11 +138,11 @@ public class onDamage implements Listener {
             } else {
                 e.setCancelled(true);
                 if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                    TosoGameAPI.teleport(player, worldConfig.getRespawnLocationConfig().getLocations());
+                    TosoGameAPI.teleport(player, worldConfig.getRespawnLocationConfig().getLocations().values());
                 } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                    TosoGameAPI.teleport(player, worldConfig.getRespawnLocationConfig().getLocations());
+                    TosoGameAPI.teleport(player, worldConfig.getRespawnLocationConfig().getLocations().values());
                 } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                    TosoGameAPI.teleport(player, worldConfig.getJailLocationConfig().getLocations());
+                    TosoGameAPI.teleport(player, worldConfig.getJailLocationConfig().getLocations().values());
                 } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
                     TosoGameAPI.teleport(player, worldConfig.getHunterLocationConfig().getLocation(1));
                 } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
@@ -172,23 +168,22 @@ public class onDamage implements Listener {
                         TosoGameAPI.setItem(WorldManager.GameType.RESPAWN, player);
                         TosoGameAPI.setPotionEffect(player);
 
-                        if (Main.playerList.contains(player))
-                            Main.playerList.remove(player);
+                        Main.opGamePlayerSet.remove(player);
                         if (onMove.zoneList.contains(player))
                             onMove.zoneList.remove(player);
 
                         TosoGameAPI.showPlayers(player);
                         TosoGameAPI.hidePlayers(player);
 
-                        if (Main.invisibleList.contains(player.getUniqueId())) {
-                            Main.invisibleList.remove(player.getUniqueId());
+                        if (Main.invisibleSet.contains(player.getUniqueId())) {
+                            Main.invisibleSet.remove(player.getUniqueId());
                             for (Player p : Bukkit.getOnlinePlayers())
                                 p.showPlayer(player);
                         }
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                TosoGameAPI.teleport(player, worldConfig.getJailLocationConfig().getLocations());
+                                TosoGameAPI.teleport(player, worldConfig.getJailLocationConfig().getLocations().values());
 
                                 RespawnRunnable.addCoolTime(player);
 
@@ -215,30 +210,39 @@ public class onDamage implements Listener {
 
     @EventHandler
     public void onProjectileDamage(EntityDamageByEntityEvent e) {
-        if (!GameManager.isGame(GameManager.GameState.GAME)) return;
-        Entity defent = e.getEntity();
-        Entity attent = e.getDamager();
+        Entity entity = e.getEntity();
+        Entity damager = e.getDamager();
 
-        if (defent instanceof Player) {
-            Player def = (Player) defent;
+        if (entity instanceof ItemFrame) {
+            if (damager instanceof Player) {
+                Player p = (Player) damager;
 
-            if (attent instanceof Egg) {
-                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, def)) {
-                    e.setCancelled(false);
-                    e.setDamage(0.1);
-                    def.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 4, false, false));
-                    def.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 4, false, false));
-                } else {
-                    e.setCancelled(true);
-                }
-            } else if (attent instanceof Snowball) {
-                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, def)) {
-                    e.setCancelled(false);
-                    e.setDamage(0.1);
-                    if (!isFenceStop(def))
-                        ironFence(def);
-                } else {
-                    e.setCancelled(true);
+                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, p)) return;
+                e.setCancelled(true);
+            }
+        } else {
+            if (entity instanceof Player) {
+                Player p = (Player) entity;
+
+                if (!GameManager.isGame(GameManager.GameState.GAME)) return;
+                if (damager instanceof Egg) {
+                    if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, p)) {
+                        e.setCancelled(false);
+                        e.setDamage(0.1);
+                        p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 5, 4, false, false));
+                        p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 4, false, false));
+                    } else {
+                        e.setCancelled(true);
+                    }
+                } else if (damager instanceof Snowball) {
+                    if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, p)) {
+                        e.setCancelled(false);
+                        e.setDamage(0.1);
+                        if (!isFenceStop(p))
+                            ironFence(p);
+                    } else {
+                        e.setCancelled(true);
+                    }
                 }
             }
         }
@@ -265,6 +269,7 @@ public class onDamage implements Listener {
         EntityDamageEvent.DamageCause damageCause = e.getCause();
 
         if (entity instanceof Player || entity instanceof Zombie) {
+            if (damageCause == EntityDamageEvent.DamageCause.SUICIDE) return;
             if (entity instanceof Player && damageCause == EntityDamageEvent.DamageCause.FALL) {
                 Player p = (Player) entity;
                 double damage = e.getDamage();
@@ -297,9 +302,9 @@ public class onDamage implements Listener {
 
                 WorldConfig worldConfig = Main.getWorldConfig();
                 if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)) {
-                    TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                    TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
                 } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, p)) {
-                    TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                    TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
                 } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, p)) {
                     TosoGameAPI.teleport(p, worldConfig.getHunterLocationConfig().getLocation(1));
                 } else {
@@ -328,7 +333,6 @@ public class onDamage implements Listener {
                     return;
                 }
             } else {
-                if (damageCause == EntityDamageEvent.DamageCause.SUICIDE) return;
                 e.setCancelled(true);
                 return;
             }

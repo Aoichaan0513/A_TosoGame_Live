@@ -1,0 +1,11 @@
+# 所持金
+money: 0
+
+# 「/leave」で運営チームに参加できるか
+hasPermission: false
+
+# 配信者モードか
+isBroadCaster: false
+
+# 付与されている進捗
+advancements: []

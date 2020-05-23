@@ -111,10 +111,10 @@ difficulty:
       respawn:
         bone:
           count: 3
-          duration: 10
+          duration: 7
         feather:
           count: 3
-          duration: 10
+          duration: 7
         egg:
           count: 3
   hardcore:

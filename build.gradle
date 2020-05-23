@@ -6,8 +6,8 @@ plugins {
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-def projectChannel = 'Dev'
-def projectVersion = '1.1.4'
+def projectChannel = 'Beta'
+def projectVersion = '1.2.0'
 def projectBuildDate = new Date().format('yy.MMdd.HHmm')
 
 group = 'jp.aoichaan0513'

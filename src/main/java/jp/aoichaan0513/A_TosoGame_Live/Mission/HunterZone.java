@@ -5,9 +5,9 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MissionManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
-import jp.aoichaan0513.A_TosoGame_Live.API.Timer.TimerFormat;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat;
 import org.apache.commons.lang.RandomStringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -59,7 +59,7 @@ public class HunterZone {
         @Override
         public void run() {
             missionTime--;
-            MissionManager.getBossBar().setTitle(ChatColor.YELLOW + "" + ChatColor.BOLD + "ハンターゾーンミッション終了まで: " + ChatColor.RESET + TimerFormat.formatJapan(missionTime));
+            MissionManager.getBossBar().setTitle(ChatColor.YELLOW + "" + ChatColor.BOLD + "ハンターゾーンミッション終了まで: " + ChatColor.RESET + TimeFormat.formatJapan(missionTime));
             // MissionManager.getBossBar().setProgress(missionTime / 420);
             MissionManager.getBossBar().setColor(BarColor.BLUE);
             if (missionTime == 0) {
@@ -71,24 +71,21 @@ public class HunterZone {
                                     MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたは確保されました。");
 
                             WorldConfig worldConfig = Main.getWorldConfig();
-                            TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                            TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                             Teams.joinTeam(Teams.OnlineTeam.TOSO_JAIL, p);
                             TosoGameAPI.setItem(WorldManager.GameType.RESPAWN, p);
 
-                            if (Main.playerList.contains(p))
-                                Main.playerList.remove(p);
+                            Main.opGamePlayerSet.remove(p.getUniqueId());
 
-                            Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + p.getName() + "が確保されました。 \n" +
-                                    MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.UNDERLINE + "残り" + (Teams.getOnlineCount(Teams.OnlineTeam.TOSO_PLAYER) + Teams.getOnlineCount(Teams.OnlineTeam.TOSO_SUCCESS)) + "人");
-
+                            Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + p.getName() + "が確保されました。(" + ChatColor.UNDERLINE + "残り" + (Teams.getOnlineCount(Teams.OnlineTeam.TOSO_PLAYER) + Teams.getOnlineCount(Teams.OnlineTeam.TOSO_SUCCESS)) + "人" + ChatColor.RESET + ChatColor.GRAY + ")");
                         }
                     }
                 }
                 MissionManager.endMission();
                 HunterZone.end();
             } else if (missionTime == 60) {
-                Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ハンターゾーンミッション終了まで残り" + TimerFormat.formatMin(missionTime) + "分");
+                Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ハンターゾーンミッション終了まで残り" + TimeFormat.formatMin(missionTime) + "分");
             }
         }
     }

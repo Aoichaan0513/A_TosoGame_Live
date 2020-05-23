@@ -8,18 +8,27 @@ description: TosoGame (Run for Money) Plugin for Minecraft Java Edition 1.15.2. 
 
 commands:
   toso:
+    usage: TosoGame Plugin Management Command.
 
   start:
+    usage: Game Start Command.
   end:
+    usage: Game End Command.
     aliases:
       - g_end
   reset:
+    usage: Game Reset Command.
   mission:
+    usage: Run Mission Command.
   hunter:
+    usage: Hunter Management Command.
   tuho:
+    usage: Tuho Management Command.
   player:
+    usage: Player Management Command.
 
   broadcaster:
+    usage: Broadcaster Management Command.
     aliases:
       - yt
       - lhide
@@ -34,24 +43,46 @@ commands:
   shuffle:
 
   location:
+    usage: Location Settings Command.
     aliases:
       - loc
   map:
+    usage: Map Settings Command.
 
   btp:
   phone:
+  menu:
 
   join:
+    usage: Game Join Command.
   leave:
+    usage: Game Leave Command.
   disappear:
+    usage: Player Full Invisible Mode Command.
     aliases:
       - vanish
   appear:
+    usage: Player Full UnInvisible Mode Command.
     aliases:
       - unvanish
+  gamemode:
+    usage: Change GameMode Command.
+    aliases:
+      - gm
+      - gms
+      - gm0
+      - gmc
+      - gm1
+      - gma
+      - gm2
+      - gmsp
+      - gm3
   hide:
+    usage: Hide Other Players Command.
   show:
+    usage: Show Other Players Command.
   spec:
+    usage: Toggle Spectator Mode Command.
   sidebar:
 
   script:

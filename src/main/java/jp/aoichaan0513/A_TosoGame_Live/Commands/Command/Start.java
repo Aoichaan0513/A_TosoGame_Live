@@ -6,7 +6,6 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
-import jp.aoichaan0513.A_TosoGame_Live.Timer.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
@@ -32,13 +31,13 @@ public class Start extends ICommand {
 
                 if (args.length != 0) {
                     if (args[0].equalsIgnoreCase("skip")) {
-                        Timer.start(1, worldConfig.getGameConfig().getGame());
+                        GameManager.startGame(1, worldConfig.getGameConfig().getGame());
                         return;
                     } else {
                         try {
                             int i = Integer.parseInt(args[0]);
                             Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "カウントダウン開始");
-                            Timer.start(i + 1, worldConfig.getGameConfig().getGame());
+                            GameManager.startGame(i + 1, worldConfig.getGameConfig().getGame());
                             return;
                         } catch (NumberFormatException ex) {
                             sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "数字を指定してください。");
@@ -47,10 +46,10 @@ public class Start extends ICommand {
                     }
                 }
                 Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "カウントダウン開始");
-                Timer.start(worldConfig.getGameConfig().getCountDown(), worldConfig.getGameConfig().getGame());
+                GameManager.startGame(worldConfig.getGameConfig().getCountDown(), worldConfig.getGameConfig().getGame());
                 return;
             }
-            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ゲームが実行されているため実行できません。");
+            MainAPI.sendMessage(sp, MainAPI.ErrorMessage.GAME);
             return;
         }
         MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS);
@@ -64,13 +63,13 @@ public class Start extends ICommand {
 
             if (args.length != 0) {
                 if (args[0].equalsIgnoreCase("skip")) {
-                    Timer.start(1, worldConfig.getGameConfig().getGame());
+                    GameManager.startGame(1, worldConfig.getGameConfig().getGame());
                     return;
                 } else {
                     try {
                         int i = Integer.parseInt(args[0]);
                         Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "カウントダウン開始");
-                        Timer.start(i + 1, worldConfig.getGameConfig().getGame());
+                        GameManager.startGame(i + 1, worldConfig.getGameConfig().getGame());
                         return;
                     } catch (NumberFormatException ex) {
                         bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "数字を指定してください。");
@@ -79,10 +78,10 @@ public class Start extends ICommand {
                 }
             }
             Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "カウントダウン開始");
-            Timer.start(worldConfig.getGameConfig().getCountDown(), worldConfig.getGameConfig().getGame());
+            GameManager.startGame(worldConfig.getGameConfig().getCountDown(), worldConfig.getGameConfig().getGame());
             return;
         }
-        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ゲームが実行されているため実行できません。");
+        MainAPI.sendMessage(bs, MainAPI.ErrorMessage.GAME);
         return;
     }
 

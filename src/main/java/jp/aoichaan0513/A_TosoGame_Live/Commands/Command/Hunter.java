@@ -9,6 +9,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
+import org.bukkit.GameMode;
 import org.bukkit.*;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
@@ -22,10 +23,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Hunter extends ICommand {
 
@@ -56,8 +54,7 @@ public class Hunter extends ICommand {
                                         TosoGameAPI.setPotionEffect(p, true);
                                         TosoGameAPI.removeOp(p);
 
-                                        if (Main.playerList.contains(p))
-                                            Main.playerList.remove(p);
+                                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
                                         p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -85,8 +82,7 @@ public class Hunter extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -111,8 +107,7 @@ public class Hunter extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -137,8 +132,7 @@ public class Hunter extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -163,8 +157,7 @@ public class Hunter extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -189,8 +182,7 @@ public class Hunter extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -225,8 +217,7 @@ public class Hunter extends ICommand {
                                         TosoGameAPI.setPotionEffect(p, true);
                                         TosoGameAPI.removeOp(p);
 
-                                        if (Main.playerList.contains(p))
-                                            Main.playerList.remove(p);
+                                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
                                         p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
@@ -262,12 +253,11 @@ public class Hunter extends ICommand {
                                         TosoGameAPI.setPotionEffect(p, true);
                                         TosoGameAPI.removeOp(p);
 
-                                        if (Main.playerList.contains(p))
-                                            Main.playerList.remove(p);
+                                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
 
-                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                         if (MissionManager.isBossBar())
                                             MissionManager.getBossBar().addPlayer(p);
@@ -292,12 +282,11 @@ public class Hunter extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.addOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
 
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -319,12 +308,11 @@ public class Hunter extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
 
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -346,12 +334,11 @@ public class Hunter extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
 
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -373,12 +360,11 @@ public class Hunter extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
 
-                                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -400,8 +386,7 @@ public class Hunter extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
 
@@ -437,12 +422,11 @@ public class Hunter extends ICommand {
                                         TosoGameAPI.setPotionEffect(p, true);
                                         TosoGameAPI.removeOp(p);
 
-                                        if (Main.playerList.contains(p))
-                                            Main.playerList.remove(p);
+                                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
 
-                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                         if (MissionManager.isBossBar())
                                             MissionManager.getBossBar().addPlayer(p);
@@ -542,8 +526,7 @@ public class Hunter extends ICommand {
                                 TosoGameAPI.setPotionEffect(p, true);
                                 TosoGameAPI.removeOp(p);
 
-                                if (Main.playerList.contains(p))
-                                    Main.playerList.remove(p);
+                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                 TosoGameAPI.showPlayers(p);
 
@@ -581,12 +564,11 @@ public class Hunter extends ICommand {
                                 TosoGameAPI.setPotionEffect(p, true);
                                 TosoGameAPI.removeOp(p);
 
-                                if (Main.playerList.contains(p))
-                                    Main.playerList.remove(p);
+                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                 TosoGameAPI.showPlayers(p);
 
-                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                 if (MissionManager.isBossBar())
                                     MissionManager.getBossBar().addPlayer(p);
@@ -666,21 +648,49 @@ public class Hunter extends ICommand {
         return;
     }
 
-    private void random(CommandSender s, String count, WorldConfig worldConfig) {
+    @Override
+    public List<String> onPlayerTabComplete(Player sp, Command cmd, String alias, String[] args) {
+        if (!TosoGameAPI.isAdmin(sp)) return null;
+        if (args.length == 1) {
+            return getTabList(args[0], new HashSet<>(Arrays.asList("join", "leave", "random", "rand", "zombie")));
+        } else if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("join") || args[0].equalsIgnoreCase("leave")) {
+                Set<String> set = new HashSet<>(Arrays.asList("@all", "@team:admin", "@team:player", "@team:success", "@team:jail", "@team:tuho"));
+                for (Player player : Bukkit.getOnlinePlayers())
+                    set.add(player.getName());
+                return getTabList(args[1], new HashSet<>(set));
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<String> onBlockTabComplete(BlockCommandSender bs, Command cmd, String alias, String[] args) {
+        if (args.length != 1) return null;
+        return getTabList(args[0], new HashSet<>(Arrays.asList("join", "leave", "random", "rand", "zombie")));
+    }
+
+    @Override
+    public List<String> onConsoleTabComplete(ConsoleCommandSender cs, Command cmd, String alias, String[] args) {
+        return null;
+    }
+
+
+    private void random(CommandSender sender, String count, WorldConfig worldConfig) {
         try {
-            if (num == -1 && Tuho.num == -1) {
-                Main.shuffleList.clear();
+            if (num == -1) {
+                Main.hunterShuffleSet.clear();
                 num = Integer.parseInt(count);
 
-                s.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ハンター募集を開始しました。");
+                sender.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ハンター募集を開始しました。");
                 if (GameManager.isGame(GameManager.GameState.GAME)) {
                     for (Player player : Bukkit.getOnlinePlayers())
                         if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, player))
-                            player.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ハンターを" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.GOLD + "募集します。\n" +
-                                    MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ハンター希望の方は20秒以内に\"/h\"と入力してください。");
+                            player.sendMessage(MainAPI.getPrefix(ChatColor.YELLOW) + "ハンターを" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.YELLOW + "募集します。\n" +
+                                    MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ハンターを希望の方は20秒以内に\"" + ChatColor.UNDERLINE + "/h" + ChatColor.RESET + ChatColor.GRAY + "\"と入力してください。");
                 } else {
-                    Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ハンターを" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.GOLD + "募集します。\n" +
-                            MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ハンター希望の方は20秒以内に\"/h\"と入力してください。");
+                    Bukkit.broadcastMessage(MainAPI.getPrefix(ChatColor.YELLOW) + "ハンターを" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.YELLOW + "募集します。\n" +
+                            MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ハンターを希望の方は20秒以内に\"" + ChatColor.UNDERLINE + "/h" + ChatColor.RESET + ChatColor.GRAY + "\"と入力してください。");
                 }
 
                 new BukkitRunnable() {
@@ -689,14 +699,16 @@ public class Hunter extends ICommand {
                     @Override
                     public void run() {
                         if (count == 10) {
-                            Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ハンター募集終了まで残り10秒です。");
+                            Bukkit.broadcastMessage(MainAPI.getPrefix(ChatColor.YELLOW) + "ハンターの募集終了まで" + ChatColor.GOLD + ChatColor.UNDERLINE + "残り10秒" + ChatColor.RESET + ChatColor.YELLOW + "です。");
                         } else if (count == 0) {
-                            if (Main.shuffleList.size() > 0) {
-                                Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "ハンターを" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.YELLOW + "選出しています…");
-                                Collections.shuffle(Main.shuffleList);
-                                for (int i = 0; i < num && i < Main.shuffleList.size(); i++) {
-                                    Player p = Main.shuffleList.get(i);
-                                    Main.shuffleList.remove(p);
+                            if (!Main.hunterShuffleSet.isEmpty()) {
+                                List<UUID> hunterShuffleList = new ArrayList<>(Main.hunterShuffleSet);
+
+                                Bukkit.broadcastMessage(MainAPI.getPrefix(ChatColor.YELLOW) + "ハンターを" + ChatColor.GOLD + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.YELLOW + "選出しています…");
+                                Collections.shuffle(hunterShuffleList);
+                                for (int i = 0; i < num && i < hunterShuffleList.size(); i++) {
+                                    Player p = Bukkit.getPlayer(hunterShuffleList.get(i));
+                                    hunterShuffleList.remove(p.getUniqueId());
 
                                     Teams.joinTeam(Teams.OnlineTeam.TOSO_HUNTER, p);
                                     p.setGameMode(GameMode.ADVENTURE);
@@ -705,8 +717,7 @@ public class Hunter extends ICommand {
                                     TosoGameAPI.setPotionEffect(p, true);
                                     TosoGameAPI.removeOp(p);
 
-                                    if (Main.playerList.contains(p))
-                                        Main.playerList.remove(p);
+                                    Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                     TosoGameAPI.showPlayers(p);
 
@@ -718,98 +729,26 @@ public class Hunter extends ICommand {
                                     p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "あなたをハンターに追加しました。");
                                     Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + p.getName() + "がハンターになりました。");
                                 }
-                                s.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GREEN + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.GRAY + "をハンターに追加しました。");
-                                Main.shuffleList.clear();
+                                sender.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + ChatColor.GREEN + ChatColor.UNDERLINE + num + "人" + ChatColor.RESET + ChatColor.GRAY + "をハンターに追加しました。");
+                                Main.hunterShuffleSet.clear();
                                 num = -1;
                             } else {
                                 Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ハンターを希望する方がいなかったため選出をキャンセルしました。");
-                                Main.shuffleList.clear();
+                                Main.hunterShuffleSet.clear();
                                 num = -1;
                             }
                         }
 
                         count--;
                     }
-                }.runTaskTimerAsynchronously(Main.getInstance(), 20, 20);
+                }.runTaskTimer(Main.getInstance(), 0, 20);
                 return;
             }
-            s.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ハンター募集中のため実行できません。");
+            sender.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ハンター募集中のため実行できません。");
             return;
         } catch (NumberFormatException e) {
-            s.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "引数が不正です。数字を指定してください。");
+            MainAPI.sendMessage(sender, MainAPI.ErrorMessage.ARGS_INTEGER);
             return;
         }
-    }
-
-    @Override
-    public List<String> onPlayerTabComplete(Player sp, Command cmd, String alias, String[] args) {
-        if (TosoGameAPI.isAdmin(sp)) {
-            if (args.length == 1) {
-                if (args[0].length() == 0) {
-                    return Arrays.asList("join", "leave", "random", "rand", "zombie");
-                } else {
-                    if ("join".startsWith(args[0])) {
-                        return Collections.singletonList("join");
-                    } else if ("leave".startsWith(args[0])) {
-                        return Collections.singletonList("leave");
-                    } else if ("random".startsWith(args[0])) {
-                        return Collections.singletonList("random");
-                    } else if ("rand".startsWith(args[0])) {
-                        return Collections.singletonList("rand");
-                    } else if ("zombie".startsWith(args[0])) {
-                        return Collections.singletonList("zombie");
-                    }
-                }
-            } else if (args.length == 2) {
-                if (args[0].equalsIgnoreCase("join") || args[0].equalsIgnoreCase("leave")) {
-                    if (args[1].length() == 0) {
-                        ArrayList<String> list = new ArrayList<String>() {{
-                            add("@all");
-                            add("@team:admin");
-                            add("@team:player");
-                            add("@team:success");
-                            add("@team:jail");
-                            add("@team:tuho");
-                        }};
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            list.add(player.getName());
-                        }
-                        return list;
-                    } else {
-                        if ("@".startsWith(args[1])) {
-                            return Arrays.asList("@all", "@team:admin", "@team:player", "@team:success", "@team:jail", "@team:tuho");
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public List<String> onBlockTabComplete(BlockCommandSender bs, Command cmd, String alias, String[] args) {
-        if (args.length == 1) {
-            if (args[0].length() == 0) {
-                return Arrays.asList("join", "leave", "random", "rand", "zombie");
-            } else {
-                if ("join".startsWith(args[0])) {
-                    return Collections.singletonList("join");
-                } else if ("leave".startsWith(args[0])) {
-                    return Collections.singletonList("leave");
-                } else if ("random".startsWith(args[0])) {
-                    return Collections.singletonList("random");
-                } else if ("rand".startsWith(args[0])) {
-                    return Collections.singletonList("rand");
-                } else if ("zombie".startsWith(args[0])) {
-                    return Collections.singletonList("zombie");
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public List<String> onConsoleTabComplete(ConsoleCommandSender cs, Command cmd, String alias, String[] args) {
-        return null;
     }
 }

@@ -24,21 +24,23 @@ public class H extends ICommand {
         if (Hunter.num > 0) {
             if (GameManager.isGame(GameManager.GameState.GAME)) {
                 if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, sp)) {
-                    if (!Main.shuffleList.contains(sp))
-                        Main.shuffleList.add(sp);
+                    if (!Main.hunterShuffleSet.contains(sp.getUniqueId()))
+                        Main.hunterShuffleSet.add(sp.getUniqueId());
                     else
-                        Main.shuffleList.remove(sp);
+                        Main.hunterShuffleSet.remove(sp.getUniqueId());
 
-                    sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.UNDERLINE + "ハンター募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (Main.shuffleList.contains(sp) ? "に応募" : "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。");
+                    sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.UNDERLINE + "ハンター募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (Main.hunterShuffleSet.contains(sp.getUniqueId()) ? "に応募" : "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。");
                     return;
                 }
+                MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS_TEAM_JAIL);
+                return;
             } else {
-                if (!Main.shuffleList.contains(sp))
-                    Main.shuffleList.add(sp);
+                if (!Main.hunterShuffleSet.contains(sp.getUniqueId()))
+                    Main.hunterShuffleSet.add(sp.getUniqueId());
                 else
-                    Main.shuffleList.remove(sp);
+                    Main.hunterShuffleSet.remove(sp.getUniqueId());
 
-                sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.UNDERLINE + "ハンター募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (Main.shuffleList.contains(sp) ? "に応募" : "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。");
+                sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + ChatColor.UNDERLINE + "ハンター募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (Main.hunterShuffleSet.contains(sp.getUniqueId()) ? "に応募" : "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。");
                 return;
             }
         }

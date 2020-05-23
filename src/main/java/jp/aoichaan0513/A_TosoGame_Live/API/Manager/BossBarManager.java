@@ -1,6 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Manager;
 
-import jp.aoichaan0513.A_TosoGame_Live.API.Timer.TimerFormat;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
@@ -60,16 +60,16 @@ public class BossBarManager {
         BossBar bossBar = getBar(p);
         switch (GameManager.getGameState()) {
             case READY:
-                bossBar.setTitle(ChatColor.YELLOW + "ゲーム開始まで" + ChatColor.GRAY + ": " + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimerFormat.formatJapan(time));
+                bossBar.setTitle(ChatColor.YELLOW + "ゲーム開始まで" + ChatColor.GRAY + ": " + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(time));
                 bossBar.setProgress((double) time / maxTime);
                 bossBar.setColor(BarColor.YELLOW);
                 bossBar.addPlayer(p);
                 break;
             case GAME:
                 if (MissionManager.isMission())
-                    bossBar.setTitle(ChatColor.BOLD + "" + ChatColor.RED + "ゲーム終了まで" + ChatColor.GRAY + ": " + ChatColor.DARK_RED + ChatColor.BOLD + ChatColor.UNDERLINE + TimerFormat.formatJapan(time) + ChatColor.RESET + ChatColor.GRAY + " / " + ChatColor.YELLOW + ChatColor.BOLD + "ミッション実施中");
+                    bossBar.setTitle(ChatColor.BOLD + "" + ChatColor.RED + "ゲーム終了まで" + ChatColor.GRAY + ": " + ChatColor.DARK_RED + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(time) + ChatColor.RESET + ChatColor.GRAY + " / " + ChatColor.YELLOW + ChatColor.BOLD + "ミッション実施中");
                 else
-                    bossBar.setTitle(ChatColor.BOLD + "" + ChatColor.RED + "ゲーム終了まで" + ChatColor.GRAY + ": " + ChatColor.DARK_RED + ChatColor.BOLD + ChatColor.UNDERLINE + TimerFormat.formatJapan(time));
+                    bossBar.setTitle(ChatColor.BOLD + "" + ChatColor.RED + "ゲーム終了まで" + ChatColor.GRAY + ": " + ChatColor.DARK_RED + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(time));
 
                 bossBar.setProgress((double) time / maxTime);
                 bossBar.setColor(BarColor.RED);

@@ -4,7 +4,6 @@ import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
-import jp.aoichaan0513.A_TosoGame_Live.Timer.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
@@ -24,10 +23,10 @@ public class End extends ICommand {
         if (TosoGameAPI.isAdmin(sp)) {
             if (GameManager.isGame()) {
                 Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム終了");
-                Timer.end();
+                GameManager.endGame();
                 return;
             }
-            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ゲームが実行されていないため実行できません。");
+            MainAPI.sendMessage(sp, MainAPI.ErrorMessage.NOT_GAME);
             return;
         }
         MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS);
@@ -38,10 +37,10 @@ public class End extends ICommand {
     public void onBlockCommand(BlockCommandSender bs, Command cmd, String label, String[] args) {
         if (GameManager.isGame()) {
             Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ゲーム終了");
-            Timer.end();
+            GameManager.endGame();
             return;
         }
-        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ゲームが実行されていないため実行できません。");
+        MainAPI.sendMessage(bs, MainAPI.ErrorMessage.NOT_GAME);
         return;
     }
 

@@ -3,7 +3,7 @@ package jp.aoichaan0513.A_TosoGame_Live.Commands.Command;
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MissionManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.ScoreBoard;
+import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
@@ -16,7 +16,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class Leave extends ICommand {
 
     @Override
     public void onPlayerCommand(Player sp, Command cmd, String label, String[] args) {
-        if (TosoGameAPI.isBroadCaster(sp) || TosoGameAPI.isPermissionHave(sp)) {
+        if (TosoGameAPI.isBroadCaster(sp) || TosoGameAPI.hasPermission(sp)) {
             if (args.length != 0) {
                 if (TosoGameAPI.isBroadCaster(sp) || TosoGameAPI.isAdmin(sp)) {
                     for (String name : args) {
@@ -47,11 +46,10 @@ public class Leave extends ICommand {
                                 TosoGameAPI.setPotionEffect(p);
                                 TosoGameAPI.addOp(p);
 
-                                Scoreboard board = ScoreBoard.getBoard(p);
+                                org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(p);
                                 board.getObjective(TosoGameAPI.Objective.SIDEBAR.getName()).setDisplaySlot(DisplaySlot.SIDEBAR);
 
-                                if (Main.playerList.contains(p))
-                                    Main.playerList.remove(p);
+                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                 TosoGameAPI.showPlayers(p);
                                 TosoGameAPI.hidePlayers(p);
@@ -82,11 +80,10 @@ public class Leave extends ICommand {
                     TosoGameAPI.setPotionEffect(sp);
                     TosoGameAPI.addOp(sp);
 
-                    Scoreboard board = ScoreBoard.getBoard(sp);
+                    org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(sp);
                     board.getObjective(TosoGameAPI.Objective.SIDEBAR.getName()).setDisplaySlot(DisplaySlot.SIDEBAR);
 
-                    if (Main.playerList.contains(sp))
-                        Main.playerList.remove(sp);
+                    Main.opGamePlayerSet.remove(sp.getUniqueId());
 
                     TosoGameAPI.showPlayers(sp);
                     TosoGameAPI.hidePlayers(sp);
@@ -125,11 +122,10 @@ public class Leave extends ICommand {
                         TosoGameAPI.setPotionEffect(p);
                         TosoGameAPI.addOp(p);
 
-                        Scoreboard board = ScoreBoard.getBoard(p);
+                        org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(p);
                         board.getObjective(TosoGameAPI.Objective.SIDEBAR.getName()).setDisplaySlot(DisplaySlot.SIDEBAR);
 
-                        if (Main.playerList.contains(p))
-                            Main.playerList.remove(p);
+                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                         TosoGameAPI.showPlayers(p);
                         TosoGameAPI.hidePlayers(p);
@@ -171,11 +167,10 @@ public class Leave extends ICommand {
                         TosoGameAPI.setPotionEffect(p);
                         TosoGameAPI.addOp(p);
 
-                        Scoreboard board = ScoreBoard.getBoard(p);
+                        org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(p);
                         board.getObjective(TosoGameAPI.Objective.SIDEBAR.getName()).setDisplaySlot(DisplaySlot.SIDEBAR);
 
-                        if (Main.playerList.contains(p))
-                            Main.playerList.remove(p);
+                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                         TosoGameAPI.showPlayers(p);
                         TosoGameAPI.hidePlayers(p);

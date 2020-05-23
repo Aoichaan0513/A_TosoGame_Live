@@ -1,13 +1,13 @@
 package jp.aoichaan0513.A_TosoGame_Live.Commands.Command;
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.OPGameManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.OPGame.Dice;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
-import jp.aoichaan0513.A_TosoGame_Live.Timer.Timer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -63,7 +63,7 @@ public class Shuffle extends ICommand {
                                         OPGameManager.player = null;
                                         Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + result + "が出ました。(" + Dice.getCount() + "/" + worldConfig.getOPGameConfig().getDiceCount() + ")\n" +
                                                 MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "1が出たためゲームが開始されました。");
-                                        Timer.start(1, worldConfig.getGameConfig().getGame());
+                                        GameManager.startGame(1, worldConfig.getGameConfig().getGame());
 
                                         for (Player player : Bukkit.getOnlinePlayers())
                                             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
@@ -72,7 +72,7 @@ public class Shuffle extends ICommand {
                                         OPGameManager.player = null;
                                         Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + result + "が出ました。(" + Dice.getCount() + "/" + worldConfig.getOPGameConfig().getDiceCount() + ")\n" +
                                                 MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "サイコロの目が合計" + worldConfig.getOPGameConfig().getDiceCount() + "カウント以上出たため、30秒の猶予のあとゲームが開始されます。");
-                                        Timer.start(30, worldConfig.getGameConfig().getGame());
+                                        GameManager.startGame(30, worldConfig.getGameConfig().getGame());
 
                                         for (UUID uuid : Dice.getSnowballPlayers(5)) {
                                             if (Bukkit.getPlayer(uuid) == null) continue;
@@ -96,13 +96,13 @@ public class Shuffle extends ICommand {
                                         OPGameManager.player = null;
                                         Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + result + "が出ました。(" + Dice.getCount() + "/" + worldConfig.getOPGameConfig().getDiceCount() + ")\n" +
                                                 MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "1が出たためゲームが開始されました。");
-                                        Timer.start(1, worldConfig.getGameConfig().getGame());
+                                        GameManager.startGame(1, worldConfig.getGameConfig().getGame());
 
                                         for (Player player : Bukkit.getOnlinePlayers())
                                             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                                     } else {
-                                        if (Main.playerList.size() > 0) {
-                                            TosoGameAPI.teleport(sp, worldConfig.getOPGameLocationConfig().getGOPLocations());
+                                        if (Main.opGamePlayerSet.size() > 0) {
+                                            TosoGameAPI.teleport(sp, worldConfig.getOPGameLocationConfig().getGOPLocations().values());
 
                                             Player p = Dice.getShufflePlayer();
                                             OPGameManager.player = p;
@@ -130,7 +130,7 @@ public class Shuffle extends ICommand {
                                             OPGameManager.player = null;
                                             Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + result + "が出ました。(" + Dice.getCount() + "/" + worldConfig.getOPGameConfig().getDiceCount() + ")\n" +
                                                     MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "オープニングゲームに参加できるプレイヤーがいないため、30秒の猶予のあとゲームが開始されます。");
-                                            Timer.start(30, worldConfig.getGameConfig().getGame());
+                                            GameManager.startGame(30, worldConfig.getGameConfig().getGame());
 
                                             for (Player player : Bukkit.getOnlinePlayers())
                                                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);

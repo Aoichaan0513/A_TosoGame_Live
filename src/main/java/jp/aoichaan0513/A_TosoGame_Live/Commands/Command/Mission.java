@@ -2,11 +2,15 @@ package jp.aoichaan0513.A_TosoGame_Live.Commands.Command;
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager;
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Inventory.Right.MissionInventory;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MissionManager;
+import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
 import jp.aoichaan0513.A_TosoGame_Live.Listeners.onInventory;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -44,6 +48,17 @@ public class Mission extends ICommand {
 
                                         sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "ミッションを開始しました。");
                                         Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ミッションが通知されました。");
+
+                                        TextComponent textComponent1 = new TextComponent(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY));
+                                        TextComponent textComponent2 = new TextComponent("" + ChatColor.GRAY + ChatColor.BOLD + ChatColor.UNDERLINE + "ここ" + ChatColor.RESET);
+                                        textComponent2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/menu open mission " + ((MissionInventory.getAmount(MissionManager.MissionBookType.MISSION) - 1) * (MissionInventory.getSlot(MissionManager.MissionBookType.MISSION) - 1))));
+                                        TextComponent textComponent3 = new TextComponent(ChatColor.GRAY + "をクリックして詳細を確認できます。");
+                                        textComponent1.addExtra(textComponent2);
+                                        textComponent1.addExtra(textComponent3);
+
+                                        for (Player player : Bukkit.getOnlinePlayers())
+                                            if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, player) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player))
+                                                player.spigot().sendMessage(textComponent1);
                                         return;
                                     } else {
                                         StringBuffer stringBuffer = new StringBuffer();
@@ -122,13 +137,23 @@ public class Mission extends ICommand {
                             StringBuffer stringBuffer = new StringBuffer();
                             for (int i = 1; i < args.length; i++)
                                 stringBuffer.append(args[i].replace("&n", "\n") + " ");
-                            String text = stringBuffer.toString().trim() + ChatColor.DARK_GRAY + " (System)";
 
                             TosoGameAPI.sendNotificationSound();
 
-                            MissionManager.sendMission(MissionManager.MissionBookType.TUTATU.getName(), text, MissionManager.MissionBookType.TUTATU, Material.QUARTZ_BLOCK);
+                            MissionManager.sendMission(MissionManager.MissionBookType.TUTATU.getName(), Collections.singletonList(stringBuffer.toString().trim()), MissionManager.MissionBookType.TUTATU, Material.QUARTZ_BLOCK);
                             sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "通達を送信しました。");
                             Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ミッションが通知されました。");
+
+                            TextComponent textComponent1 = new TextComponent(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY));
+                            TextComponent textComponent2 = new TextComponent("" + ChatColor.GRAY + ChatColor.BOLD + ChatColor.UNDERLINE + "ここ" + ChatColor.RESET);
+                            textComponent2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/menu open tutatu " + ((MissionInventory.getAmount(MissionManager.MissionBookType.TUTATU) - 1) * (MissionInventory.getSlot(MissionManager.MissionBookType.TUTATU) - 1))));
+                            TextComponent textComponent3 = new TextComponent(ChatColor.GRAY + "をクリックして詳細を確認できます。");
+                            textComponent1.addExtra(textComponent2);
+                            textComponent1.addExtra(textComponent3);
+
+                            for (Player player : Bukkit.getOnlinePlayers())
+                                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, player) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player))
+                                    player.spigot().sendMessage(textComponent1);
                             return;
                         }
                         sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "引数が不正です。説明を指定してください。");
@@ -138,13 +163,23 @@ public class Mission extends ICommand {
                             StringBuffer stringBuffer = new StringBuffer();
                             for (int i = 1; i < args.length; i++)
                                 stringBuffer.append(args[i].replace("&n", "\n") + " ");
-                            String text = stringBuffer.toString().trim() + ChatColor.DARK_GRAY + " (System)";
 
                             TosoGameAPI.sendNotificationSound();
 
-                            MissionManager.sendMission(MissionManager.MissionBookType.HINT.getName(), text, MissionManager.MissionBookType.HINT, Material.QUARTZ_BLOCK);
+                            MissionManager.sendMission(MissionManager.MissionBookType.HINT.getName(), Collections.singletonList(stringBuffer.toString().trim()), MissionManager.MissionBookType.HINT, Material.QUARTZ_BLOCK);
                             sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "ヒントを送信しました。");
                             Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ミッションが通知されました。");
+
+                            TextComponent textComponent1 = new TextComponent(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY));
+                            TextComponent textComponent2 = new TextComponent("" + ChatColor.GRAY + ChatColor.BOLD + ChatColor.UNDERLINE + "ここ" + ChatColor.RESET);
+                            textComponent2.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/menu open hint " + ((MissionInventory.getAmount(MissionManager.MissionBookType.HINT) - 1) * (MissionInventory.getSlot(MissionManager.MissionBookType.HINT) - 1))));
+                            TextComponent textComponent3 = new TextComponent(ChatColor.GRAY + "をクリックして詳細を確認できます。");
+                            textComponent1.addExtra(textComponent2);
+                            textComponent1.addExtra(textComponent3);
+
+                            for (Player player : Bukkit.getOnlinePlayers())
+                                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, player) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player))
+                                    player.spigot().sendMessage(textComponent1);
                             return;
                         }
                         sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "引数が不正です。説明を指定してください。");
@@ -181,7 +216,7 @@ public class Mission extends ICommand {
                         MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "\"/mission end\" - 実行中のミッションを終了");
                 return;
             }
-            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ゲーム中ではないため実行できません。");
+            MainAPI.sendMessage(sp, MainAPI.ErrorMessage.NOT_GAME);
             return;
         }
         MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS);
@@ -272,11 +307,10 @@ public class Mission extends ICommand {
                         StringBuffer stringBuffer = new StringBuffer();
                         for (int i = 1; i < args.length; i++)
                             stringBuffer.append(args[i].replace("&n", "\n") + " ");
-                        String text = stringBuffer.toString().trim() + ChatColor.DARK_GRAY + " (System)";
 
                         TosoGameAPI.sendNotificationSound();
 
-                        MissionManager.sendMission(MissionManager.MissionBookType.TUTATU.getName(), text, MissionManager.MissionBookType.TUTATU, Material.QUARTZ_BLOCK);
+                        MissionManager.sendMission(MissionManager.MissionBookType.TUTATU.getName(), Collections.singletonList(stringBuffer.toString().trim()), MissionManager.MissionBookType.TUTATU, Material.QUARTZ_BLOCK);
 
                         bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "通達を送信しました。");
                         Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ミッションが通知されました。");
@@ -289,11 +323,10 @@ public class Mission extends ICommand {
                         StringBuffer stringBuffer = new StringBuffer();
                         for (int i = 1; i < args.length; i++)
                             stringBuffer.append(args[i].replace("&n", "\n") + " ");
-                        String text = stringBuffer.toString().trim() + ChatColor.DARK_GRAY + " (System)";
 
                         TosoGameAPI.sendNotificationSound();
 
-                        MissionManager.sendMission(MissionManager.MissionBookType.HINT.getName(), text, MissionManager.MissionBookType.HINT, Material.QUARTZ_BLOCK);
+                        MissionManager.sendMission(MissionManager.MissionBookType.HINT.getName(), Collections.singletonList(stringBuffer.toString().trim()), MissionManager.MissionBookType.HINT, Material.QUARTZ_BLOCK);
 
                         bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "ヒントを送信しました。");
                         Bukkit.broadcastMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ミッションが通知されました。");
@@ -334,7 +367,7 @@ public class Mission extends ICommand {
                     MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "\"/mission end\" - 実行中のミッションを終了");
             return;
         }
-        bs.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ゲーム中ではないため実行できません。");
+        MainAPI.sendMessage(bs, MainAPI.ErrorMessage.NOT_GAME);
         return;
     }
 

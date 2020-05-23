@@ -15,10 +15,10 @@ import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.ConsoleCommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Player extends ICommand {
 
@@ -48,11 +48,10 @@ public class Player extends ICommand {
                                         TosoGameAPI.setPotionEffect(p);
                                         TosoGameAPI.removeOp(p);
 
-                                        if (!Main.playerList.contains(p))
-                                            Main.playerList.add(p);
+                                        Main.opGamePlayerSet.add(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
-                                        TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                        TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                         if (MissionManager.isBossBar())
                                             MissionManager.getBossBar().addPlayer(p);
@@ -78,11 +77,10 @@ public class Player extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (!Main.playerList.contains(p))
-                                                    Main.playerList.add(p);
+                                                Main.opGamePlayerSet.add(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -105,11 +103,10 @@ public class Player extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (!Main.playerList.contains(p))
-                                                    Main.playerList.add(p);
+                                                Main.opGamePlayerSet.add(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -132,11 +129,10 @@ public class Player extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (!Main.playerList.contains(p))
-                                                    Main.playerList.add(p);
+                                                Main.opGamePlayerSet.add(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -159,11 +155,10 @@ public class Player extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (!Main.playerList.contains(p))
-                                                    Main.playerList.add(p);
+                                                Main.opGamePlayerSet.add(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -186,11 +181,10 @@ public class Player extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (!Main.playerList.contains(p))
-                                                    Main.playerList.add(p);
+                                                Main.opGamePlayerSet.add(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -222,12 +216,11 @@ public class Player extends ICommand {
                                         TosoGameAPI.setPotionEffect(p);
                                         TosoGameAPI.removeOp(p);
 
-                                        if (!Main.playerList.contains(p))
-                                            Main.playerList.add(p);
+                                        Main.opGamePlayerSet.add(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
 
-                                        TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                        TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                         if (MissionManager.isBossBar())
                                             MissionManager.getBossBar().addPlayer(p);
@@ -258,11 +251,10 @@ public class Player extends ICommand {
 
                                         TosoGameAPI.removeOp(p);
 
-                                        if (Main.playerList.contains(p))
-                                            Main.playerList.remove(p);
+                                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
-                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                         if (MissionManager.isBossBar())
                                             MissionManager.getBossBar().addPlayer(p);
@@ -283,13 +275,12 @@ public class Player extends ICommand {
                                                 Teams.joinTeam(Teams.OnlineTeam.TOSO_ADMIN, p);
                                                 p.setGameMode(GameMode.CREATIVE);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 TosoGameAPI.addOp(p);
 
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -307,13 +298,12 @@ public class Player extends ICommand {
                                                 Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p);
                                                 p.setGameMode(GameMode.ADVENTURE);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -331,13 +321,12 @@ public class Player extends ICommand {
                                                 Teams.joinTeam(Teams.OnlineTeam.TOSO_JAIL, p);
                                                 p.setGameMode(GameMode.ADVENTURE);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -359,8 +348,7 @@ public class Player extends ICommand {
                                                 TosoGameAPI.setPotionEffect(p, true);
                                                 TosoGameAPI.removeOp(p);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 p.teleport(worldConfig.getHunterLocationConfig().getLocation(1));
 
@@ -380,13 +368,12 @@ public class Player extends ICommand {
                                                 Teams.joinTeam(Teams.OnlineTeam.TOSO_TUHO, p);
                                                 p.setGameMode(GameMode.ADVENTURE);
 
-                                                if (Main.playerList.contains(p))
-                                                    Main.playerList.remove(p);
+                                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                                 TosoGameAPI.showPlayers(p);
                                                 TosoGameAPI.removeOp(p);
 
-                                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                                 if (MissionManager.isBossBar())
                                                     MissionManager.getBossBar().addPlayer(p);
@@ -414,13 +401,12 @@ public class Player extends ICommand {
                                         Teams.joinTeam(Teams.OnlineTeam.TOSO_JAIL, p);
                                         p.setGameMode(GameMode.ADVENTURE);
 
-                                        if (Main.playerList.contains(p))
-                                            Main.playerList.remove(p);
+                                        Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                         TosoGameAPI.showPlayers(p);
                                         TosoGameAPI.removeOp(p);
 
-                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                        TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                         if (MissionManager.isBossBar())
                                             MissionManager.getBossBar().addPlayer(p);
@@ -477,11 +463,10 @@ public class Player extends ICommand {
                                 TosoGameAPI.setPotionEffect(p);
                                 TosoGameAPI.removeOp(p);
 
-                                if (!Main.playerList.contains(p))
-                                    Main.playerList.add(p);
+                                Main.opGamePlayerSet.add(p.getUniqueId());
 
                                 TosoGameAPI.showPlayers(p);
-                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations());
+                                TosoGameAPI.teleport(p, worldConfig.getRespawnLocationConfig().getLocations().values());
 
                                 if (MissionManager.isBossBar())
                                     MissionManager.getBossBar().addPlayer(p);
@@ -513,11 +498,10 @@ public class Player extends ICommand {
 
                                 TosoGameAPI.removeOp(p);
 
-                                if (Main.playerList.contains(p))
-                                    Main.playerList.remove(p);
+                                Main.opGamePlayerSet.remove(p.getUniqueId());
 
                                 TosoGameAPI.showPlayers(p);
-                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations());
+                                TosoGameAPI.teleport(p, worldConfig.getJailLocationConfig().getLocations().values());
 
                                 if (MissionManager.isBossBar())
                                     MissionManager.getBossBar().addPlayer(p);
@@ -556,37 +540,16 @@ public class Player extends ICommand {
 
     @Override
     public List<String> onPlayerTabComplete(org.bukkit.entity.Player sp, Command cmd, String alias, String[] args) {
+        if (!TosoGameAPI.isAdmin(sp)) return null;
         if (TosoGameAPI.isAdmin(sp)) {
             if (args.length == 1) {
-                if (args[0].length() == 0) {
-                    return Arrays.asList("join", "leave");
-                } else {
-                    if ("join".startsWith(args[0])) {
-                        return Collections.singletonList("join");
-                    } else if ("leave".startsWith(args[0])) {
-                        return Collections.singletonList("leave");
-                    }
-                }
+                return getTabList(args[0], new HashSet<>(Arrays.asList("join", "leave")));
             } else if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("join") || args[0].equalsIgnoreCase("leave")) {
-                    if (args[1].length() == 0) {
-                        ArrayList<String> list = new ArrayList<String>() {{
-                            add("@all");
-                            add("@team:admin");
-                            add("@team:success");
-                            add("@team:jail");
-                            add("@team:hunter");
-                            add("@team:tuho");
-                        }};
-                        for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
-                            list.add(player.getName());
-                        }
-                        return list;
-                    } else {
-                        if ("@".startsWith(args[1])) {
-                            return Arrays.asList("@all", "@team:admin", "@team:success", "@team:jail", "@team:hunter", "@team:tuho");
-                        }
-                    }
+                    Set<String> set = new HashSet<>(Arrays.asList("@all", "@team:admin", "@team:success", "@team:jail", "@team:hunter", "@team:tuho"));
+                    for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers())
+                        set.add(player.getName());
+                    return getTabList(args[1], new HashSet<>(set));
                 }
             }
         }
@@ -595,18 +558,8 @@ public class Player extends ICommand {
 
     @Override
     public List<String> onBlockTabComplete(BlockCommandSender bs, Command cmd, String alias, String[] args) {
-        if (args.length == 1) {
-            if (args[0].length() == 0) {
-                return Arrays.asList("join", "leave");
-            } else {
-                if ("join".startsWith(args[0])) {
-                    return Collections.singletonList("join");
-                } else if ("leave".startsWith(args[0])) {
-                    return Collections.singletonList("leave");
-                }
-            }
-        }
-        return null;
+        if (args.length != 1) return null;
+        return getTabList(args[0], new HashSet<>(Arrays.asList("join", "leave")));
     }
 
     @Override

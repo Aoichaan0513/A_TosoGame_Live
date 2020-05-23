@@ -8,9 +8,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Maps.MapUtility;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.ConsoleCommandSender;
@@ -19,7 +17,7 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 public class Map extends ICommand {
@@ -39,9 +37,19 @@ public class Map extends ICommand {
                         if (new File(args[1]).exists()) {
                             if (!Bukkit.getWorlds().contains(args[1])) {
                                 sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "マップを読み込んでいます…");
-                                WorldManager.setWorld(args[1]);
+
                                 World world = Bukkit.createWorld(new WorldCreator(args[1]));
+
+                                world.setDifficulty(Difficulty.EASY);
+                                world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+                                world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+                                world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+
+                                WorldManager.setWorld(world);
+                                Main.setWorldConfig(new WorldConfig(world));
+
                                 sp.teleport(world.getSpawnLocation());
+
                                 sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "マップを読み込みました。");
                                 return;
                             }
@@ -59,17 +67,28 @@ public class Map extends ICommand {
                             if (Bukkit.getWorlds().contains(args[1])) {
                                 if (Bukkit.getWorld(args[1]).getPlayers().size() == 0) {
                                     sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "読み込んだマップを破棄しています…");
+
                                     World world = Bukkit.getWorld("world");
+
+                                    world.setDifficulty(Difficulty.EASY);
+                                    world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+                                    world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+                                    world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+
+                                    WorldManager.setWorld(world);
+                                    Main.setWorldConfig(new WorldConfig(world));
+
                                     sp.teleport(world.getSpawnLocation());
-                                    WorldManager.setWorld("world");
+
                                     Bukkit.unloadWorld(args[1], true);
+
                                     sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "読み込んだマップを破棄しました。");
                                     return;
                                 }
                                 sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "指定したマップにプレイヤーがいるため読み込みを破棄することができません。");
                                 return;
                             }
-                            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "指定したマップはすでに読み込まれていません。");
+                            sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "指定したマップは読み込まれていません。");
                             return;
                         }
                         sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "引数が不正です。存在するマップ名を指定してください。");
@@ -134,21 +153,7 @@ public class Map extends ICommand {
     public List<String> onPlayerTabComplete(Player sp, Command cmd, String alias, String[] args) {
         if (TosoGameAPI.isAdmin(sp)) {
             if (args.length == 1) {
-                if (args[0].length() == 0) {
-                    return Arrays.asList("load", "unload", "generate", "edit", "list");
-                } else {
-                    if ("load".startsWith(args[0])) {
-                        return Collections.singletonList("load");
-                    } else if ("unload".startsWith(args[0])) {
-                        return Collections.singletonList("unload");
-                    } else if ("generate".startsWith(args[0])) {
-                        return Collections.singletonList("generate");
-                    } else if ("edit".startsWith(args[0])) {
-                        return Collections.singletonList("edit");
-                    } else if ("list".startsWith(args[0])) {
-                        return Collections.singletonList("list");
-                    }
-                }
+                return getTabList(args[0], new HashSet<>(Arrays.asList("load", "unload", "generate", "edit", "list")));
             } else if (args.length == 2) {
                 if (args[1].length() == 0) {
                     if (args[0].equalsIgnoreCase("load")) {

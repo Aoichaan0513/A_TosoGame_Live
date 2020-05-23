@@ -20,7 +20,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MissionManager {
 
@@ -157,18 +159,30 @@ public class MissionManager {
             File file = new File("plugins" + Main.FILE_SEPARATOR + "A_TosoGame_Live" + Main.FILE_SEPARATOR + "missions" + Main.FILE_SEPARATOR + id + ".txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), System.getProperty("os.name").toLowerCase().startsWith("windows") ? "Shift-JIS" : "UTF-8"));
 
-            String title = "";
-            String content = "";
+            List<String> descriptions = new ArrayList<>();
+
+            String title = null;
+
+            StringBuffer stringBuffer = new StringBuffer();
+
             String line = br.readLine();
             while (line != null) {
-                if (title == "") {
+                if (title == null) {
                     title = line;
                 } else {
-                    content += line + "\n";
+                    if (line.equalsIgnoreCase("---")) {
+                        stringBuffer.append(ChatColor.DARK_GRAY + " (続く)");
+                        descriptions.add(stringBuffer.toString().trim());
+                        stringBuffer = new StringBuffer();
+                    } else {
+                        stringBuffer.append(line + "\n");
+                    }
                 }
                 line = br.readLine();
             }
             br.close();
+
+            descriptions.add(stringBuffer.toString().trim());
 
             bossBar = Bukkit.createBossBar(ChatColor.BOLD + title, color, BarStyle.SOLID);
             for (Player player : Bukkit.getOnlinePlayers())
@@ -181,37 +195,36 @@ public class MissionManager {
                 Bukkit.getPluginManager().callEvent(event);
             }
             setMissionState(MissionState.MISSION);
-            MissionManager.sendMission(title, content.trim() + ChatColor.DARK_GRAY, MissionBookType.MISSION, material);
-        } catch (IOException e) {
-            System.out.println(e);
+            MissionManager.sendMission(title, descriptions, MissionBookType.MISSION, material);
+        } catch (IOException err) {
+            System.out.println(err);
         }
     }
 
-    public static void sendMission(String title, String description, MissionBookType type, Material material) {
-        MissionInventory.addMission(title, description, type, material);
+    public static void sendMission(String title, List<String> descriptions, MissionBookType type, Material material) {
+        MissionInventory.addMission(title, descriptions, type, material);
         return;
     }
 
     public static void endMission() {
-        if (isMission()) {
-            WorldConfig worldConfig = Main.getWorldConfig();
-            if (worldConfig.getGameConfig().getScript()) {
-                MissionEndEvent event = new MissionEndEvent(missionType.getId());
-                Bukkit.getPluginManager().callEvent(event);
-            }
+        if (!isMission()) return;
 
-            HunterZone.end();
-
-            bossBar.removeAll();
-
-            resetBossBar();
-            resetMission();
-
-            MissionInventory.endMission();
-
-            setMissionState(MissionState.NONE);
-            return;
+        WorldConfig worldConfig = Main.getWorldConfig();
+        if (worldConfig.getGameConfig().getScript()) {
+            MissionEndEvent event = new MissionEndEvent(missionType.getId());
+            Bukkit.getPluginManager().callEvent(event);
         }
+
+        HunterZone.end();
+
+        bossBar.removeAll();
+
+        resetBossBar();
+        resetMission();
+
+        MissionInventory.endMission();
+
+        setMissionState(MissionState.NONE);
         return;
     }
 

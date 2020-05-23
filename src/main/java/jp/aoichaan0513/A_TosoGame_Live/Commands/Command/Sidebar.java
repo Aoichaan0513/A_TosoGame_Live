@@ -1,7 +1,7 @@
 package jp.aoichaan0513.A_TosoGame_Live.Commands.Command;
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.ScoreBoard;
+import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
@@ -14,7 +14,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.List;
 
@@ -26,18 +25,18 @@ public class Sidebar extends ICommand {
 
     @Override
     public void onPlayerCommand(Player sp, Command cmd, String label, String[] args) {
-        if (!ScoreBoard.isHidePlayer(sp)) {
-            ScoreBoard.addHidePlayer(sp);
+        if (!Scoreboard.isHidePlayer(sp)) {
+            Scoreboard.addHidePlayer(sp);
 
-            Scoreboard board = ScoreBoard.getBoard(sp);
+            org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(sp);
             board.getObjective(TosoGameAPI.Objective.SIDEBAR.getName()).setDisplaySlot(DisplaySlot.SIDEBAR);
 
             sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "サイドバーを常時表示に変更しました。");
             return;
         } else {
-            ScoreBoard.removeHidePlayer(sp);
+            Scoreboard.removeHidePlayer(sp);
 
-            Scoreboard board = ScoreBoard.getBoard(sp);
+            org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(sp);
             if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, sp) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, sp)) {
                 if (sp.getInventory().getItemInMainHand().getType() == Material.BOOK) {
                     ItemMeta itemMeta = sp.getInventory().getItemInMainHand().getItemMeta();

@@ -3,9 +3,12 @@ package jp.aoichaan0513.A_TosoGame_Live.Commands;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-public abstract class ICommand implements CommandExecutor, TabCompleter {
+public abstract class ICommand implements TabExecutor {
 
     private final String name;
 
@@ -46,5 +49,9 @@ public abstract class ICommand implements CommandExecutor, TabCompleter {
         else if (sender instanceof ConsoleCommandSender)
             return onConsoleTabComplete((ConsoleCommandSender) sender, cmd, alias, args);
         return null;
+    }
+
+    public List<String> getTabList(String str, Set<String> set) {
+        return str.length() == 0 ? new ArrayList<>(set) : set.stream().filter(s -> s.toLowerCase().startsWith(str.toLowerCase())).collect(Collectors.toList());
     }
 }

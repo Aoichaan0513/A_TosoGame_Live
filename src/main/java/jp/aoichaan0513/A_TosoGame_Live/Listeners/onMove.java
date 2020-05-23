@@ -84,7 +84,7 @@ public class onMove implements Listener {
                 if (OPGameManager.getDice()) {
                     if (OPGameManager.player != null) {
                         if (!p.getName().equals(OPGameManager.player.getName())) {
-                            if (Main.playerList.contains(p)) {
+                            if (Main.opGamePlayerSet.contains(p.getUniqueId())) {
                                 if (isAllowArea(e.getTo(), worldConfig.getOPGameBorderConfig())) {
                                     e.setCancelled(true);
                                     p.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ここから外に出ることは出来ません。");
@@ -92,7 +92,7 @@ public class onMove implements Listener {
 
                                         @Override
                                         public void run() {
-                                            TosoGameAPI.teleport(p, worldConfig.getOPGameLocationConfig().getGOPLocations());
+                                            TosoGameAPI.teleport(p, worldConfig.getOPGameLocationConfig().getGOPLocations().values());
                                         }
                                     }.runTaskLater(Main.getInstance(), 1);
                                     return;
@@ -153,10 +153,16 @@ public class onMove implements Listener {
         return false;
         */
 
-        return loc1.getBlockX() == loc.getBlockX() && (loc.getBlockZ() >= z1 && loc.getBlockZ() <= z2 || loc.getBlockZ() <= z1 && loc.getBlockZ() >= z2) && (loc.getBlockY() >= y1 && loc.getBlockY() <= y2 || loc.getBlockY() <= y1 && loc.getBlockY() >= y2)
-                || loc1.getBlockZ() == loc.getBlockZ() && (loc.getBlockX() >= x1 && loc.getBlockX() <= x2 || loc.getBlockX() <= x1 && loc.getBlockX() >= x2) && (loc.getBlockY() >= y1 && loc.getBlockY() <= y2 || loc.getBlockY() <= y1 && loc.getBlockY() >= y2)
-                || loc2.getBlockX() == loc.getBlockX() && (loc.getBlockZ() >= z1 && loc.getBlockZ() <= z2 || loc.getBlockZ() <= z1 && loc.getBlockZ() >= z2) && (loc.getBlockY() >= y1 && loc.getBlockY() <= y2 || loc.getBlockY() <= y1 && loc.getBlockY() >= y2)
-                || loc2.getBlockZ() == loc.getBlockZ() && (loc.getBlockX() >= x1 && loc.getBlockX() <= x2 || loc.getBlockX() <= x1 && loc.getBlockX() >= x2) && (loc.getBlockY() >= y1 && loc.getBlockY() <= y2 || loc.getBlockY() <= y1 && loc.getBlockY() >= y2);
+        boolean isXAllowArea = (loc.getBlockX() >= x1 && loc.getBlockX() <= x2 || loc.getBlockX() <= x1 && loc.getBlockX() >= x2);
+        boolean isYAllowArea = (loc.getBlockY() >= y1 && loc.getBlockY() <= y2 || loc.getBlockY() <= y1 && loc.getBlockY() >= y2);
+        boolean isZAllowArea = (loc.getBlockZ() >= z1 && loc.getBlockZ() <= z2 || loc.getBlockZ() <= z1 && loc.getBlockZ() >= z2);
+
+        return loc1.getBlockX() == loc.getBlockX() && isYAllowArea && isZAllowArea
+                || loc1.getBlockY() == loc.getBlockY() && isXAllowArea && isZAllowArea
+                || loc1.getBlockZ() == loc.getBlockZ() && isXAllowArea && isYAllowArea
+                || loc2.getBlockX() == loc.getBlockX() && isYAllowArea && isZAllowArea
+                || loc2.getBlockY() == loc.getBlockY() && isXAllowArea && isZAllowArea
+                || loc2.getBlockZ() == loc.getBlockZ() && isXAllowArea && isYAllowArea;
     }
 
     public Location getKnockbackLoc(Location fromLoc, Location toLoc, Location loc1, Location loc2) {

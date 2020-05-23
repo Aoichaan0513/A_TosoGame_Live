@@ -8,7 +8,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 
@@ -24,9 +23,9 @@ public class Teams {
     private static Team Toso_success;
     private static Team Toso_tuho;
 
-    public static Scoreboard setScoreboard() {
+    public static org.bukkit.scoreboard.Scoreboard setScoreboard() {
         ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard board = manager.getMainScoreboard();
+        org.bukkit.scoreboard.Scoreboard board = manager.getMainScoreboard();
 
         Toso_admin = board.getTeam(TosoGameAPI.Objective.TEAM_ADMIN.getName());
         if (Toso_admin == null) {
@@ -102,7 +101,7 @@ public class Teams {
         return board;
     }
 
-    public static Scoreboard setScoreboard(Scoreboard board) {
+    public static org.bukkit.scoreboard.Scoreboard setScoreboard(org.bukkit.scoreboard.Scoreboard board) {
         Team Toso_admin = board.getTeam(TosoGameAPI.Objective.TEAM_ADMIN.getName());
         if (Toso_admin == null) {
             Toso_admin = board.registerNewTeam(TosoGameAPI.Objective.TEAM_ADMIN.getName());
@@ -179,7 +178,7 @@ public class Teams {
 
     public static void resetScoreboard() {
         ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard board = manager.getMainScoreboard();
+        org.bukkit.scoreboard.Scoreboard board = manager.getMainScoreboard();
 
         Toso_admin.unregister();
         Toso_player.unregister();
@@ -191,7 +190,7 @@ public class Teams {
         setScoreboard();
     }
 
-    public static void resetScoreboard(Scoreboard board) {
+    public static void resetScoreboard(org.bukkit.scoreboard.Scoreboard board) {
         board.getTeam(TosoGameAPI.Objective.TEAM_ADMIN.getName()).unregister();
         board.getTeam(TosoGameAPI.Objective.TEAM_PLAYER.getName()).unregister();
         board.getTeam(TosoGameAPI.Objective.TEAM_HUNTER.getName()).unregister();
@@ -219,7 +218,7 @@ public class Teams {
         }
     }
 
-    public static Team getOnlineTeam(OnlineTeam team, Scoreboard board) {
+    public static Team getOnlineTeam(OnlineTeam team, org.bukkit.scoreboard.Scoreboard board) {
         return board.getTeam(team.getName());
     }
 
@@ -238,7 +237,7 @@ public class Teams {
             return OnlineTeam.TOSO_PLAYER;
     }
 
-    public static OnlineTeam getJoinedTeam(Player p, Scoreboard board) {
+    public static OnlineTeam getJoinedTeam(Player p, org.bukkit.scoreboard.Scoreboard board) {
         if (board.getTeam(OnlineTeam.TOSO_ADMIN.getName()).hasEntry(p.getName()))
             return OnlineTeam.TOSO_ADMIN;
         if (board.getTeam(OnlineTeam.TOSO_HUNTER.getName()).hasEntry(p.getName()))
@@ -281,14 +280,14 @@ public class Teams {
         // setTeamOptions();
         setTeamOption(p);
 
-        for (Map.Entry<UUID, Scoreboard> entry : ScoreBoard.getBoardMap().entrySet()) {
+        for (Map.Entry<UUID, org.bukkit.scoreboard.Scoreboard> entry : Scoreboard.getBoardMap().entrySet()) {
             if (Bukkit.getPlayer(entry.getKey()) == null) continue;
             getOnlineTeam(team, entry.getValue()).addEntry(p.getName());
             setTeamOption(entry.getValue());
         }
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Scoreboard board = ScoreBoard.getBoard(player);
+            org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(player);
 
             if (GameManager.isGame() && (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player))) {
                 if (player.getInventory().getItemInMainHand().getType() == Material.BOOK) {
@@ -321,11 +320,11 @@ public class Teams {
         // setTeamOptions();
         setTeamOption(p);
 
-        for (Scoreboard board : ScoreBoard.getBoardMap().values())
+        for (org.bukkit.scoreboard.Scoreboard board : Scoreboard.getBoardMap().values())
             board.getTeam(team.getName()).removeEntry(p.getName());
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Scoreboard board = ScoreBoard.getBoard(player);
+            org.bukkit.scoreboard.Scoreboard board = Scoreboard.getBoard(player);
 
             if (GameManager.isGame() && (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player))) {
                 if (player.getInventory().getItemInMainHand().getType() == Material.BOOK) {
@@ -353,34 +352,34 @@ public class Teams {
     }
 
     public static void setTeamOptions() {
-        for (Scoreboard board : ScoreBoard.getBoardMap().values()) {
-            for (Team t : board.getTeams()) {
-                t.setColor(getOnlineTeam(t.getDisplayName()).getColor());
-                t.setPrefix(getOnlineTeam(t.getDisplayName()).getColor().toString());
-                t.setSuffix(ChatColor.RESET.toString());
+        for (org.bukkit.scoreboard.Scoreboard scoreboard : Scoreboard.getBoardMap().values()) {
+            for (Team team : scoreboard.getTeams()) {
+                team.setColor(getOnlineTeam(team.getDisplayName()).getColor());
+                team.setPrefix(getOnlineTeam(team.getDisplayName()).getColor().toString());
+                team.setSuffix(ChatColor.RESET.toString());
 
-                t.setAllowFriendlyFire(false);
-                t.setCanSeeFriendlyInvisibles(true);
-                t.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
-                t.setOption(Team.Option.NAME_TAG_VISIBILITY, t.getDisplayName().equalsIgnoreCase(OnlineTeam.TOSO_ADMIN.getName()) || t.getDisplayName().equalsIgnoreCase(OnlineTeam.TOSO_JAIL.getName()) ? Team.OptionStatus.ALWAYS : Team.OptionStatus.NEVER);
+                team.setAllowFriendlyFire(false);
+                team.setCanSeeFriendlyInvisibles(true);
+                team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+                team.setOption(Team.Option.NAME_TAG_VISIBILITY, team.getDisplayName().equalsIgnoreCase(OnlineTeam.TOSO_ADMIN.getName()) || team.getDisplayName().equalsIgnoreCase(OnlineTeam.TOSO_JAIL.getName()) ? Team.OptionStatus.ALWAYS : Team.OptionStatus.NEVER);
             }
         }
     }
 
     public static void setTeamOption(Player p) {
-        setTeamOption(ScoreBoard.getBoard(p));
+        setTeamOption(Scoreboard.getBoard(p));
     }
 
-    public static void setTeamOption(Scoreboard board) {
-        for (Team t : board.getTeams()) {
-            t.setColor(getOnlineTeam(t.getDisplayName()).getColor());
-            t.setPrefix(getOnlineTeam(t.getDisplayName()).getColor().toString());
-            t.setSuffix(ChatColor.RESET.toString());
+    public static void setTeamOption(org.bukkit.scoreboard.Scoreboard scoreboard) {
+        for (Team team : scoreboard.getTeams()) {
+            team.setColor(getOnlineTeam(team.getDisplayName()).getColor());
+            team.setPrefix(getOnlineTeam(team.getDisplayName()).getColor().toString());
+            team.setSuffix(ChatColor.RESET.toString());
 
-            t.setAllowFriendlyFire(false);
-            t.setCanSeeFriendlyInvisibles(true);
-            t.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
-            t.setOption(Team.Option.NAME_TAG_VISIBILITY, t.getDisplayName().equalsIgnoreCase(OnlineTeam.TOSO_ADMIN.getName()) || t.getDisplayName().equalsIgnoreCase(OnlineTeam.TOSO_JAIL.getName()) ? Team.OptionStatus.ALWAYS : Team.OptionStatus.NEVER);
+            team.setAllowFriendlyFire(false);
+            team.setCanSeeFriendlyInvisibles(true);
+            team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, team.getDisplayName().equalsIgnoreCase(OnlineTeam.TOSO_ADMIN.getName()) || team.getDisplayName().equalsIgnoreCase(OnlineTeam.TOSO_JAIL.getName()) ? Team.OptionStatus.ALWAYS : Team.OptionStatus.NEVER);
         }
     }
 

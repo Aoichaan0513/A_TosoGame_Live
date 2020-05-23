@@ -5,8 +5,8 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
-import jp.aoichaan0513.A_TosoGame_Live.API.Timer.TimerFormat;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -34,8 +34,8 @@ public class RespawnRunnable extends BukkitRunnable {
             int time = timeMap.get(player.getUniqueId());
 
             if (time > 0) {
-                ActionBarManager.sendActionBar(player, ChatColor.GRAY + "復活まで残り" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimerFormat.formatJapan(time));
-                timeMap.put(player.getUniqueId(), time--);
+                ActionBarManager.sendActionBar(player, ChatColor.GRAY + "復活クールタイム終了まで残り" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(time));
+                timeMap.put(player.getUniqueId(), time - 1);
             } else {
                 timeMap.remove(player.getUniqueId());
             }
@@ -54,7 +54,8 @@ public class RespawnRunnable extends BukkitRunnable {
         WorldConfig worldConfig = Main.getWorldConfig();
         WorldConfig.DifficultyConfig difficultyConfig = worldConfig.getDifficultyConfig(p);
 
-        timeMap.put(p.getUniqueId(), difficultyConfig.getRespawnCoolTime() * countMap.put(p.getUniqueId(), count));
+        countMap.put(p.getUniqueId(), count);
+        timeMap.put(p.getUniqueId(), difficultyConfig.getRespawnCoolTime() * count);
     }
 
     public static int getCount(Player p) {
@@ -72,7 +73,7 @@ public class RespawnRunnable extends BukkitRunnable {
         WorldConfig worldConfig = Main.getWorldConfig();
         WorldConfig.DifficultyConfig difficultyConfig = worldConfig.getDifficultyConfig(p);
 
-        return getCount(p) < difficultyConfig.getRespawnDenyCount();
+        return getCount(p) <= difficultyConfig.getRespawnDenyCount();
     }
 
     public static boolean isCoolTime(Player p) {

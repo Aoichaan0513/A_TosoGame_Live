@@ -20,9 +20,8 @@ public class onEntity implements Listener {
 
     @EventHandler
     public void onEntityBreakDoor(EntityBreakDoorEvent e) {
-        if (e.getEntityType() == EntityType.ZOMBIE) {
+        if (e.getEntityType() != EntityType.PLAYER)
             e.setCancelled(true);
-        }
     }
 
     @EventHandler
@@ -57,9 +56,8 @@ public class onEntity implements Listener {
     @EventHandler
     public void onEntitySpawn(CreatureSpawnEvent e) {
         if (e.getLocation().getWorld() == WorldManager.getWorld()) {
-            if (e.getEntityType() != EntityType.ZOMBIE) {
-                e.setCancelled(true);
-            }
+            if (e.getEntityType() == EntityType.ZOMBIE || e.getEntityType() == EntityType.ARMOR_STAND) return;
+            e.setCancelled(true);
         }
     }
 

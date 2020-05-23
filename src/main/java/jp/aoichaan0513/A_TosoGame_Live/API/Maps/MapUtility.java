@@ -57,14 +57,11 @@ public class MapUtility {
         for (int i = max_height - 1; i >= 0; i--) {
             for (int x = minx; x <= maxx; x++) {
                 for (int z = minz; z <= maxz; z++) {
-                    if (block_type.containsKey((maxx - x) + "_" + (maxz - z))) {
-                        continue;
-                    }
+                    if (block_type.containsKey((maxx - x) + "_" + (maxz - z))) continue;
                     Location loc = new Location(world, x, i, z);
                     Block b = loc.getBlock();
-                    if (BlockColor.getBlockColor(b.getType(), b.getData()) != null) {
+                    if (BlockColor.getBlockColor(b.getType(), b.getData()) != null)
                         block_type.put((maxx - x) + "_" + (maxz - z), new Tuple(b.getType(), b.getData()));
-                    }
                 }
             }
         }

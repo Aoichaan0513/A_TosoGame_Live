@@ -7,6 +7,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
+import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable;
 import org.bukkit.GameMode;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
@@ -25,18 +26,19 @@ public class Spec extends ICommand {
     public void onPlayerCommand(Player sp, Command cmd, String label, String[] args) {
         if (GameManager.isGame(GameManager.GameState.GAME)) {
             if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, sp)) {
-                if (!TosoGameAPI.isRes) {
+                if (!TosoGameAPI.isRes || !RespawnRunnable.isAllowRespawn(sp)) {
                     WorldConfig worldConfig = Main.getWorldConfig();
 
                     if (sp.getGameMode() == GameMode.ADVENTURE) {
                         sp.setGameMode(GameMode.SPECTATOR);
-                        TosoGameAPI.teleport(sp, worldConfig.getRespawnLocationConfig().getLocations());
+                        sp.getInventory().setHeldItemSlot(0);
+                        TosoGameAPI.teleport(sp, worldConfig.getRespawnLocationConfig().getLocations().values());
                         sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "観戦モードになりました。\n" +
                                 MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "\"/spec\"で観戦モードから戻れます。");
                         return;
                     } else {
                         sp.setGameMode(GameMode.ADVENTURE);
-                        TosoGameAPI.teleport(sp, worldConfig.getJailLocationConfig().getLocations());
+                        TosoGameAPI.teleport(sp, worldConfig.getJailLocationConfig().getLocations().values());
                         sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "観戦モードから戻りました。");
                         return;
                     }
@@ -47,7 +49,7 @@ public class Spec extends ICommand {
             sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "確保されていないため実行できません。");
             return;
         }
-        sp.sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.ERROR) + "ゲーム中ではないため実行できません。");
+        MainAPI.sendMessage(sp, MainAPI.ErrorMessage.NOT_GAME);
         return;
     }
 

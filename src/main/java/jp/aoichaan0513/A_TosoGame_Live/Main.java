@@ -1,6 +1,5 @@
 package jp.aoichaan0513.A_TosoGame_Live;
 
-import jp.aoichaan0513.A_TosoGame_Live.API.HttpSendJSON;
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.ActionBarManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager;
@@ -9,17 +8,21 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MissionManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Maps.MapUtility;
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.ScoreBoard;
+import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
-import jp.aoichaan0513.A_TosoGame_Live.API.Timer.TimerFormat;
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI;
+import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.GameMode;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Location;
+import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Map;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.*;
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand;
 import jp.aoichaan0513.A_TosoGame_Live.Listeners.*;
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat;
+import jp.aoichaan0513.A_TosoGame_Live.Utils.HttpSendJSON;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,15 +37,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class Main extends JavaPlugin implements Listener {
 
-    private static JavaPlugin plugin;
-    private static String channel = "Dev";
+    private static JavaPlugin instance;
 
     public static final String PHONE_ITEM_NAME = "スマートフォン";
 
@@ -52,46 +51,52 @@ public final class Main extends JavaPlugin implements Listener {
     private static FileConfiguration mainConfig;
     private static WorldConfig worldConfig;
 
-    // オープニングゲーム参加者リスト
-    public static ArrayList<Player> playerList = new ArrayList<>();
-
-    // ハンター・通報部隊抽選応募リスト
-    public static ArrayList<Player> shuffleList = new ArrayList<>();
-
-    // 姿非表示中プレイヤーリスト
-    public static ArrayList<UUID> invisibleList = new ArrayList<>();
-
     private static HashMap<String, ICommand> commands = new HashMap<>();
     private static List<Listener> listeners = new ArrayList<>();
 
 
+    // オープニングゲーム参加者リスト
+    public static Set<UUID> opGamePlayerSet = new HashSet<>();
+
+    // ハンター・通報部隊抽選応募リスト
+    public static Set<UUID> hunterShuffleSet = new HashSet<>();
+    public static Set<UUID> tuhoShuffleSet = new HashSet<>();
+
+    // 姿非表示中プレイヤーリスト
+    public static Set<UUID> invisibleSet = new HashSet<>();
+
+    // プレイヤーが座るときの矢のリスト
+    public static Set<Arrow> arrowSet = new HashSet<>();
+
+
     @Override
     public void onEnable() {
-        plugin = this;
+        instance = this;
         saveDefaultConfig();
 
         mainConfig = getConfig();
 
         loadConfig();
+        loadWorld();
+
         loadCommand();
         loadBlockedCommand();
         loadListener();
-        loadWorld();
         // loadMap();
 
         Teams.setScoreboard();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             TosoGameAPI.difficultyMap.put(player.getUniqueId(), WorldManager.Difficulty.NORMAL);
-            if (!ScoreBoard.getBoardMap().containsKey(player.getUniqueId()))
-                ScoreBoard.setBoard(player);
+            if (!Scoreboard.getBoardMap().containsKey(player.getUniqueId()))
+                Scoreboard.setBoard(player);
         }
 
         new BukkitRunnable() {
 
             @Override
             public void run() {
-                ScoreBoard.updateScoreboard();
+                Scoreboard.updateScoreboard();
 
                 boolean isGame = GameManager.isGame();
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -112,15 +117,18 @@ public final class Main extends JavaPlugin implements Listener {
 
         new RespawnRunnable().runTaskTimerAsynchronously(getInstance(), 0, 20);
 
-        /*
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers())
-                    TosoGameAPI.showPlayers(player);
-            }
-        }.runTaskTimer(getInstance(), 0, 20);
-        */
+//        new BukkitRunnable() {
+//
+//            @Override
+//            public void run() {
+//                for (Arrow arrow : arrowList) {
+//                    if (arrow.getPassenger() == null) {
+//                        arrow.remove();
+//                        arrowList.remove(arrow);
+//                    }
+//                }
+//            }
+//        }.runTaskTimer(getInstance(), 0, 20);
 
         // download();
 
@@ -137,8 +145,22 @@ public final class Main extends JavaPlugin implements Listener {
 
     // インスタンス取得
     public static JavaPlugin getInstance() {
-        return plugin;
+        return instance;
     }
+
+    //
+    public static String getProjectChannel() {
+        return ResourceBundle.getBundle("settings").getString("projectChannel");
+    }
+
+    public static String getProjectVersion() {
+        return ResourceBundle.getBundle("settings").getString("projectVersion");
+    }
+
+    public static String getProjectBuildDate() {
+        return ResourceBundle.getBundle("settings").getString("projectBuildDate");
+    }
+
 
     public static FileConfiguration getMainConfig() {
         return mainConfig;
@@ -158,11 +180,6 @@ public final class Main extends JavaPlugin implements Listener {
         Main.worldConfig = worldConfig;
     }
 
-    // チャンネル取得
-    private String getChannel() {
-        return channel;
-    }
-
     public static void loadConfig() {
         loadFolder("updates");
         loadFolder("players");
@@ -170,6 +187,8 @@ public final class Main extends JavaPlugin implements Listener {
         loadFolder("scripts");
         loadFolder("scripts" + FILE_SEPARATOR + "commands");
         loadFolder("scripts" + FILE_SEPARATOR + "missions");
+
+        loadFile("scripts" + FILE_SEPARATOR + "commands", "template.js");
 
         loadFile("scripts" + FILE_SEPARATOR + "missions", "template.js");
         loadFile("scripts" + FILE_SEPARATOR + "missions", "0.js");
@@ -213,6 +232,7 @@ public final class Main extends JavaPlugin implements Listener {
             // ユーティリティコマンド
             put("btp", new Btp("btp"));
             put("phone", new Phone("phone"));
+            put("menu", new Menu("menu"));
 
             // プレイヤー用コマンド
             put("join", new Join("join")); // コマンドブロック対応
@@ -220,6 +240,7 @@ public final class Main extends JavaPlugin implements Listener {
             put("broadcaster", new BroadCaster("broadcaster")); // コマンドブロック対応
             put("disappear", new Disappear("disappear")); // コマンドブロック対応
             put("appear", new Appear("appear")); // コマンドブロック対応
+            put("gamemode", new GameMode("gamemode")); // コマンドブロック対応
             put("hide", new Hide("hide"));
             put("show", new Show("show"));
             put("spec", new Spec("spec"));
@@ -233,15 +254,25 @@ public final class Main extends JavaPlugin implements Listener {
             put("ride", new Ride("ride"));
         }};
 
-        for (java.util.Map.Entry<String, ICommand> entry : commands.entrySet()) {
+        for (java.util.Map.Entry<String, ICommand> entry : commands.entrySet())
             getCommand(entry.getKey()).setExecutor(entry.getValue());
-        }
+
         Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "コマンドを" + ChatColor.GREEN + ChatColor.UNDERLINE + commands.size() + "件" + ChatColor.RESET + ChatColor.GRAY + "読み込みました。");
         return;
     }
 
     private void loadBlockedCommand() {
         onCommand.addBlockCommand("gamemode");
+        onCommand.addBlockCommand("gm");
+        onCommand.addBlockCommand("gms");
+        onCommand.addBlockCommand("gm0");
+        onCommand.addBlockCommand("gmc");
+        onCommand.addBlockCommand("gm1");
+        onCommand.addBlockCommand("gma");
+        onCommand.addBlockCommand("gm2");
+        onCommand.addBlockCommand("gmsp");
+        onCommand.addBlockCommand("gm3");
+
         onCommand.addBlockCommand("tell");
         onCommand.addBlockCommand("w");
         onCommand.addBlockCommand("r");
@@ -303,6 +334,7 @@ public final class Main extends JavaPlugin implements Listener {
             World world = Bukkit.createWorld(new WorldCreator(WorldManager.getWorldName()));
 
             world.setDifficulty(Difficulty.EASY);
+            world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
             world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
             world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
 
@@ -314,6 +346,7 @@ public final class Main extends JavaPlugin implements Listener {
             World world = WorldManager.getWorld();
 
             world.setDifficulty(Difficulty.EASY);
+            world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
             world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
             world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
 
@@ -327,15 +360,15 @@ public final class Main extends JavaPlugin implements Listener {
         String strPostUrl = urlStr + "api";
 
         Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "更新を確認しています…");
-        String JSON = "{\"channel\":\"" + getChannel() + "\", \"current\":\"" + getDescription().getVersion().split("-")[1] + "\"}";
+        String JSON = "{\"channel\":\"" + getProjectChannel() + "\", \"current\":\"" + getProjectVersion() + "\"}";
         HttpSendJSON httpSendJSON = new HttpSendJSON();
         String result = httpSendJSON.callPost(strPostUrl, JSON);
         try {
             JSONObject jsonObject = new JSONObject(result);
             if (jsonObject.getBoolean("result")) {
                 Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "更新が見つかりました。\n" +
-                        MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "プラグインチャンネル: " + getChannel() + "\n" +
-                        MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "現在のバージョン: " + getDescription().getVersion().split("-")[1] + "\n" +
+                        MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "プラグインチャンネル: " + getProjectChannel() + "\n" +
+                        MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "現在のバージョン: " + getProjectVersion() + "\n" +
                         MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "最新のバージョン: " + jsonObject.getString("latest") + "\n" +
                         MainAPI.getPrefix(MainAPI.PrefixType.WARNING) + "最新のバージョンをダウンロードしています…");
                 try {
@@ -419,11 +452,11 @@ public final class Main extends JavaPlugin implements Listener {
     private static void loadFile(String folderName, String fileName) {
         File file = new File(getInstance().getDataFolder() + FILE_SEPARATOR + folderName, fileName);
         if (!file.exists()) {
-            Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ファイル  \"" + fileName + "\" を作成します…");
+            Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ファイル  \"" + folderName + FILE_SEPARATOR + fileName + "\" を作成します…");
             getInstance().saveResource(folderName + FILE_SEPARATOR + fileName, false);
-            Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "ファイル \"" + fileName + "\" を作成しました。");
+            Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS) + "ファイル \"" + folderName + FILE_SEPARATOR + fileName + "\" を作成しました。");
         } else {
-            Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ファイル \"" + fileName + "\" が見つかったためスルーしました。");
+            Bukkit.getConsoleSender().sendMessage(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY) + "ファイル \"" + folderName + FILE_SEPARATOR + fileName + "\" が見つかったためスルーしました。");
         }
     }
 
@@ -466,6 +499,7 @@ public final class Main extends JavaPlugin implements Listener {
 
     private void sendActionBar() {
         new BukkitRunnable() {
+
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers())
@@ -476,18 +510,18 @@ public final class Main extends JavaPlugin implements Listener {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player)) {
                             if (player.hasPotionEffect(PotionEffectType.INVISIBILITY) && player.hasPotionEffect(PotionEffectType.SPEED))
-                                ActionBarManager.sendActionBar(player, "" + ChatColor.AQUA + ChatColor.UNDERLINE + "透明化" + ChatColor.RESET + ChatColor.GRAY + "終了まで残り" + ChatColor.RED + ChatColor.UNDERLINE + TimerFormat.formatSec(player.getPotionEffect(PotionEffectType.INVISIBILITY).getDuration() / 20) + "秒" + ChatColor.RESET + ChatColor.GRAY + " / " + ChatColor.BLUE + ChatColor.UNDERLINE + "移動速度上昇" + ChatColor.RESET + ChatColor.GRAY + "終了まで残り" + ChatColor.RED + ChatColor.UNDERLINE + TimerFormat.formatSec(player.getPotionEffect(PotionEffectType.SPEED).getDuration() / 20) + "秒");
+                                ActionBarManager.sendActionBar(player, "" + ChatColor.AQUA + ChatColor.UNDERLINE + "透明化" + ChatColor.RESET + ChatColor.GRAY + "終了まで残り" + ChatColor.RED + ChatColor.UNDERLINE + TimeFormat.formatSec(player.getPotionEffect(PotionEffectType.INVISIBILITY).getDuration() / 20) + "秒" + ChatColor.RESET + ChatColor.GRAY + " / " + ChatColor.BLUE + ChatColor.UNDERLINE + "移動速度上昇" + ChatColor.RESET + ChatColor.GRAY + "終了まで残り" + ChatColor.RED + ChatColor.UNDERLINE + TimeFormat.formatSec(player.getPotionEffect(PotionEffectType.SPEED).getDuration() / 20) + "秒");
                             else if (player.hasPotionEffect(PotionEffectType.INVISIBILITY))
-                                ActionBarManager.sendActionBar(player, "" + ChatColor.AQUA + ChatColor.UNDERLINE + "透明化" + ChatColor.RESET + ChatColor.GRAY + "終了まで残り" + ChatColor.RED + ChatColor.UNDERLINE + TimerFormat.formatSec(player.getPotionEffect(PotionEffectType.INVISIBILITY).getDuration() / 20) + "秒");
+                                ActionBarManager.sendActionBar(player, "" + ChatColor.AQUA + ChatColor.UNDERLINE + "透明化" + ChatColor.RESET + ChatColor.GRAY + "終了まで残り" + ChatColor.RED + ChatColor.UNDERLINE + TimeFormat.formatSec(player.getPotionEffect(PotionEffectType.INVISIBILITY).getDuration() / 20) + "秒");
                             else if (player.hasPotionEffect(PotionEffectType.SPEED))
-                                ActionBarManager.sendActionBar(player, "" + ChatColor.BLUE + ChatColor.UNDERLINE + "移動速度上昇" + ChatColor.RESET + ChatColor.GRAY + "終了まで残り" + ChatColor.RED + ChatColor.UNDERLINE + TimerFormat.formatSec(player.getPotionEffect(PotionEffectType.SPEED).getDuration() / 20) + "秒");
+                                ActionBarManager.sendActionBar(player, "" + ChatColor.BLUE + ChatColor.UNDERLINE + "移動速度上昇" + ChatColor.RESET + ChatColor.GRAY + "終了まで残り" + ChatColor.RED + ChatColor.UNDERLINE + TimeFormat.formatSec(player.getPotionEffect(PotionEffectType.SPEED).getDuration() / 20) + "秒");
                         }
                         if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, player) && player.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
-                            ActionBarManager.sendActionBar(player, ChatColor.GRAY + "復活可能まで残り" + ChatColor.RED + ChatColor.UNDERLINE + TimerFormat.formatJapan(player.getPotionEffect(PotionEffectType.FIRE_RESISTANCE).getDuration() / 20));
+                            ActionBarManager.sendActionBar(player, ChatColor.GRAY + "復活可能まで残り" + ChatColor.RED + ChatColor.UNDERLINE + TimeFormat.formatJapan(player.getPotionEffect(PotionEffectType.FIRE_RESISTANCE).getDuration() / 20));
                         }
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(getInstance(), 0, 20);
+        }.runTaskTimerAsynchronously(getInstance(), 0, 0);
     }
 }

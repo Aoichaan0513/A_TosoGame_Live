@@ -1,5 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.OPGame;
 
+import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI;
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.OPGameManager;
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams;
 import jp.aoichaan0513.A_TosoGame_Live.Main;
@@ -8,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class Dice {
@@ -53,19 +55,20 @@ public class Dice {
     public static Player getShufflePlayer() {
         Player p = null;
 
-        for (int c = 0; c < 3; c++)
-            Collections.shuffle(Main.playerList);
+        List<UUID> opGamePlayerList = new ArrayList<>(Main.opGamePlayerSet);
 
-        for (Player player : Main.playerList) {
+        for (int c = 0; c < 3; c++)
+            Collections.shuffle(opGamePlayerList);
+
+        for (Player player : MainAPI.getOnlinePlayers(opGamePlayerList)) {
             if (!list.contains(player)) {
                 p = player;
-                Main.playerList.remove(player);
+                opGamePlayerList.remove(player.getUniqueId());
                 list.add(player);
                 break;
             } else {
                 for (int c = 0; c < 3; c++)
-                    Collections.shuffle(Main.playerList);
-                continue;
+                    Collections.shuffle(opGamePlayerList);
             }
         }
         return p;
