@@ -84,7 +84,7 @@ class onDamage : Listener {
                         RespawnRunnable.addCoolTime(player)
 
                         val rate = MoneyManager.getRate(player)
-                        if (rate != worldConfig.getDifficultyConfig(player).rate) {
+                        if (TosoGameAPI.isRunnedBonusMission && rate != worldConfig.getDifficultyConfig(player).rate) {
                             MoneyManager.setRate(player)
                             player.sendMessage("""
                                 ${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたのレートが変更されました。

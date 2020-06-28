@@ -79,20 +79,11 @@ class MoneyManager {
             return getRate(p.uniqueId)
         }
 
-        fun setRate(uuid: UUID) {
-            val worldConfig = Main.worldConfig
-            setRate(uuid, worldConfig.getDifficultyConfig(uuid).rate)
-        }
-
-        fun setRate(p: Player) {
-            setRate(p.uniqueId)
-        }
-
-        fun setRate(uuid: UUID, rate: Int) {
+        fun setRate(uuid: UUID, rate: Int = Main.worldConfig.getDifficultyConfig(uuid).rate) {
             rateMap[uuid] = rate
         }
 
-        fun setRate(p: Player, rate: Int) {
+        fun setRate(p: Player, rate: Int = Main.worldConfig.getDifficultyConfig(p).rate) {
             setRate(p.uniqueId, rate)
         }
 
