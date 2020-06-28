@@ -1,10 +1,10 @@
 name: A_TosoGame_Live
-version: Beta-1.2.0
+version: Dev-2.0.0
 api-version: 1.13
 main: jp.aoichaan0513.A_TosoGame_Live.Main
 authors: [Aoichaan0513]
 website: https://aoichaan0513.jp
-description: TosoGame (Run for Money) Plugin for Minecraft Java Edition 1.15.2. (Build 20.0524.0349)
+description: TosoGame (Run for Money) Plugin for Minecraft Java Edition 1.15.2. (Build 20.0628.0314)
 
 commands:
   toso:
@@ -50,7 +50,10 @@ commands:
     usage: Map Settings Command.
 
   btp:
-  phone:
+  resource:
+    usage: Load Resource Pack Command.
+    aliases:
+      - texture
   menu:
 
   join:

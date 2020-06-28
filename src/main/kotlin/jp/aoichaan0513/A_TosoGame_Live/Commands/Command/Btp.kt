@@ -1,0 +1,67 @@
+package jp.aoichaan0513.A_TosoGame_Live.Commands.Command
+
+import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
+import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.ErrorMessage
+import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
+import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
+import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
+import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
+import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.onInteract
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.GameMode
+import org.bukkit.Location
+import org.bukkit.command.BlockCommandSender
+import org.bukkit.command.Command
+import org.bukkit.command.ConsoleCommandSender
+import org.bukkit.entity.Player
+
+class Btp(name: String) : ICommand(name) {
+    override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
+        if (TosoGameAPI.isAdmin(sp)) {
+            if (!GameManager.isGame()) {
+                val loc = onInteract.successBlockLoc
+                if (loc != null) {
+                    for (p in Bukkit.getOnlinePlayers()) {
+                        if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) {
+                            p.gameMode = GameMode.SPECTATOR
+                            p.teleport(Location(loc.world, loc.blockX + 0.5, loc.blockY.toDouble(), loc.blockZ + 0.5))
+                        }
+                    }
+                    sp.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${Bukkit.getOnlinePlayers().size - Teams.getOnlineCount(OnlineTeam.TOSO_ADMIN)}人${ChatColor.RESET}${ChatColor.GRAY}を生存ブロックの位置にテレポートしました。")
+                    return
+                }
+                sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}生存ミッションを実行していないため実行できません。")
+                return
+            }
+            sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ゲームが実行されているため実行できません。")
+            return
+        }
+        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
+        return
+    }
+
+    override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
+        MainAPI.sendMessage(bs, ErrorMessage.NOT_PLAYER)
+        return
+    }
+
+    override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
+        MainAPI.sendMessage(cs, ErrorMessage.NOT_PLAYER)
+        return
+    }
+
+    override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
+        return null
+    }
+
+    override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
+        return null
+    }
+
+    override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
+        return null
+    }
+}

@@ -50,7 +50,10 @@ commands:
     usage: Map Settings Command.
 
   btp:
-  phone:
+  resource:
+    usage: Load Resource Pack Command.
+    aliases:
+      - texture
   menu:
 
   join:
