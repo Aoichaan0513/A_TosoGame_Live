@@ -4,6 +4,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -22,7 +23,6 @@ class MapInventory {
         val difficultyTitle = "${ChatColor.DARK_GRAY}> ${ChatColor.BOLD}マップ設定${ChatColor.RESET}${ChatColor.DARK_GRAY} > ${ChatColor.BOLD}難易度選択${ChatColor.RESET}${ChatColor.DARK_GRAY} > "
         val listTitle = "${ChatColor.DARK_GRAY}> ${ChatColor.BOLD}ホーム${ChatColor.RESET}${ChatColor.DARK_GRAY} > ${ChatColor.BOLD}マップリスト"
 
-        private val itemFlags = arrayOf(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS)
 
         val editInventory: Inventory
             get() {
@@ -361,7 +361,7 @@ class MapInventory {
 
             val itemStackBorder = ItemStack(Material.BLACK_STAINED_GLASS_PANE)
             val itemMetaBorder = itemStackBorder.itemMeta!!
-            itemMetaBorder.addItemFlags(*itemFlags)
+            itemMetaBorder.addItemFlags(*ItemUtil.itemFlags)
             itemMetaBorder.setDisplayName("${ChatColor.BOLD}")
             itemStackBorder.itemMeta = itemMetaBorder
             for (i in 0..8)
@@ -371,7 +371,7 @@ class MapInventory {
 
             val itemStackDifficultyEasy = ItemStack(MainInventory.Item.DIFFICULTY_EASY.material, 1)
             val itemMetaDifficultyEasy = itemStackDifficultyEasy.itemMeta!!
-            itemMetaDifficultyEasy.addItemFlags(*itemFlags)
+            itemMetaDifficultyEasy.addItemFlags(*ItemUtil.itemFlags)
             itemMetaDifficultyEasy.setDisplayName("${ChatColor.BOLD}${ChatColor.UNDERLINE}${WorldManager.Difficulty.EASY.displayName}")
             itemMetaDifficultyEasy.lore = listOf()
             itemStackDifficultyEasy.itemMeta = itemMetaDifficultyEasy
@@ -379,7 +379,7 @@ class MapInventory {
 
             val itemStackDifficultyNormal = ItemStack(MainInventory.Item.DIFFICULTY_NORMAL.material, 1)
             val itemMetaDifficultyNormal = itemStackDifficultyNormal.itemMeta!!
-            itemMetaDifficultyNormal.addItemFlags(*itemFlags)
+            itemMetaDifficultyNormal.addItemFlags(*ItemUtil.itemFlags)
             itemMetaDifficultyNormal.setDisplayName("${ChatColor.BOLD}${ChatColor.UNDERLINE}${WorldManager.Difficulty.NORMAL.displayName}")
             itemMetaDifficultyNormal.lore = listOf()
             itemStackDifficultyNormal.itemMeta = itemMetaDifficultyNormal
@@ -387,7 +387,7 @@ class MapInventory {
 
             val itemStackDifficultyHard = ItemStack(MainInventory.Item.DIFFICULTY_HARD.material, 1)
             val itemMetaDifficultyHard = itemStackDifficultyHard.itemMeta!!
-            itemMetaDifficultyHard.addItemFlags(*itemFlags)
+            itemMetaDifficultyHard.addItemFlags(*ItemUtil.itemFlags)
             itemMetaDifficultyHard.setDisplayName("${ChatColor.BOLD}${ChatColor.UNDERLINE}${WorldManager.Difficulty.HARD.displayName}")
             itemMetaDifficultyHard.lore = listOf()
             itemStackDifficultyHard.itemMeta = itemMetaDifficultyHard
@@ -395,15 +395,15 @@ class MapInventory {
 
             val itemStackDifficultyHardCore = ItemStack(MainInventory.Item.DIFFICULTY_HARDCORE.material, 1)
             val itemMetaDifficultyHardCore = itemStackDifficultyHardCore.itemMeta!!
-            itemMetaDifficultyHardCore.addItemFlags(*itemFlags)
+            itemMetaDifficultyHardCore.addItemFlags(*ItemUtil.itemFlags)
             itemMetaDifficultyHardCore.setDisplayName("${ChatColor.BOLD}${ChatColor.UNDERLINE}${WorldManager.Difficulty.HARDCORE.displayName}")
             itemMetaDifficultyHardCore.lore = listOf()
             itemStackDifficultyHardCore.itemMeta = itemMetaDifficultyHardCore
             inv.setItem(13, itemStackDifficultyHardCore)
 
             val itemStackCancel = ItemStack(Material.BARRIER, 1)
-            val itemMetaCancel = itemStackCancel.itemMeta
-            itemMetaCancel!!.addItemFlags(*itemFlags)
+            val itemMetaCancel = itemStackCancel.itemMeta!!
+            itemMetaCancel.addItemFlags(*ItemUtil.itemFlags)
             itemMetaCancel.setDisplayName("${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}キャンセル")
             itemMetaCancel.lore = listOf()
             itemStackCancel.itemMeta = itemMetaCancel

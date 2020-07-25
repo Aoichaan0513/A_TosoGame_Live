@@ -1,235 +1,224 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Map
 
-import org.bukkit.Bukkit
 import org.bukkit.Material
-import java.util.*
 
 class BlockColor {
     companion object {
 
-        var color_map: HashMap<Material, RgbColor> = object : HashMap<Material, RgbColor>() {
-            init {
-                put(Material.OAK_FENCE, RgbColor(143, 119, 72))
-                put(Material.SPRUCE_FENCE, RgbColor(102, 76, 51))
-                put(Material.BIRCH_FENCE, RgbColor(247, 233, 163))
-                put(Material.JUNGLE_FENCE, RgbColor(151, 109, 77))
-                put(Material.ACACIA_FENCE, RgbColor(216, 127, 51))
-                put(Material.DARK_OAK_FENCE, RgbColor(102, 76, 51))
-                put(Material.NETHER_BRICK_FENCE, RgbColor(247, 233, 163))
-                put(Material.TERRACOTTA, RgbColor(184, 116, 86))
-                put(Material.OAK_FENCE_GATE, RgbColor(143, 119, 72))
-                put(Material.SPRUCE_FENCE_GATE, RgbColor(102, 76, 51))
-                put(Material.BIRCH_FENCE_GATE, RgbColor(247, 233, 163))
-                put(Material.JUNGLE_FENCE_GATE, RgbColor(151, 109, 77))
-                put(Material.ACACIA_FENCE_GATE, RgbColor(216, 127, 51))
-                put(Material.DARK_OAK_FENCE_GATE, RgbColor(102, 76, 51))
-                put(Material.CHEST, RgbColor(184, 128, 44))
-                put(Material.TRAPPED_CHEST, RgbColor(184, 128, 44))
-                put(Material.ENDER_CHEST, RgbColor(57, 81, 83))
-                put(Material.BEACON, RgbColor(165, 241, 241))
-                put(Material.STONE, RgbColor(153, 153, 153))
-                put(Material.STONE_BRICKS, RgbColor(112, 112, 112))
-                put(Material.STONE_BRICK_STAIRS, RgbColor(112, 112, 112))
-                put(Material.REDSTONE_LAMP, RgbColor(136, 92, 64))
-                put(Material.GRASS, RgbColor(127, 178, 56))
-                put(Material.GRASS_BLOCK, RgbColor(127, 178, 56))
+        val colorMap = mapOf(
+                Material.OAK_FENCE to DataClass.RGBColor(143, 119, 72),
+                Material.SPRUCE_FENCE to DataClass.RGBColor(102, 76, 51),
+                Material.BIRCH_FENCE to DataClass.RGBColor(247, 233, 163),
+                Material.JUNGLE_FENCE to DataClass.RGBColor(151, 109, 77),
+                Material.ACACIA_FENCE to DataClass.RGBColor(216, 127, 51),
+                Material.DARK_OAK_FENCE to DataClass.RGBColor(102, 76, 51),
+                Material.NETHER_BRICK_FENCE to DataClass.RGBColor(247, 233, 163),
+                Material.TERRACOTTA to DataClass.RGBColor(184, 116, 86),
+                Material.OAK_FENCE_GATE to DataClass.RGBColor(143, 119, 72),
+                Material.SPRUCE_FENCE_GATE to DataClass.RGBColor(102, 76, 51),
+                Material.BIRCH_FENCE_GATE to DataClass.RGBColor(247, 233, 163),
+                Material.JUNGLE_FENCE_GATE to DataClass.RGBColor(151, 109, 77),
+                Material.ACACIA_FENCE_GATE to DataClass.RGBColor(216, 127, 51),
+                Material.DARK_OAK_FENCE_GATE to DataClass.RGBColor(102, 76, 51),
+                Material.CHEST to DataClass.RGBColor(184, 128, 44),
+                Material.TRAPPED_CHEST to DataClass.RGBColor(184, 128, 44),
+                Material.ENDER_CHEST to DataClass.RGBColor(57, 81, 83),
+                Material.BEACON to DataClass.RGBColor(165, 241, 241),
+                Material.STONE to DataClass.RGBColor(153, 153, 153),
+                Material.STONE_BRICKS to DataClass.RGBColor(112, 112, 112),
+                Material.STONE_BRICK_STAIRS to DataClass.RGBColor(112, 112, 112),
+                Material.REDSTONE_LAMP to DataClass.RGBColor(136, 92, 64),
+                Material.GRASS to DataClass.RGBColor(127, 178, 56),
+                Material.GRASS_BLOCK to DataClass.RGBColor(127, 178, 56),
+                Material.SANDSTONE to DataClass.RGBColor(247, 233, 163),
+                Material.BROWN_MUSHROOM to DataClass.RGBColor(247, 233, 163),
+                Material.BONE_BLOCK to DataClass.RGBColor(247, 233, 163),
+                Material.GLOWSTONE to DataClass.RGBColor(247, 233, 163),
+                Material.END_STONE to DataClass.RGBColor(247, 233, 163),
+                Material.OAK_STAIRS to DataClass.RGBColor(143, 119, 72),
+                Material.BIRCH_STAIRS to DataClass.RGBColor(247, 233, 163),
+                Material.JUNGLE_STAIRS to DataClass.RGBColor(151, 109, 77),
+                Material.TNT to DataClass.RGBColor(255, 0, 0),
+                Material.REDSTONE_BLOCK to DataClass.RGBColor(255, 0, 0),
+                Material.LAVA to DataClass.RGBColor(255, 0, 0),
+                Material.ICE to DataClass.RGBColor(160, 160, 255),
+                Material.FROSTED_ICE to DataClass.RGBColor(160, 160, 255),
+                Material.PACKED_ICE to DataClass.RGBColor(160, 160, 255),
+                Material.IRON_BLOCK to DataClass.RGBColor(167, 167, 167),
+                Material.HEAVY_WEIGHTED_PRESSURE_PLATE to DataClass.RGBColor(167, 167, 167),
+                Material.OAK_LEAVES to DataClass.RGBColor(0, 124, 0),
+                Material.SPRUCE_LEAVES to DataClass.RGBColor(0, 124, 0),
+                Material.BIRCH_LEAVES to DataClass.RGBColor(0, 124, 0),
+                Material.JUNGLE_LEAVES to DataClass.RGBColor(0, 124, 0),
+                Material.ACACIA_LEAVES to DataClass.RGBColor(0, 124, 0),
+                Material.DARK_OAK_LEAVES to DataClass.RGBColor(0, 124, 0),
+                Material.SNOW_BLOCK to DataClass.RGBColor(0, 0, 0),
+                Material.CLAY to DataClass.RGBColor(164, 168, 184),
+                Material.BROWN_MUSHROOM to DataClass.RGBColor(151, 109, 77),
+                Material.DIRT to DataClass.RGBColor(151, 109, 77),
+                Material.FARMLAND to DataClass.RGBColor(151, 109, 77),
+                Material.JUKEBOX to DataClass.RGBColor(151, 109, 77),
+                Material.GRASS_PATH to DataClass.RGBColor(151, 109, 77),
+                Material.MOSSY_COBBLESTONE to DataClass.RGBColor(112, 112, 112),
+                Material.COBBLESTONE_WALL to DataClass.RGBColor(112, 112, 112),
+                Material.COBBLESTONE_STAIRS to DataClass.RGBColor(112, 112, 112),
+                Material.BRICK to DataClass.RGBColor(112, 112, 112),
+                Material.BRICK_STAIRS to DataClass.RGBColor(112, 112, 112),
+                Material.GRAVEL to DataClass.RGBColor(112, 112, 112),
+                Material.COAL_ORE to DataClass.RGBColor(112, 112, 112),
+                Material.IRON_ORE to DataClass.RGBColor(112, 112, 112),
+                Material.GOLD_ORE to DataClass.RGBColor(112, 112, 112),
+                Material.REDSTONE_ORE to DataClass.RGBColor(112, 112, 112),
+                Material.LAPIS_ORE to DataClass.RGBColor(112, 112, 112),
+                Material.DIAMOND_ORE to DataClass.RGBColor(112, 112, 112),
+                Material.EMERALD_ORE to DataClass.RGBColor(112, 112, 112),
+                Material.BEDROCK to DataClass.RGBColor(112, 112, 112),
+                Material.FURNACE to DataClass.RGBColor(112, 112, 112),
+                Material.DISPENSER to DataClass.RGBColor(112, 112, 112),
+                Material.DROPPER to DataClass.RGBColor(112, 112, 112),
+                Material.HOPPER to DataClass.RGBColor(112, 112, 112),
+                Material.OBSERVER to DataClass.RGBColor(112, 112, 112),
+                Material.WATER to DataClass.RGBColor(64, 64, 255),
+                Material.CRAFTING_TABLE to DataClass.RGBColor(143, 119, 72),
+                Material.BOOKSHELF to DataClass.RGBColor(143, 119, 72),
+                Material.NOTE_BLOCK to DataClass.RGBColor(143, 119, 72),
+                Material.QUARTZ_BLOCK to DataClass.RGBColor(255, 252, 245),
+                Material.QUARTZ_STAIRS to DataClass.RGBColor(255, 252, 245),
+                Material.SEA_LANTERN to DataClass.RGBColor(255, 252, 245),
+                Material.ACACIA_STAIRS to DataClass.RGBColor(216, 127, 51),
+                Material.PUMPKIN to DataClass.RGBColor(216, 127, 51),
+                Material.JACK_O_LANTERN to DataClass.RGBColor(216, 127, 51),
+                Material.RED_SANDSTONE to DataClass.RGBColor(216, 127, 51),
+                Material.RED_SANDSTONE_STAIRS to DataClass.RGBColor(216, 127, 51),
+                Material.RED_SANDSTONE_SLAB to DataClass.RGBColor(216, 127, 51),
+                Material.PURPUR_BLOCK to DataClass.RGBColor(178, 76, 216),
+                Material.PURPUR_PILLAR to DataClass.RGBColor(178, 76, 216),
+                Material.PURPUR_SLAB to DataClass.RGBColor(178, 76, 216),
+                Material.PURPUR_STAIRS to DataClass.RGBColor(178, 76, 216),
+                Material.HAY_BLOCK to DataClass.RGBColor(229, 229, 51),
+                Material.SPONGE to DataClass.RGBColor(229, 229, 51),
+                Material.MELON to DataClass.RGBColor(127, 204, 25),
+                Material.REPEATING_COMMAND_BLOCK to DataClass.RGBColor(127, 63, 178),
+                Material.MYCELIUM to DataClass.RGBColor(127, 63, 178),
+                Material.COMMAND_BLOCK to DataClass.RGBColor(102, 76, 51),
+                Material.SOUL_SAND to DataClass.RGBColor(102, 76, 51),
+                Material.DARK_OAK_STAIRS to DataClass.RGBColor(102, 76, 51),
+                Material.BRICK to DataClass.RGBColor(153, 51, 51),
+                Material.BRICK_STAIRS to DataClass.RGBColor(153, 51, 51),
+                Material.NETHER_WART_BLOCK to DataClass.RGBColor(153, 51, 51),
+                Material.COAL_BLOCK to DataClass.RGBColor(25, 25, 25),
+                Material.OBSIDIAN to DataClass.RGBColor(25, 25, 25),
+                Material.GOLD_BLOCK to DataClass.RGBColor(250, 238, 77),
+                Material.LIGHT_WEIGHTED_PRESSURE_PLATE to DataClass.RGBColor(250, 238, 77),
+                Material.DIAMOND_BLOCK to DataClass.RGBColor(92, 238, 77),
+                Material.LAPIS_BLOCK to DataClass.RGBColor(74, 128, 255),
+                Material.EMERALD_BLOCK to DataClass.RGBColor(0, 217, 58),
+                Material.NETHERRACK to DataClass.RGBColor(112, 2, 0),
+                Material.NETHER_BRICK_STAIRS to DataClass.RGBColor(112, 2, 0),
+                Material.RED_NETHER_BRICKS to DataClass.RGBColor(112, 2, 0),
+                Material.NETHER_QUARTZ_ORE to DataClass.RGBColor(112, 2, 0),
+                Material.MAGMA_BLOCK to DataClass.RGBColor(112, 2, 0),
+                Material.CAULDRON to DataClass.RGBColor(60, 60, 60),
+                Material.SLIME_BLOCK to DataClass.RGBColor(147, 204, 134),
+                Material.COBWEB to DataClass.RGBColor(251, 251, 251),
+                Material.ANVIL to DataClass.RGBColor(63, 58, 58),
+                Material.WHITE_WOOL to DataClass.RGBColor(255, 255, 255),
+                Material.ORANGE_WOOL to DataClass.RGBColor(216, 127, 51),
+                Material.MAGENTA_WOOL to DataClass.RGBColor(178, 76, 216),
+                Material.LIGHT_BLUE_WOOL to DataClass.RGBColor(102, 153, 216),
+                Material.YELLOW_WOOL to DataClass.RGBColor(229, 229, 51),
+                Material.LIME_WOOL to DataClass.RGBColor(127, 204, 25),
+                Material.PINK_WOOL to DataClass.RGBColor(242, 127, 165),
+                Material.GRAY_WOOL to DataClass.RGBColor(76, 76, 76),
+                Material.LIGHT_GRAY_WOOL to DataClass.RGBColor(155, 157, 181),
+                Material.CYAN_WOOL to DataClass.RGBColor(76, 127, 153),
+                Material.PURPLE_WOOL to DataClass.RGBColor(127, 63, 178),
+                Material.BLUE_WOOL to DataClass.RGBColor(51, 76, 178),
+                Material.BROWN_WOOL to DataClass.RGBColor(102, 76, 51),
+                Material.GREEN_WOOL to DataClass.RGBColor(55, 77, 36),
+                Material.RED_WOOL to DataClass.RGBColor(153, 51, 51),
+                Material.BLACK_WOOL to DataClass.RGBColor(25, 25, 25),
+                Material.WHITE_CARPET to DataClass.RGBColor(255, 255, 255),
+                Material.ORANGE_CARPET to DataClass.RGBColor(216, 127, 51),
+                Material.MAGENTA_CARPET to DataClass.RGBColor(178, 76, 216),
+                Material.LIGHT_BLUE_CARPET to DataClass.RGBColor(102, 153, 216),
+                Material.YELLOW_CARPET to DataClass.RGBColor(229, 229, 51),
+                Material.LIME_CARPET to DataClass.RGBColor(127, 204, 25),
+                Material.PINK_CARPET to DataClass.RGBColor(242, 127, 165),
+                Material.GRAY_CARPET to DataClass.RGBColor(76, 76, 76),
+                Material.LIGHT_GRAY_CARPET to DataClass.RGBColor(155, 157, 181),
+                Material.CYAN_CARPET to DataClass.RGBColor(76, 127, 153),
+                Material.PURPLE_CARPET to DataClass.RGBColor(127, 63, 178),
+                Material.BLUE_CARPET to DataClass.RGBColor(51, 76, 178),
+                Material.BROWN_CARPET to DataClass.RGBColor(102, 76, 51),
+                Material.GREEN_CARPET to DataClass.RGBColor(55, 77, 36),
+                Material.RED_CARPET to DataClass.RGBColor(153, 51, 51),
+                Material.BLACK_CARPET to DataClass.RGBColor(25, 25, 25),
+                Material.WHITE_TERRACOTTA to DataClass.RGBColor(189, 176, 172),
+                Material.ORANGE_TERRACOTTA to DataClass.RGBColor(216, 127, 51),
+                Material.MAGENTA_TERRACOTTA to DataClass.RGBColor(178, 76, 216),
+                Material.LIGHT_BLUE_TERRACOTTA to DataClass.RGBColor(102, 153, 216),
+                Material.YELLOW_TERRACOTTA to DataClass.RGBColor(229, 229, 51),
+                Material.LIME_TERRACOTTA to DataClass.RGBColor(127, 204, 25),
+                Material.PINK_TERRACOTTA to DataClass.RGBColor(242, 127, 165),
+                Material.GRAY_TERRACOTTA to DataClass.RGBColor(76, 76, 76),
+                Material.LIGHT_GRAY_TERRACOTTA to DataClass.RGBColor(122, 99, 90),
+                Material.CYAN_TERRACOTTA to DataClass.RGBColor(76, 127, 153),
+                Material.PURPLE_TERRACOTTA to DataClass.RGBColor(127, 63, 178),
+                Material.BLUE_TERRACOTTA to DataClass.RGBColor(127, 63, 178),
+                Material.BROWN_TERRACOTTA to DataClass.RGBColor(102, 76, 51),
+                Material.GREEN_TERRACOTTA to DataClass.RGBColor(82, 89, 45),
+                Material.RED_TERRACOTTA to DataClass.RGBColor(153, 51, 51),
+                Material.BLACK_TERRACOTTA to DataClass.RGBColor(25, 25, 25),
+                Material.STONE_SLAB to DataClass.RGBColor(167, 167, 167),
+                Material.SMOOTH_STONE_SLAB to DataClass.RGBColor(167, 167, 167),
+                Material.SANDSTONE_SLAB to DataClass.RGBColor(247, 233, 163),
+                Material.COBBLESTONE_SLAB to DataClass.RGBColor(112, 112, 112),
+                Material.BRICK_SLAB to DataClass.RGBColor(153, 51, 51),
+                Material.STONE_BRICK_SLAB to DataClass.RGBColor(112, 112, 112),
+                Material.NETHER_BRICK_SLAB to DataClass.RGBColor(112, 2, 0),
+                Material.QUARTZ_SLAB to DataClass.RGBColor(255, 252, 245),
+                Material.SMOOTH_STONE to DataClass.RGBColor(167, 167, 167),
+                Material.SMOOTH_SANDSTONE to DataClass.RGBColor(247, 233, 163),
+                Material.COBBLESTONE to DataClass.RGBColor(112, 112, 112),
+                Material.BRICK to DataClass.RGBColor(153, 51, 51),
+                Material.STONE_BRICKS to DataClass.RGBColor(112, 112, 112),
+                Material.NETHER_BRICK to DataClass.RGBColor(112, 2, 0),
+                Material.NETHER_BRICKS to DataClass.RGBColor(112, 2, 0),
+                Material.SMOOTH_QUARTZ to DataClass.RGBColor(255, 252, 245),
+                Material.OAK_SLAB to DataClass.RGBColor(143, 119, 72),
+                Material.SPRUCE_SLAB to DataClass.RGBColor(102, 76, 51),
+                Material.BIRCH_SLAB to DataClass.RGBColor(247, 233, 163),
+                Material.JUNGLE_SLAB to DataClass.RGBColor(151, 109, 77),
+                Material.ACACIA_SLAB to DataClass.RGBColor(216, 127, 51),
+                Material.DARK_OAK_SLAB to DataClass.RGBColor(102, 76, 51),
+                Material.OAK_PLANKS to DataClass.RGBColor(143, 119, 72),
+                Material.SPRUCE_PLANKS to DataClass.RGBColor(102, 76, 51),
+                Material.BIRCH_PLANKS to DataClass.RGBColor(247, 233, 163),
+                Material.JUNGLE_PLANKS to DataClass.RGBColor(151, 109, 77),
+                Material.ACACIA_PLANKS to DataClass.RGBColor(216, 127, 51),
+                Material.DARK_OAK_PLANKS to DataClass.RGBColor(102, 76, 51),
+                Material.OAK_WOOD to DataClass.RGBColor(143, 119, 72),
+                Material.SPRUCE_WOOD to DataClass.RGBColor(102, 76, 51),
+                Material.BIRCH_WOOD to DataClass.RGBColor(247, 233, 163),
+                Material.JUNGLE_WOOD to DataClass.RGBColor(151, 109, 77),
+                Material.ACACIA_WOOD to DataClass.RGBColor(216, 127, 51),
+                Material.DARK_OAK_WOOD to DataClass.RGBColor(102, 76, 51),
+                Material.OAK_LOG to DataClass.RGBColor(143, 119, 72),
+                Material.SPRUCE_LOG to DataClass.RGBColor(102, 76, 51),
+                Material.BIRCH_LOG to DataClass.RGBColor(247, 233, 163),
+                Material.JUNGLE_LOG to DataClass.RGBColor(151, 109, 77),
+                Material.ACACIA_LOG to DataClass.RGBColor(216, 127, 51),
+                Material.DARK_OAK_LOG to DataClass.RGBColor(102, 76, 51),
+                Material.SAND to DataClass.RGBColor(247, 233, 163),
+                Material.RED_SAND to DataClass.RGBColor(216, 127, 51),
+                Material.PRISMARINE to DataClass.RGBColor(76, 127, 153),
+                Material.PRISMARINE_BRICKS to DataClass.RGBColor(92, 219, 213),
+                Material.DARK_PRISMARINE to DataClass.RGBColor(92, 219, 213)
+        )
 
-                //put(Material.SAND, new RgbColor(247, 233, 163));
-                put(Material.SANDSTONE, RgbColor(247, 233, 163))
-                //put(Material.WOOD, new RgbColor(247, 233, 163));
-                put(Material.BROWN_MUSHROOM, RgbColor(247, 233, 163))
-                put(Material.BONE_BLOCK, RgbColor(247, 233, 163))
-                put(Material.GLOWSTONE, RgbColor(247, 233, 163))
-                put(Material.END_STONE, RgbColor(247, 233, 163))
-                put(Material.OAK_STAIRS, RgbColor(143, 119, 72))
-                put(Material.BIRCH_STAIRS, RgbColor(247, 233, 163))
-                put(Material.JUNGLE_STAIRS, RgbColor(151, 109, 77))
-                put(Material.TNT, RgbColor(255, 0, 0))
-                put(Material.REDSTONE_BLOCK, RgbColor(255, 0, 0))
-                put(Material.LAVA, RgbColor(255, 0, 0))
-                put(Material.ICE, RgbColor(160, 160, 255))
-                put(Material.FROSTED_ICE, RgbColor(160, 160, 255))
-                put(Material.PACKED_ICE, RgbColor(160, 160, 255))
-                put(Material.IRON_BLOCK, RgbColor(167, 167, 167))
-                put(Material.HEAVY_WEIGHTED_PRESSURE_PLATE, RgbColor(167, 167, 167))
-                put(Material.OAK_LEAVES, RgbColor(0, 124, 0))
-                put(Material.SPRUCE_LEAVES, RgbColor(0, 124, 0))
-                put(Material.BIRCH_LEAVES, RgbColor(0, 124, 0))
-                put(Material.JUNGLE_LEAVES, RgbColor(0, 124, 0))
-                put(Material.ACACIA_LEAVES, RgbColor(0, 124, 0))
-                put(Material.DARK_OAK_LEAVES, RgbColor(0, 124, 0))
-
-                //put(Material.WOOL, new RgbColor(0, 0, 0));
-                put(Material.SNOW_BLOCK, RgbColor(0, 0, 0))
-                put(Material.CLAY, RgbColor(164, 168, 184))
-                put(Material.BROWN_MUSHROOM, RgbColor(151, 109, 77))
-                put(Material.DIRT, RgbColor(151, 109, 77))
-                put(Material.FARMLAND, RgbColor(151, 109, 77))
-                put(Material.JUKEBOX, RgbColor(151, 109, 77))
-                put(Material.GRASS_PATH, RgbColor(151, 109, 77))
-                put(Material.MOSSY_COBBLESTONE, RgbColor(112, 112, 112))
-                put(Material.COBBLESTONE_WALL, RgbColor(112, 112, 112))
-                put(Material.COBBLESTONE_STAIRS, RgbColor(112, 112, 112))
-                put(Material.BRICK, RgbColor(112, 112, 112))
-                put(Material.BRICK_STAIRS, RgbColor(112, 112, 112))
-                put(Material.GRAVEL, RgbColor(112, 112, 112))
-                put(Material.COAL_ORE, RgbColor(112, 112, 112))
-                put(Material.IRON_ORE, RgbColor(112, 112, 112))
-                put(Material.GOLD_ORE, RgbColor(112, 112, 112))
-                put(Material.REDSTONE_ORE, RgbColor(112, 112, 112))
-                put(Material.LAPIS_ORE, RgbColor(112, 112, 112))
-                put(Material.DIAMOND_ORE, RgbColor(112, 112, 112))
-                put(Material.EMERALD_ORE, RgbColor(112, 112, 112))
-                put(Material.BEDROCK, RgbColor(112, 112, 112))
-                put(Material.FURNACE, RgbColor(112, 112, 112))
-                put(Material.DISPENSER, RgbColor(112, 112, 112))
-                put(Material.DROPPER, RgbColor(112, 112, 112))
-                put(Material.HOPPER, RgbColor(112, 112, 112))
-                put(Material.OBSERVER, RgbColor(112, 112, 112))
-                put(Material.WATER, RgbColor(64, 64, 255))
-                put(Material.CRAFTING_TABLE, RgbColor(143, 119, 72))
-                put(Material.BOOKSHELF, RgbColor(143, 119, 72))
-                put(Material.NOTE_BLOCK, RgbColor(143, 119, 72))
-                put(Material.QUARTZ_BLOCK, RgbColor(255, 252, 245))
-                put(Material.QUARTZ_STAIRS, RgbColor(255, 252, 245))
-                put(Material.SEA_LANTERN, RgbColor(255, 252, 245))
-                put(Material.ACACIA_STAIRS, RgbColor(216, 127, 51))
-                put(Material.PUMPKIN, RgbColor(216, 127, 51))
-                put(Material.JACK_O_LANTERN, RgbColor(216, 127, 51))
-                put(Material.RED_SANDSTONE, RgbColor(216, 127, 51))
-                put(Material.RED_SANDSTONE_STAIRS, RgbColor(216, 127, 51))
-                put(Material.RED_SANDSTONE_SLAB, RgbColor(216, 127, 51))
-                put(Material.PURPUR_BLOCK, RgbColor(178, 76, 216))
-                put(Material.PURPUR_PILLAR, RgbColor(178, 76, 216))
-                put(Material.PURPUR_SLAB, RgbColor(178, 76, 216))
-                put(Material.PURPUR_STAIRS, RgbColor(178, 76, 216))
-                put(Material.HAY_BLOCK, RgbColor(229, 229, 51))
-                put(Material.SPONGE, RgbColor(229, 229, 51))
-                put(Material.MELON, RgbColor(127, 204, 25))
-
-                //put(Material.PRISMARINE, new RgbColor(76, 127, 153));
-                put(Material.REPEATING_COMMAND_BLOCK, RgbColor(127, 63, 178))
-                put(Material.MYCELIUM, RgbColor(127, 63, 178))
-                put(Material.COMMAND_BLOCK, RgbColor(102, 76, 51))
-                put(Material.SOUL_SAND, RgbColor(102, 76, 51))
-                put(Material.DARK_OAK_STAIRS, RgbColor(102, 76, 51))
-                put(Material.BRICK, RgbColor(153, 51, 51))
-                put(Material.BRICK_STAIRS, RgbColor(153, 51, 51))
-                put(Material.NETHER_WART_BLOCK, RgbColor(153, 51, 51))
-                put(Material.COAL_BLOCK, RgbColor(25, 25, 25))
-                put(Material.OBSIDIAN, RgbColor(25, 25, 25))
-                put(Material.GOLD_BLOCK, RgbColor(250, 238, 77))
-                put(Material.LIGHT_WEIGHTED_PRESSURE_PLATE, RgbColor(250, 238, 77))
-                put(Material.DIAMOND_BLOCK, RgbColor(92, 238, 77))
-                put(Material.LAPIS_BLOCK, RgbColor(74, 128, 255))
-                put(Material.EMERALD_BLOCK, RgbColor(0, 217, 58))
-                put(Material.NETHERRACK, RgbColor(112, 2, 0))
-                put(Material.NETHER_BRICK_STAIRS, RgbColor(112, 2, 0))
-                put(Material.RED_NETHER_BRICKS, RgbColor(112, 2, 0))
-                put(Material.NETHER_QUARTZ_ORE, RgbColor(112, 2, 0))
-                put(Material.MAGMA_BLOCK, RgbColor(112, 2, 0))
-                put(Material.CAULDRON, RgbColor(60, 60, 60))
-                put(Material.SLIME_BLOCK, RgbColor(147, 204, 134))
-                put(Material.COBWEB, RgbColor(251, 251, 251))
-                put(Material.ANVIL, RgbColor(63, 58, 58))
-                put(Material.WHITE_WOOL, RgbColor(255, 255, 255))
-                put(Material.ORANGE_WOOL, RgbColor(216, 127, 51))
-                put(Material.MAGENTA_WOOL, RgbColor(178, 76, 216))
-                put(Material.LIGHT_BLUE_WOOL, RgbColor(102, 153, 216))
-                put(Material.YELLOW_WOOL, RgbColor(229, 229, 51))
-                put(Material.LIME_WOOL, RgbColor(127, 204, 25))
-                put(Material.PINK_WOOL, RgbColor(242, 127, 165))
-                put(Material.GRAY_WOOL, RgbColor(76, 76, 76))
-                put(Material.LIGHT_GRAY_WOOL, RgbColor(155, 157, 181))
-                put(Material.CYAN_WOOL, RgbColor(76, 127, 153))
-                put(Material.PURPLE_WOOL, RgbColor(127, 63, 178))
-                put(Material.BLUE_WOOL, RgbColor(51, 76, 178))
-                put(Material.BROWN_WOOL, RgbColor(102, 76, 51))
-                put(Material.GREEN_WOOL, RgbColor(55, 77, 36))
-                put(Material.RED_WOOL, RgbColor(153, 51, 51))
-                put(Material.BLACK_WOOL, RgbColor(25, 25, 25))
-                put(Material.WHITE_CARPET, RgbColor(255, 255, 255))
-                put(Material.ORANGE_CARPET, RgbColor(216, 127, 51))
-                put(Material.MAGENTA_CARPET, RgbColor(178, 76, 216))
-                put(Material.LIGHT_BLUE_CARPET, RgbColor(102, 153, 216))
-                put(Material.YELLOW_CARPET, RgbColor(229, 229, 51))
-                put(Material.LIME_CARPET, RgbColor(127, 204, 25))
-                put(Material.PINK_CARPET, RgbColor(242, 127, 165))
-                put(Material.GRAY_CARPET, RgbColor(76, 76, 76))
-                put(Material.LIGHT_GRAY_CARPET, RgbColor(155, 157, 181))
-                put(Material.CYAN_CARPET, RgbColor(76, 127, 153))
-                put(Material.PURPLE_CARPET, RgbColor(127, 63, 178))
-                put(Material.BLUE_CARPET, RgbColor(51, 76, 178))
-                put(Material.BROWN_CARPET, RgbColor(102, 76, 51))
-                put(Material.GREEN_CARPET, RgbColor(55, 77, 36))
-                put(Material.RED_CARPET, RgbColor(153, 51, 51))
-                put(Material.BLACK_CARPET, RgbColor(25, 25, 25))
-                put(Material.WHITE_TERRACOTTA, RgbColor(189, 176, 172))
-                put(Material.ORANGE_TERRACOTTA, RgbColor(216, 127, 51))
-                put(Material.MAGENTA_TERRACOTTA, RgbColor(178, 76, 216))
-                put(Material.LIGHT_BLUE_TERRACOTTA, RgbColor(102, 153, 216))
-                put(Material.YELLOW_TERRACOTTA, RgbColor(229, 229, 51))
-                put(Material.LIME_TERRACOTTA, RgbColor(127, 204, 25))
-                put(Material.PINK_TERRACOTTA, RgbColor(242, 127, 165))
-                put(Material.GRAY_TERRACOTTA, RgbColor(76, 76, 76))
-                put(Material.LIGHT_GRAY_TERRACOTTA, RgbColor(122, 99, 90))
-                put(Material.CYAN_TERRACOTTA, RgbColor(76, 127, 153))
-                put(Material.PURPLE_TERRACOTTA, RgbColor(127, 63, 178))
-                put(Material.BLUE_TERRACOTTA, RgbColor(127, 63, 178))
-                put(Material.BROWN_TERRACOTTA, RgbColor(102, 76, 51))
-                put(Material.GREEN_TERRACOTTA, RgbColor(82, 89, 45))
-                put(Material.RED_TERRACOTTA, RgbColor(153, 51, 51))
-                put(Material.BLACK_TERRACOTTA, RgbColor(25, 25, 25))
-                put(Material.STONE_SLAB, RgbColor(167, 167, 167))
-                put(Material.SMOOTH_STONE_SLAB, RgbColor(167, 167, 167))
-                put(Material.SANDSTONE_SLAB, RgbColor(247, 233, 163))
-                put(Material.COBBLESTONE_SLAB, RgbColor(112, 112, 112))
-                put(Material.BRICK_SLAB, RgbColor(153, 51, 51))
-                put(Material.STONE_BRICK_SLAB, RgbColor(112, 112, 112))
-                put(Material.NETHER_BRICK_SLAB, RgbColor(112, 2, 0))
-                put(Material.QUARTZ_SLAB, RgbColor(255, 252, 245))
-                put(Material.SMOOTH_STONE, RgbColor(167, 167, 167))
-                put(Material.SMOOTH_SANDSTONE, RgbColor(247, 233, 163))
-                put(Material.COBBLESTONE, RgbColor(112, 112, 112))
-                put(Material.BRICK, RgbColor(153, 51, 51))
-                put(Material.STONE_BRICKS, RgbColor(112, 112, 112))
-                put(Material.NETHER_BRICK, RgbColor(112, 2, 0))
-                put(Material.NETHER_BRICKS, RgbColor(112, 2, 0))
-                put(Material.SMOOTH_QUARTZ, RgbColor(255, 252, 245))
-                put(Material.OAK_SLAB, RgbColor(143, 119, 72))
-                put(Material.SPRUCE_SLAB, RgbColor(102, 76, 51))
-                put(Material.BIRCH_SLAB, RgbColor(247, 233, 163))
-                put(Material.JUNGLE_SLAB, RgbColor(151, 109, 77))
-                put(Material.ACACIA_SLAB, RgbColor(216, 127, 51))
-                put(Material.DARK_OAK_SLAB, RgbColor(102, 76, 51))
-                put(Material.OAK_PLANKS, RgbColor(143, 119, 72))
-                put(Material.SPRUCE_PLANKS, RgbColor(102, 76, 51))
-                put(Material.BIRCH_PLANKS, RgbColor(247, 233, 163))
-                put(Material.JUNGLE_PLANKS, RgbColor(151, 109, 77))
-                put(Material.ACACIA_PLANKS, RgbColor(216, 127, 51))
-                put(Material.DARK_OAK_PLANKS, RgbColor(102, 76, 51))
-                put(Material.OAK_WOOD, RgbColor(143, 119, 72))
-                put(Material.SPRUCE_WOOD, RgbColor(102, 76, 51))
-                put(Material.BIRCH_WOOD, RgbColor(247, 233, 163))
-                put(Material.JUNGLE_WOOD, RgbColor(151, 109, 77))
-                put(Material.ACACIA_WOOD, RgbColor(216, 127, 51))
-                put(Material.DARK_OAK_WOOD, RgbColor(102, 76, 51))
-                put(Material.OAK_LOG, RgbColor(143, 119, 72))
-                put(Material.SPRUCE_LOG, RgbColor(102, 76, 51))
-                put(Material.BIRCH_LOG, RgbColor(247, 233, 163))
-                put(Material.JUNGLE_LOG, RgbColor(151, 109, 77))
-                put(Material.ACACIA_LOG, RgbColor(216, 127, 51))
-                put(Material.DARK_OAK_LOG, RgbColor(102, 76, 51))
-                put(Material.SAND, RgbColor(247, 233, 163))
-                put(Material.RED_SAND, RgbColor(216, 127, 51))
-                put(Material.PRISMARINE, RgbColor(76, 127, 153))
-                put(Material.PRISMARINE_BRICKS, RgbColor(92, 219, 213))
-                put(Material.DARK_PRISMARINE, RgbColor(92, 219, 213))
-            }
-        }
-
-        fun getBlockColor(type: Material): RgbColor? {
-            val ignore_list = arrayOf(
+        fun getBlockColor(type: Material): DataClass.RGBColor? {
+            val ignoreSet = arrayOf(
                     Material.AIR,
                     Material.BARRIER,
                     Material.DAYLIGHT_DETECTOR,
@@ -280,11 +269,12 @@ class BlockColor {
                     Material.CARROT,
                     Material.END_PORTAL_FRAME
             )
-            if (Arrays.asList(*ignore_list).contains(type)) return null
-            return if (color_map.containsKey(type)) {
-                color_map[type]
+
+            if (ignoreSet.contains(type)) return null
+            return if (colorMap.containsKey(type)) {
+                colorMap[type]
             } else {
-                Bukkit.getLogger().info("Block Data Not Found: $type")
+                // Bukkit.getLogger().info("Block Data Not Found: $type")
                 null
             }
         }

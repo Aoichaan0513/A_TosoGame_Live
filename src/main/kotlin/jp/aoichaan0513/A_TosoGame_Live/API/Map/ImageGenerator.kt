@@ -17,7 +17,6 @@ class ImageGenerator {
             val outputImage = if (angle % 180 != 0) {
                 BufferedImage(height, width, BufferedImage.TYPE_INT_RGB)
             } else {
-                // 180度の倍数の時は画像サイズの変更は行わない。
                 BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
             }
 
@@ -38,45 +37,45 @@ class ImageGenerator {
             return outputImage
         }
 
-        fun getPaintedImage(width: Int, height: Int, command: List<String>): BufferedImage {
+        fun getPaintedImage(width: Int, height: Int, list: List<DataClass.BlockData>): BufferedImage {
             val size = if (height < width) width else height
-            var addx = 0
-            var addy = 0
+
+            var addX = 0
+            var addY = 0
+
             if (width != height) {
-                if (width < height) {
-                    addx = (height - width) / 2
-                } else {
-                    addy = (width - height) / 2
-                }
+                if (width < height)
+                    addX = (height - width) / 2
+                else
+                    addY = (width - height) / 2
             }
+
             val im = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
-            val g = im.graphics
-            g.color = Color(206, 180, 136)
-            g.fillRect(0, 0, im.width, im.height)
-            for (cmd in command) {
-                val data = cmd.split(",").toTypedArray()
-                /*
-                 * [DataFormat]
-                 * 0: x
-                 * 1: y
-                 * 2: r
-                 * 3: g
-                 * 4: b
-                 */g.color = Color(data[2].toInt(), data[3].toInt(), data[4].toInt())
-                g.drawLine(data[0].toInt() + addx, data[1].toInt() + addy, data[0].toInt() + addx, data[1].toInt() + addy)
+
+            val graphics = im.graphics
+            graphics.color = Color(206, 180, 136)
+            graphics.fillRect(0, 0, im.width, im.height)
+
+            for (blockData in list) {
+                val (x, y) = Pair(blockData.x + addX, blockData.y + addY)
+                val (r, g, b) = blockData.rgbColor
+
+                graphics.color = Color(r, g, b)
+                graphics.drawLine(x, y, x, y)
             }
+
             im.flush()
-            g.dispose()
+            graphics.dispose()
             return im
         }
 
         fun getResizedImage(size: Int, img: BufferedImage): BufferedImage {
             val tmp = img.getScaledInstance(size, size, Image.SCALE_DEFAULT)
-            val dimg = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
-            val g2d = dimg.createGraphics()
-            g2d.drawImage(tmp, 0, 0, null)
-            g2d.dispose()
-            return dimg
+            val bufferedImage = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
+            val graphics2D = bufferedImage.createGraphics()
+            graphics2D.drawImage(tmp, 0, 0, null)
+            graphics2D.dispose()
+            return bufferedImage
         }
     }
 }

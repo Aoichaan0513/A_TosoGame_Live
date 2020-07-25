@@ -7,6 +7,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -42,30 +43,26 @@ class onItem : Listener {
         val item = p.inventory.getItem(e.newSlot)
 
         val board = Scoreboard.getBoard(p)
-        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p)) {
+        val objective = board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName) ?: return
+        if (p.isPlayerGroup) {
             if (!Scoreboard.isHidePlayer(p)) {
                 if (item != null && item.type == Material.BOOK) {
                     val itemMeta = item.itemMeta
 
                     if (itemMeta != null && ChatColor.stripColor(itemMeta.displayName).equals(Main.PHONE_ITEM_NAME)) {
-                        if (board.getObjective(DisplaySlot.SIDEBAR) != null) return
-                        board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(DisplaySlot.SIDEBAR)
+                        objective.displaySlot = DisplaySlot.SIDEBAR
                     } else {
-                        if (board.getObjective(DisplaySlot.SIDEBAR) == null) return
                         board.clearSlot(DisplaySlot.SIDEBAR)
                     }
                 } else {
-                    if (board.getObjective(DisplaySlot.SIDEBAR) == null) return
                     board.clearSlot(DisplaySlot.SIDEBAR)
                 }
             } else {
-                if (board.getObjective(DisplaySlot.SIDEBAR) != null) return
-                board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(DisplaySlot.SIDEBAR)
+                objective.displaySlot = DisplaySlot.SIDEBAR
             }
         } else {
-            // if (board.getObjective(DisplaySlot.SIDEBAR)?.name.equals(TosoGameAPI.Objective.SIDEBAR.objectName)) return
             if (board.getObjective(DisplaySlot.SIDEBAR) != null) return
-            board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(DisplaySlot.SIDEBAR)
+            objective.displaySlot = DisplaySlot.SIDEBAR
         }
     }
 }

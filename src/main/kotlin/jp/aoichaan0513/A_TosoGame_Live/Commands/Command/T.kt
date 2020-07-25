@@ -16,19 +16,20 @@ import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
 
 class T(name: String) : ICommand(name) {
+
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
-        if (Tuho.num > 0) {
+        if (Team.isTuhoRandom) {
             if (GameManager.isGame(GameState.GAME)) {
                 if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, sp)) {
                     if (!Main.tuhoShuffleSet.contains(sp.uniqueId)) Main.tuhoShuffleSet.add(sp.uniqueId) else Main.tuhoShuffleSet.remove(sp.uniqueId)
-                    sp.sendMessage(MainAPI.getPrefix(PrefixType.WARNING) + ChatColor.UNDERLINE + "通報部隊募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (if (Main.tuhoShuffleSet.contains(sp.uniqueId)) "に応募" else "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。")
+                    sp.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}${ChatColor.UNDERLINE}通報部隊募集${ChatColor.GOLD}${ChatColor.UNDERLINE}${if (Main.hunterShuffleSet.contains(sp.uniqueId)) "に応募" else "の応募をキャンセル"}${ChatColor.RESET}${ChatColor.YELLOW}しました。")
                     return
                 }
                 MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS_TEAM_JAIL)
                 return
             } else {
                 if (!Main.tuhoShuffleSet.contains(sp.uniqueId)) Main.tuhoShuffleSet.add(sp.uniqueId) else Main.tuhoShuffleSet.remove(sp.uniqueId)
-                sp.sendMessage(MainAPI.getPrefix(PrefixType.WARNING) + ChatColor.UNDERLINE + "通報部隊募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (if (Main.tuhoShuffleSet.contains(sp.uniqueId)) "に応募" else "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。")
+                sp.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}${ChatColor.UNDERLINE}通報部隊募集${ChatColor.GOLD}${ChatColor.UNDERLINE}${if (Main.hunterShuffleSet.contains(sp.uniqueId)) "に応募" else "の応募をキャンセル"}${ChatColor.RESET}${ChatColor.YELLOW}しました。")
                 return
             }
         }

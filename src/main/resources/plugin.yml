@@ -20,12 +20,8 @@ commands:
     usage: Game Reset Command.
   mission:
     usage: Run Mission Command.
-  hunter:
-    usage: Hunter Management Command.
-  tuho:
-    usage: Tuho Management Command.
-  player:
-    usage: Player Management Command.
+  team:
+    usage: Team Management Command.
 
   broadcaster:
     usage: Broadcaster Management Command.

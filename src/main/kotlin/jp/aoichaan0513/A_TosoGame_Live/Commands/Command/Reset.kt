@@ -9,8 +9,8 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager.GameState
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.DifficultyManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
@@ -21,10 +21,11 @@ import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.onInventory
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
+import jp.aoichaan0513.A_TosoGame_Live.Mission.TimedDevice
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
+import jp.aoichaan0513.A_TosoGame_Live.Utils.setSidebar
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
@@ -32,7 +33,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import org.bukkit.scoreboard.DisplaySlot
 
 class Reset(name: String) : ICommand(name) {
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
@@ -83,10 +83,11 @@ class Reset(name: String) : ICommand(name) {
         BossBarManager.resetBar()
         Main.hunterShuffleSet.clear()
         Main.tuhoShuffleSet.clear()
-        Main.invisibleSet.clear()
+        VisibilityManager.clear(VisibilityManager.VisibilityType.ITEM)
 
         RespawnRunnable.reset()
         HunterZone.resetMission()
+        TimedDevice.resetMission()
         DifficultyManager.clear()
         onDamage.hunterMap.clear()
 
@@ -123,10 +124,8 @@ class Reset(name: String) : ICommand(name) {
             Bukkit.getScheduler().runTaskLater(Main.pluginInstance, Runnable {
                 player.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたのデータをリセットしています…")
                 Teams.setTeamOption(player)
-                TosoGameAPI.showPlayers(player)
 
-                val board = Scoreboard.getBoard(player)
-                board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(DisplaySlot.SIDEBAR)
+                player.setSidebar()
 
                 if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, player)) {
                     Teams.joinTeam(OnlineTeam.TOSO_PLAYER, player)
@@ -142,11 +141,8 @@ class Reset(name: String) : ICommand(name) {
                 player.health = 20.0
                 player.foodLevel = 20
 
-                player.sendMessage("""
-                    ${MainAPI.getPrefix(PrefixType.SUCCESS)}あなたのデータをリセットしました。
-                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}現在のチームは${ChatColor.BOLD}${ChatColor.UNDERLINE}${Teams.getJoinedTeam(player).displayName}${ChatColor.RESET}${ChatColor.GRAY}に設定されています。
-                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}現在の難易度は${ChatColor.BOLD}${ChatColor.UNDERLINE}${worldConfig.getDifficultyConfig(player).difficulty.displayName}${ChatColor.RESET}${ChatColor.GRAY}に設定されています。
-                """.trimIndent())
+                player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}あなたのデータをリセットしました。")
+                TosoGameAPI.sendInformationText(player)
             }, d.toLong())
         }
 

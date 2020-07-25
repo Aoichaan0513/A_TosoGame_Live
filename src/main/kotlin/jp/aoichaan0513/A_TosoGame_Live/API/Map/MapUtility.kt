@@ -20,7 +20,7 @@ class MapUtility {
 
         var map: ItemStack? = null
             private set
-        var plotRem: List<String> = ArrayList()
+        var plotRem = listOf<String>()
         var mapPlot = HashMap<String, PlotInfo>()
         var resolution = 1
 
@@ -31,7 +31,7 @@ class MapUtility {
         }
 
         private val areaMap: ItemStack
-            private get() {
+            get() {
                 val world = WorldManager.world
 
                 val worldConfig = Main.worldConfig
@@ -39,43 +39,41 @@ class MapUtility {
                 val p1 = worldConfig.mapBorderConfig.getLocation(BorderType.POINT_1)
                 val p2 = worldConfig.mapBorderConfig.getLocation(BorderType.POINT_2)
 
-                val max_height = world.maxHeight
+                val minX = p1.blockX.coerceAtMost(p2.blockX)
+                val maxX = p1.blockX.coerceAtLeast(p2.blockX)
+                val minY = p1.blockY.coerceAtMost(p2.blockY)
+                val maxY = p1.blockY.coerceAtLeast(p2.blockY)
+                val minZ = p1.blockZ.coerceAtMost(p2.blockZ)
+                val maxZ = p1.blockZ.coerceAtLeast(p2.blockZ)
 
-                val minx = Math.min(p1.blockX, p2.blockX)
-                val minz = Math.min(p1.blockZ, p2.blockZ)
-                val maxx = Math.max(p1.blockX, p2.blockX)
-                val maxz = Math.max(p1.blockZ, p2.blockZ)
+                val width = maxX - minX
+                val height = maxZ - minZ
 
-                val block_type = HashMap<String, Tuple>()
-                for (i in max_height - 1 downTo 0) {
-                    for (x in minx..maxx) {
-                        for (z in minz..maxz) {
-                            if (block_type.containsKey("${maxx - x}_${maxz - z}")) continue
-                            val loc = Location(world, x.toDouble(), i.toDouble(), z.toDouble())
-                            val b = loc.block
-                            if (BlockColor.getBlockColor(b.type) != null)
-                                block_type["${maxx - x}_${maxz - z}"] = Tuple(b.type)
+                val isX = maxX - minX < maxZ - minZ
+
+                val dataMap = mutableMapOf<String, DataClass.BlockData>()
+                for (y in maxY - 1 downTo minY) {
+                    for (x in minX..maxX) {
+                        for (z in minZ..maxZ) {
+                            val x1 = maxX - x
+                            val z1 = maxZ - z
+
+                            if (dataMap.containsKey("${x1}_$z1")) continue
+
+                            val rgbColor = BlockColor.getBlockColor(Location(world, x.toDouble(), y.toDouble(), z.toDouble()).block.type)
+                            if (rgbColor != null)
+                                dataMap["${x1}_$z1"] = DataClass.BlockData(x1, z1, rgbColor)
                         }
                     }
                 }
-                val width = maxx - minx
-                val height = maxz - minz
-                val data: MutableList<String> = ArrayList()
-                for (key in block_type.keys) {
-                    val d = key.split("_").toTypedArray()
-                    val x = d[0].toInt()
-                    val y = d[1].toInt()
-                    val t = block_type[key]!!
-                    val c = BlockColor.getBlockColor(t.material)!!
-                    data.add("$x,$y,${c.red},${c.green},${c.blue}")
-                }
 
-                val map_img3 = ImageGenerator.getPaintedImage(width, height, data)
-                val map_img2 = ImageGenerator.getRotatedImage(180, map_img3)
-                val map_img = ImageGenerator.getResizedImage(128, map_img2)
+                val paintedImage = ImageGenerator.getPaintedImage(width, height, dataMap.values.toList())
+                val rotatedImage = ImageGenerator.getRotatedImage(180, paintedImage)
+                val resizedImage = ImageGenerator.getResizedImage(128, rotatedImage)
                 val file = File("${world.name}${Main.FILE_SEPARATOR}map.png")
+
                 try {
-                    ImageIO.write(map_img2, "png", file)
+                    ImageIO.write(rotatedImage, "png", file)
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -85,58 +83,53 @@ class MapUtility {
                 mapView.centerX = 99999
                 mapView.centerZ = 99999
                 mapView.scale = MapView.Scale.FARTHEST
-                resolution = if (maxx - minx < maxz - minz) maxz - minz else maxx - minx
-                mapView.addRenderer(object : MapRenderer() {
-                    var r = false
-                    var cursor = MapCursorCollection()
-                    var cu = MapCursor(0.toByte(), 0.toByte(), 0.toByte(), 0.toByte(), true)
-                    var sa = if (maxx - minx < maxz - minz) maxz - minz - (maxx - minx) else maxx - minx - (maxz - minz)
-                    var isX = maxx - minx < maxz - minz
+                resolution = if (isX) maxZ - minZ else maxX - minX
 
-                    override fun render(v: MapView, c: MapCanvas, p: Player) {
+                mapView.addRenderer(object : MapRenderer() {
+
+                    var r = false
+                    val cursor = MapCursorCollection()
+                    val mapCursor = MapCursor(0.toByte(), 0.toByte(), 0.toByte(), 0.toByte(), true)
+                    val sa = if (isX) maxZ - minZ - (maxX - minX) else maxX - minX - (maxZ - minZ)
+
+                    override fun render(mapView: MapView, mapCanvas: MapCanvas, p: Player) {
                         if (!r) {
-                            c.drawImage(0, 0, map_img)
+                            mapCanvas.drawImage(0, 0, resizedImage)
                             r = true
-                            cursor.addCursor(cu)
-                            c.cursors = cursor
+                            cursor.addCursor(mapCursor)
+                            mapCanvas.cursors = cursor
                         }
+
                         for (value in mapPlot.values) {
                             if (!value.isSetup) {
                                 val loc = value.loc
-                                val xpos = if (isX) loc.blockX - minx + sa / 2 else loc.blockX - minx
-                                val zpos = if (!isX) loc.blockZ - minz + sa / 2 else loc.blockZ - minz
-                                if (xpos >= 0 && xpos < resolution || zpos >= 0 && zpos < resolution) {
-                                    val centerratiox = if (xpos in 0 until resolution) getRatioValue(resolution, xpos) - 128 else cu.x.toInt()
-                                    val centerratioz = if (zpos in 0 until resolution) getRatioValue(resolution, zpos) - 128 else cu.y.toInt()
-                                    val px = centerratiox.toByte()
-                                    val py = centerratioz.toByte()
+                                val cursorRatio = getCursorRatio(loc, mapCursor, isX, minX, minZ, sa)
+                                if (cursorRatio != null) {
+                                    val (ratioX, ratioY) = cursorRatio
                                     val cu2 = MapCursor(0.toByte(), 0.toByte(), 0.toByte(), 0.toByte(), true)
-                                    cu2.x = px
-                                    cu2.y = py
+                                    cu2.x = ratioX
+                                    cu2.y = ratioY
                                     cu2.type = value.type
                                     value.cursor = cu2
-                                    c.cursors.addCursor(cu2)
+                                    mapCanvas.cursors.addCursor(cu2)
                                 }
                                 value.isSetup = true
                             }
                         }
+
                         for (key in plotRem) {
                             val value = mapPlot[key]
-                            if (value!!.cursor != null) {
-                                c.cursors.removeCursor(value.cursor!!)
-                            }
+                            if (value!!.cursor != null)
+                                mapCanvas.cursors.removeCursor(value.cursor!!)
                         }
+
                         val loc = p.location
-                        val xpos = if (isX) loc.blockX - minx + sa / 2 else loc.blockX - minx
-                        val zpos = if (!isX) loc.blockZ - minz + sa / 2 else loc.blockZ - minz
-                        if (xpos in 0 until resolution || zpos in 0 until resolution) {
-                            val centerratiox = if (xpos in 0 until resolution) getRatioValue(resolution, xpos) - 128 else cu.x.toInt()
-                            val centerratioz = if (zpos in 0 until resolution) getRatioValue(resolution, zpos) - 128 else cu.y.toInt()
-                            val px = centerratiox.toByte()
-                            val py = centerratioz.toByte()
-                            cu.x = px
-                            cu.y = py
-                            cu.direction = getDirection(loc)!!
+                        val cursorRatio = getCursorRatio(loc, mapCursor, isX, minX, minZ, sa)
+                        if (cursorRatio != null) {
+                            val (ratioX, ratioY) = cursorRatio
+                            mapCursor.x = ratioX
+                            mapCursor.y = ratioY
+                            mapCursor.direction = getDirection(loc)!!
                         }
                     }
                 })
@@ -146,6 +139,19 @@ class MapUtility {
                 map.itemMeta = mapMeta
                 return map
             }
+
+        private fun getCursorRatio(loc: Location, mapCursor: MapCursor, isX: Boolean, minX: Int, minZ: Int, sa: Int): Pair<Byte, Byte>? {
+            val xPos = if (isX) loc.blockX - minX + sa / 2 else loc.blockX - minX
+            val zPos = if (!isX) loc.blockZ - minZ + sa / 2 else loc.blockZ - minZ
+
+            return if (xPos in 0 until resolution || zPos in 0 until resolution) {
+                val centerRatioX = if (xPos in 0 until resolution) getRatioValue(resolution, xPos) - 128 else mapCursor.x.toInt()
+                val centerRatioZ = if (zPos in 0 until resolution) getRatioValue(resolution, zPos) - 128 else mapCursor.y.toInt()
+                Pair(centerRatioX.toByte(), centerRatioZ.toByte())
+            } else {
+                null
+            }
+        }
 
         private fun getRatioValue(resolution: Int, pos: Int): Int {
             return 256 * pos / resolution

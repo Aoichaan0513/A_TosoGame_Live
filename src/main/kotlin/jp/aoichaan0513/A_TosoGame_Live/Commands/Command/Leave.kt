@@ -1,23 +1,17 @@
 package jp.aoichaan0513.A_TosoGame_Live.Commands.Command
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
-import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.ErrorMessage
-import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
-import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.setTeam
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.GameMode
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
-import org.bukkit.scoreboard.DisplaySlot
 
 class Leave(name: String) : ICommand(name) {
 
@@ -28,30 +22,14 @@ class Leave(name: String) : ICommand(name) {
                     for (name in args) {
                         val p = Bukkit.getPlayerExact(name)
                         if (p != null) {
-                            if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) {
-                                Teams.joinTeam(OnlineTeam.TOSO_ADMIN, p)
-                                p.gameMode = GameMode.CREATIVE
+                            if (!p.isAdminTeam) {
+                                p.setTeam(Teams.OnlineTeam.TOSO_ADMIN, false)
 
-                                TosoGameAPI.setItem(GameType.START, p)
-                                TosoGameAPI.setPotionEffect(p)
-                                TosoGameAPI.addOp(p)
-
-                                val board = Scoreboard.getBoard(p)
-                                val objective = board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName) ?: return
-                                if (objective.getDisplaySlot() != DisplaySlot.SIDEBAR)
-                                    objective.setDisplaySlot(DisplaySlot.SIDEBAR)
-
-                                TosoGameAPI.showPlayers(p)
-                                TosoGameAPI.hidePlayers(p)
-
-                                MissionManager.bossBar?.addPlayer(p)
-
-                                sp.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${p.name}を運営に追加しました。")
-                                p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを運営に追加しました。")
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GRAY}がゲームから抜けました。")
+                                sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を運営に追加しました。")
+                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームから抜けました。")
                                 continue
                             }
-                            sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}${p.name}はすでにゲームから離脱しています。")
+                            sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでにゲームに抜けています。")
                             continue
                         }
                         MainAPI.sendOfflineMessage(sp, name)
@@ -59,37 +37,19 @@ class Leave(name: String) : ICommand(name) {
                     }
                     return
                 }
-                MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
-                return
+                MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS)
             } else {
-                if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, sp)) {
-                    Teams.joinTeam(OnlineTeam.TOSO_ADMIN, sp)
-                    sp.gameMode = GameMode.CREATIVE
+                if (!sp.isAdminTeam) {
+                    sp.setTeam(Teams.OnlineTeam.TOSO_ADMIN, false)
 
-                    TosoGameAPI.setItem(GameType.START, sp)
-                    TosoGameAPI.setPotionEffect(sp)
-                    TosoGameAPI.addOp(sp)
-
-                    val board = Scoreboard.getBoard(sp)
-                    val objective = board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName) ?: return
-                    if (objective.getDisplaySlot() != DisplaySlot.SIDEBAR)
-                        objective.setDisplaySlot(DisplaySlot.SIDEBAR)
-
-                    TosoGameAPI.showPlayers(sp)
-                    TosoGameAPI.hidePlayers(sp)
-
-                    if (MissionManager.isBossBar)
-                        MissionManager.bossBar!!.addPlayer(sp)
-
-                    sp.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを運営に追加しました。")
-                    Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${sp.name}${ChatColor.RESET}${ChatColor.GRAY}がゲームから抜けました。")
+                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${sp.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームから抜けました。")
                     return
                 }
-                sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}すでにゲームから離脱しています。")
-                return
+                sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}すでにゲームから離脱しています。")
             }
+            return
         }
-        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
+        MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS)
         return
     }
 
@@ -98,31 +58,14 @@ class Leave(name: String) : ICommand(name) {
             for (name in args) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
-                    if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) {
-                        Teams.joinTeam(OnlineTeam.TOSO_ADMIN, p)
-                        p.gameMode = GameMode.CREATIVE
+                    if (!p.isAdminTeam) {
+                        p.setTeam(Teams.OnlineTeam.TOSO_ADMIN, false)
 
-                        TosoGameAPI.setItem(GameType.START, p)
-                        TosoGameAPI.setPotionEffect(p)
-                        TosoGameAPI.addOp(p)
-
-                        val board = Scoreboard.getBoard(p)
-                        val objective = board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName) ?: return
-                        if (objective.getDisplaySlot() != DisplaySlot.SIDEBAR)
-                            objective.setDisplaySlot(DisplaySlot.SIDEBAR)
-
-                        TosoGameAPI.showPlayers(p)
-                        TosoGameAPI.hidePlayers(p)
-
-                        if (MissionManager.isBossBar)
-                            MissionManager.bossBar!!.addPlayer(p)
-
-                        bs.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${p.name}を運営に追加しました。")
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを運営に追加しました。")
-                        Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GRAY}がゲームから抜けました。")
+                        bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を運営に追加しました。")
+                        Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームから抜けました。")
                         continue
                     }
-                    bs.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}${p.name}はすでにゲームから離脱しています。")
+                    bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでにゲームに抜けています。")
                     continue
                 }
                 MainAPI.sendOfflineMessage(bs, name)
@@ -130,7 +73,7 @@ class Leave(name: String) : ICommand(name) {
             }
             return
         }
-        MainAPI.sendMessage(bs, ErrorMessage.ARGS_PLAYER)
+        MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_PLAYER)
         return
     }
 
@@ -139,31 +82,14 @@ class Leave(name: String) : ICommand(name) {
             for (name in args) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
-                    if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) {
-                        Teams.joinTeam(OnlineTeam.TOSO_ADMIN, p)
-                        p.gameMode = GameMode.CREATIVE
+                    if (!p.isAdminTeam) {
+                        p.setTeam(Teams.OnlineTeam.TOSO_ADMIN, false)
 
-                        TosoGameAPI.setItem(GameType.START, p)
-                        TosoGameAPI.setPotionEffect(p)
-                        TosoGameAPI.addOp(p)
-
-                        val board = Scoreboard.getBoard(p)
-                        val objective = board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName) ?: return
-                        if (objective.getDisplaySlot() != DisplaySlot.SIDEBAR)
-                            objective.setDisplaySlot(DisplaySlot.SIDEBAR)
-
-                        TosoGameAPI.showPlayers(p)
-                        TosoGameAPI.hidePlayers(p)
-
-                        if (MissionManager.isBossBar)
-                            MissionManager.bossBar!!.addPlayer(p)
-
-                        cs.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${p.name}を運営に追加しました。")
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを運営に追加しました。")
-                        Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GRAY}がゲームから抜けました。")
+                        cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を運営に追加しました。")
+                        Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームから抜けました。")
                         continue
                     }
-                    cs.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}${p.name}はすでにゲームから離脱しています。")
+                    cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでにゲームに抜けています。")
                     continue
                 }
                 MainAPI.sendOfflineMessage(cs, name)
@@ -171,7 +97,7 @@ class Leave(name: String) : ICommand(name) {
             }
             return
         }
-        MainAPI.sendMessage(cs, ErrorMessage.ARGS_PLAYER)
+        MainAPI.sendMessage(cs, MainAPI.ErrorMessage.ARGS_PLAYER)
         return
     }
 

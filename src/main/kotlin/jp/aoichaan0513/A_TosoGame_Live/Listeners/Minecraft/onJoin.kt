@@ -7,7 +7,9 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.DifficultyManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerConfig
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.API.Map.MapUtility
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard
@@ -19,14 +21,13 @@ import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
+import jp.aoichaan0513.A_TosoGame_Live.Utils.setSidebar
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
-import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.scoreboard.DisplaySlot
 
 class onJoin : Listener {
 
@@ -34,11 +35,13 @@ class onJoin : Listener {
     fun onJoin(e: PlayerJoinEvent) {
         val p = e.player
 
-        e.joinMessage = if (!MainAPI.isHidePlayer(p)) "${ChatColor.YELLOW}-> ${ChatColor.GOLD}${p.name}" else ""
+        e.joinMessage = if (!VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) "${ChatColor.YELLOW}-> ${ChatColor.GOLD}${p.name}" else ""
         p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}リソースパックを適用するには\"${ChatColor.GOLD}${ChatColor.UNDERLINE}/resource${ChatColor.RESET}${ChatColor.GRAY}\"と入力してください。")
 
         val worldConfig = Main.worldConfig
         val playerConfig = PlayerManager.loadConfig(p)
+
+        playerConfig.bookForegroundColor = PlayerConfig.BookForegroundColor.BLACK
 
         if (playerConfig.advancementConfig.hasAdvancement(Advancement.FIRST_JOIN) && !playerConfig.advancementConfig.hasAdvancement(Advancement.UPDATE_2_0_0)) {
             playerConfig.advancementConfig.addAdvancement(Advancement.UPDATE_2_0_0)
@@ -136,34 +139,11 @@ class onJoin : Listener {
             }
         }
 
-        for (player in Bukkit.getOnlinePlayers()) {
-            TosoGameAPI.showPlayers(player)
-            val board = Scoreboard.getBoard(player)
-            if (!TosoGameAPI.isAdmin(player)) {
-                if (player.inventory.itemInMainHand.type == Material.BOOK) {
-                    val itemMeta = player.inventory.itemInMainHand.itemMeta
-                    if (ChatColor.stripColor(itemMeta!!.displayName) == Main.PHONE_ITEM_NAME) {
-                        board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(DisplaySlot.SIDEBAR)
-                    } else {
-                        board.clearSlot(DisplaySlot.SIDEBAR)
-                    }
-                } else if (player.inventory.itemInOffHand.type == Material.BOOK) {
-                    val itemMeta = player.inventory.itemInOffHand.itemMeta
-                    if (ChatColor.stripColor(itemMeta!!.displayName) == Main.PHONE_ITEM_NAME) {
-                        board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(DisplaySlot.SIDEBAR)
-                    } else {
-                        board.clearSlot(DisplaySlot.SIDEBAR)
-                    }
-                } else {
-                    board.clearSlot(DisplaySlot.SIDEBAR)
-                }
-            } else {
-                board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(DisplaySlot.SIDEBAR)
-            }
-        }
+        for (player in Bukkit.getOnlinePlayers())
+            player.setSidebar()
 
         p.setPlayerListHeaderFooter("${ChatColor.RED}${ChatColor.BOLD}Run${ChatColor.RESET}${ChatColor.GRAY} for ${ChatColor.DARK_RED}${ChatColor.BOLD}Money", "")
-        TosoGameAPI.sendInformationText(p, worldConfig)
+        TosoGameAPI.sendInformationText(p)
 
         val scoreboard = Scoreboard.getBoard(p)
         Teams.setTeamOption(scoreboard)

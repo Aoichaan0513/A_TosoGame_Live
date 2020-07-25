@@ -1,7 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.Runnable
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.ActionBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager.GameState
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
@@ -9,7 +8,6 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
@@ -139,21 +137,13 @@ class RespawnRunnable : BukkitRunnable() {
                     TosoGameAPI.setItem(GameType.RESPAWN, player)
                     TosoGameAPI.removeOp(player)
 
-                    TosoGameAPI.showPlayers(player)
                     TosoGameAPI.teleport(player, worldConfig.respawnLocationConfig.locations.values)
 
                     player.addPotionEffect(PotionEffect(PotionEffectType.NIGHT_VISION, 200000, 1, false, false))
                     player.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 20 * 15, 1, false, false))
                     player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 20 * 15, 1, false, false))
 
-                    Main.invisibleSet.add(player.uniqueId)
-                    for (p in Bukkit.getOnlinePlayers())
-                        TosoGameAPI.showPlayers(p)
-                    Bukkit.getScheduler().runTaskLater(Main.pluginInstance, Runnable {
-                        Main.invisibleSet.remove(player.uniqueId)
-                        for (p in Bukkit.getOnlinePlayers())
-                            TosoGameAPI.showPlayers(p)
-                    }, 20 * 10)
+                    TosoGameAPI.hidePlayer(player)
 
                     player.sendMessage("""
                         ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを逃走者に追加しました。
@@ -171,8 +161,6 @@ class RespawnRunnable : BukkitRunnable() {
                 else
                     coolTimeMap[player.uniqueId] = coolTime - 1
             }
-
-            ActionBarManager.sendActionBar(player, "${if (autoTime != null && autoTime > 0) "${ChatColor.GOLD}${ChatColor.UNDERLINE}自動復活${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(autoTime)}" else ""}${if (autoTime != null && autoTime > 0 && coolTime != null && coolTime > 0) " / " else ""}${if (coolTime != null && coolTime > 0) "${ChatColor.GOLD}${ChatColor.UNDERLINE}復活可能${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(coolTime)}" else ""}")
         }
     }
 }

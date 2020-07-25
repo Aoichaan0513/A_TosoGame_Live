@@ -1,24 +1,22 @@
 package jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
-import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager.GameState
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig.BorderType
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Inventory.MainInventory
 import jp.aoichaan0513.A_TosoGame_Live.Inventory.MissionInventory
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
-import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager.MissionType
+import jp.aoichaan0513.A_TosoGame_Live.Mission.TimedDevice
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
+import jp.aoichaan0513.A_TosoGame_Live.Utils.*
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
-import jp.aoichaan0513.A_TosoGame_Live.Utils.ParseUtil
 import net.wesjd.anvilgui.AnvilGUI
 import org.bukkit.*
 import org.bukkit.block.BlockFace
@@ -35,6 +33,7 @@ import org.bukkit.entity.Zombie
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerAnimationEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
@@ -46,8 +45,8 @@ import java.util.function.BiFunction
 
 
 class onInteract : Listener {
-    companion object {
 
+    companion object {
         var successBlockLoc: Location? = null
         var hunterZoneBlockLoc: Location? = null
     }
@@ -62,7 +61,7 @@ class onInteract : Listener {
 
         val itemGameType = RespawnRunnable.getGameType(p)
 
-        if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) {
+        if (!p.isAdminTeam) {
             if (clickedBlock != null && (clickedBlock.type.name.startsWith("POTTED_") || clickedBlock.type == Material.FLOWER_POT)) {
                 e.isCancelled = true
                 return
@@ -70,55 +69,47 @@ class onInteract : Listener {
         }
 
         if (e.action == Action.PHYSICAL) {
-            if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, p) || clickedBlock == null) return
+            if (!p.isJailTeam || clickedBlock == null) return
             if (clickedBlock.location.clone().add(0.0, -1.0, 0.0).block.type == Material.IRON_BLOCK && clickedBlock.type == Material.STONE_PRESSURE_PLATE) {
-                if (GameManager.isGame(GameState.GAME)) {
+                if (GameManager.isGame(GameManager.GameState.GAME)) {
                     if (TosoGameAPI.isRes) {
                         if (RespawnRunnable.isAllowRespawn(p)) {
                             if (!RespawnRunnable.isCoolTime(p)) {
-                                Teams.joinTeam(OnlineTeam.TOSO_PLAYER, p)
+                                Teams.joinTeam(Teams.OnlineTeam.TOSO_PLAYER, p)
                                 p.gameMode = GameMode.ADVENTURE
 
-                                TosoGameAPI.setItem(GameType.RESPAWN, p)
+                                TosoGameAPI.setItem(WorldManager.GameType.RESPAWN, p)
                                 TosoGameAPI.removeOp(p)
 
-                                TosoGameAPI.showPlayers(p)
                                 TosoGameAPI.teleport(p, worldConfig.respawnLocationConfig.locations.values)
 
                                 p.addPotionEffect(PotionEffect(PotionEffectType.NIGHT_VISION, 200000, 1, false, false))
                                 p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 20 * 15, 1, false, false))
                                 p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 20 * 15, 1, false, false))
 
-                                Main.invisibleSet.add(p.uniqueId)
-                                for (player in Bukkit.getOnlinePlayers())
-                                    TosoGameAPI.showPlayers(player)
-                                Bukkit.getScheduler().runTaskLater(Main.pluginInstance, Runnable {
-                                    Main.invisibleSet.remove(p.uniqueId)
-                                    for (player in Bukkit.getOnlinePlayers())
-                                        TosoGameAPI.showPlayers(player)
-                                }, 20 * 10)
+                                TosoGameAPI.hidePlayer(p)
 
                                 p.sendMessage("""
-                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを逃走者に追加しました。
-                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたはあと${difficultyConfig.respawnDenyCount - RespawnRunnable.getCount(p)}回復活できます。
+                                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを逃走者に追加しました。
+                                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたはあと${difficultyConfig.respawnDenyCount - RespawnRunnable.getCount(p)}回復活できます。
                                 """.trimIndent())
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${p.name}が復活しました。(${ChatColor.UNDERLINE}残り${Teams.getOnlineCount(OnlineTeam.TOSO_PLAYER) + Teams.getOnlineCount(OnlineTeam.TOSO_SUCCESS)}人${ChatColor.RESET}${ChatColor.GRAY})")
+                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}が復活しました。(${ChatColor.UNDERLINE}残り${Teams.getOnlineCount(Teams.OnlineTeam.TOSO_PLAYER) + Teams.getOnlineCount(Teams.OnlineTeam.TOSO_SUCCESS)}人${ChatColor.RESET}${ChatColor.GRAY})")
                                 return
                             } else {
                                 TosoGameAPI.teleport(p, worldConfig.jailLocationConfig.locations.values)
-                                p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたは${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}復活クールタイム中${ChatColor.RESET}${ChatColor.GRAY}のため復活できません。")
+                                p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたは${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}復活クールタイム中${ChatColor.RESET}${ChatColor.GRAY}のため復活できません。")
                                 return
                             }
                         } else {
                             TosoGameAPI.teleport(p, worldConfig.jailLocationConfig.locations.values)
                             p.gameMode = GameMode.ADVENTURE
-                            p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたは${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${difficultyConfig.respawnDenyCount}回復活${ChatColor.RESET}${ChatColor.GRAY}したためこれ以上は復活できません。")
+                            p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたは${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${difficultyConfig.respawnDenyCount}回復活${ChatColor.RESET}${ChatColor.GRAY}したためこれ以上は復活できません。")
                             return
                         }
                     } else {
                         TosoGameAPI.teleport(p, worldConfig.jailLocationConfig.locations.values)
                         p.gameMode = GameMode.ADVENTURE
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム終了まで残り${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(worldConfig.gameConfig.respawnDeny)}以下${ChatColor.RESET}${ChatColor.GRAY}になったため復活できません。")
+                        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ゲーム終了まで残り${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(worldConfig.gameConfig.respawnDeny)}以下${ChatColor.RESET}${ChatColor.GRAY}になったため復活できません。")
                         return
                     }
                 }
@@ -146,47 +137,47 @@ class onInteract : Listener {
                         if (itemMeta == null || ChatColor.stripColor(itemMeta.displayName) != Main.PHONE_ITEM_NAME) return
 
                         e.isCancelled = true
-                        p.openInventory(MissionInventory.getInventory(MissionType.MISSION))
+                        p.openInventory(MissionInventory.getInventory(MissionManager.MissionType.MISSION))
                     } else {
                         val itemMeta = p.inventory.itemInOffHand.itemMeta
                         if (itemMeta == null || ChatColor.stripColor(itemMeta.displayName) != Main.PHONE_ITEM_NAME) return
 
                         e.isCancelled = true
-                        p.openInventory(MissionInventory.getInventory(MissionType.MISSION))
+                        p.openInventory(MissionInventory.getInventory(MissionManager.MissionType.MISSION))
                     }
                 }
             } else {
-                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) {
+                if (p.isAdminTeam) {
                     if (clickedBlock == null) return
                     if (e.action == Action.LEFT_CLICK_BLOCK) {
                         if (p.inventory.itemInMainHand.type == Material.DIAMOND_AXE || p.inventory.itemInOffHand.type == Material.DIAMOND_AXE) {
                             if (GameManager.isGame()) return
 
                             e.isCancelled = true
-                            worldConfig.mapBorderConfig.setLocation(BorderType.POINT_1, clickedBlock.location)
+                            worldConfig.mapBorderConfig.setLocation(WorldConfig.BorderType.POINT_1, clickedBlock.location)
                             p.sendMessage("""
-                                ${MainAPI.getPrefix(PrefixType.WARNING)}マップのボーダーの角1を設定しました。
-                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}マップのボーダーの角1を設定しました。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
                             """.trimIndent())
                             return
                         } else if (p.inventory.itemInMainHand.type == Material.GOLDEN_AXE || p.inventory.itemInOffHand.type == Material.GOLDEN_AXE) {
                             if (GameManager.isGame()) return
 
                             e.isCancelled = true
-                            worldConfig.hunterZoneBorderConfig.setLocation(BorderType.POINT_1, clickedBlock.location)
+                            worldConfig.hunterZoneBorderConfig.setLocation(WorldConfig.BorderType.POINT_1, clickedBlock.location)
                             p.sendMessage("""
-                                ${MainAPI.getPrefix(PrefixType.WARNING)}ハンターゾーンのボーダーの角1を設定しました。
-                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ハンターゾーンのボーダーの角1を設定しました。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
                             """.trimIndent())
                             return
                         } else if (p.inventory.itemInMainHand.type == Material.IRON_AXE || p.inventory.itemInOffHand.type == Material.IRON_AXE) {
                             if (GameManager.isGame()) return
 
                             e.isCancelled = true
-                            worldConfig.opGameBorderConfig.setLocation(BorderType.POINT_1, clickedBlock.location)
+                            worldConfig.opGameBorderConfig.setLocation(WorldConfig.BorderType.POINT_1, clickedBlock.location)
                             p.sendMessage("""
-                                ${MainAPI.getPrefix(PrefixType.WARNING)}オープニングゲームのボーダーの角1を設定しました。
-                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}オープニングゲームのボーダーの角1を設定しました。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
                             """.trimIndent())
                             return
                         } else if (p.inventory.itemInMainHand.type == Material.STONE_AXE || p.inventory.itemInOffHand.type == Material.STONE_AXE) {
@@ -198,7 +189,7 @@ class onInteract : Listener {
                                 if (ParseUtil.isInt(reply)) {
                                     val i = reply.toInt()
                                     worldConfig.hunterDoorConfig.setDoor(i, clickedBlock)
-                                    p.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}ハンターボックスのドア位置${i}を設定しました。")
+                                    p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ハンターボックスのドア位置${i}を設定しました。")
                                 } else {
                                     MainAPI.sendMessage(player, MainAPI.ErrorMessage.ARGS_INTEGER)
                                 }
@@ -211,30 +202,30 @@ class onInteract : Listener {
                             if (GameManager.isGame()) return
 
                             e.isCancelled = true
-                            worldConfig.mapBorderConfig.setLocation(BorderType.POINT_2, clickedBlock.location)
+                            worldConfig.mapBorderConfig.setLocation(WorldConfig.BorderType.POINT_2, clickedBlock.location)
                             p.sendMessage("""
-                                ${MainAPI.getPrefix(PrefixType.WARNING)}マップのボーダーの角2を設定しました。
-                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}マップのボーダーの角2を設定しました。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
                             """.trimIndent())
                             return
                         } else if (p.inventory.itemInMainHand.type == Material.GOLDEN_AXE || p.inventory.itemInOffHand.type == Material.GOLDEN_AXE) {
                             if (GameManager.isGame()) return
 
                             e.isCancelled = true
-                            worldConfig.hunterZoneBorderConfig.setLocation(BorderType.POINT_2, clickedBlock.location)
+                            worldConfig.hunterZoneBorderConfig.setLocation(WorldConfig.BorderType.POINT_2, clickedBlock.location)
                             p.sendMessage("""
-                                ${MainAPI.getPrefix(PrefixType.WARNING)}ハンターゾーンのボーダーの角2を設定しました。
-                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ハンターゾーンのボーダーの角2を設定しました。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
                             """.trimIndent())
                             return
                         } else if (p.inventory.itemInMainHand.type == Material.IRON_AXE || p.inventory.itemInOffHand.type == Material.IRON_AXE) {
                             if (GameManager.isGame()) return
 
                             e.isCancelled = true
-                            worldConfig.opGameBorderConfig.setLocation(BorderType.POINT_2, clickedBlock.location)
+                            worldConfig.opGameBorderConfig.setLocation(WorldConfig.BorderType.POINT_2, clickedBlock.location)
                             p.sendMessage("""
-                                ${MainAPI.getPrefix(PrefixType.WARNING)}オープニングゲームのボーダーの角2を設定しました。
-                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}オープニングゲームのボーダーの角2を設定しました。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${clickedBlock.x}, ${clickedBlock.y}, ${clickedBlock.z}
                             """.trimIndent())
                             return
                         } else {
@@ -245,197 +236,72 @@ class onInteract : Listener {
                                 if (block.type == Material.EMERALD_BLOCK) {
                                     val missionState = MissionManager.MissionState.SUCCESS
 
-                                    if (GameManager.isGame(GameState.GAME) && TosoGameAPI.isAdmin(p)) {
+                                    if (GameManager.isGame(GameManager.GameState.GAME) && TosoGameAPI.isAdmin(p)) {
                                         if (worldConfig.gameConfig.successMission) {
                                             successBlockLoc = block.location
 
                                             if (!MissionManager.isMission(missionState)) {
                                                 p.sendMessage("""
-                                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}生存ミッションを開始しました。
-                                                    ${MainAPI.getPrefix(PrefixType.SUCCESS)}ミッションを開始しました。
+                                                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}生存ミッションを開始しました。
+                                                    ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ミッションを開始しました。
                                                 """.trimIndent())
-                                                MissionManager.sendMission(p, missionState.id)
+                                                MissionManager.sendMission(p, missionState)
                                             } else {
-                                                p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}生存ミッションで使用するブロックの位置を変更しました。")
-                                                MissionManager.sendMission(p, MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU, "生存ミッションで使用されるブロックの位置が変更された。", Material.EMERALD_BLOCK)
+                                                p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}生存ミッションで使用するブロックの位置を変更しました。")
+                                                MissionManager.sendMission(p, MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU, "生存ミッションで使用されるブロックの位置が変更された。", Material.EMERALD_BLOCK)
                                             }
                                         } else {
-                                            p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}生存ミッションが有効になっていないため開始できません。")
+                                            p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}生存ミッションが有効になっていないため開始できません。")
                                             return
                                         }
                                     }
                                 } else if (block.type == Material.BONE_BLOCK) {
                                     val missionState = MissionManager.MissionState.HUNTER_ZONE
 
-                                    if (GameManager.isGame(GameState.GAME) && TosoGameAPI.isAdmin(p)) {
+                                    if (GameManager.isGame(GameManager.GameState.GAME) && TosoGameAPI.isAdmin(p)) {
                                         hunterZoneBlockLoc = block.location
 
                                         if (!MissionManager.isMission(missionState)) {
                                             p.sendMessage("""
-                                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}ハンターゾーンミッションを開始しました。
-                                                ${MainAPI.getPrefix(PrefixType.SUCCESS)}ミッションを開始しました。
+                                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッションを開始しました。
+                                                ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ミッションを開始しました。
                                             """.trimIndent())
-                                            MissionManager.sendMission(p, missionState.id)
+                                            MissionManager.sendMission(p, missionState)
                                         } else {
-                                            p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ハンターゾーンミッションで使用するブロックの位置を変更しました。")
-                                            MissionManager.sendMission(p, MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU, "ハンターゾーンミッションで使用されるブロックの位置が変更された。", Material.BONE_BLOCK)
+                                            p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッションで使用するブロックの位置を変更しました。")
+                                            MissionManager.sendMission(p, MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU, "ハンターゾーンミッションで使用されるブロックの位置が変更された。", Material.BONE_BLOCK)
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p)) {
+                } else if (p.isPlayerGroup) {
                     if (p.inventory.itemInMainHand.type == Material.BONE) {
-                        if (!GameManager.isGame(GameState.GAME) || p.hasPotionEffect(PotionEffectType.INVISIBILITY) || p.hasCooldown(Material.BONE)) return
-
-                        val duration = 20 * difficultyConfig.getBone(itemGameType).duration
-
-                        p.setCooldown(Material.BONE, duration + 20 * 5)
-                        if (p.inventory.itemInMainHand.amount == 1) {
-                            p.inventory.setItemInMainHand(null)
-                        } else {
-                            p.inventory.itemInMainHand.amount = p.inventory.itemInMainHand.amount - 1
-                            p.inventory.setItemInMainHand(p.inventory.itemInMainHand)
-                        }
-
-                        p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
-                        p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, duration, 1, false, false))
-
-                        for (entity in p.world.entities)
-                            if (entity is Zombie && entity.target is Player && (entity.target as Player).uniqueId == p.uniqueId)
-                                entity.target = null
-
-                        Main.invisibleSet.add(p.uniqueId)
-                        for (player in Bukkit.getOnlinePlayers())
-                            TosoGameAPI.showPlayers(player)
-                        Bukkit.getScheduler().runTaskLater(Main.pluginInstance, Runnable {
-                            Main.invisibleSet.remove(p.uniqueId)
-                            for (player in Bukkit.getOnlinePlayers())
-                                TosoGameAPI.showPlayers(player)
-                        }, duration.toLong())
-                        return
+                        bone(p, true, difficultyConfig, itemGameType)
                     } else if (p.inventory.itemInOffHand.type == Material.BONE) {
-                        if (!GameManager.isGame(GameState.GAME) || p.hasPotionEffect(PotionEffectType.INVISIBILITY) || p.hasCooldown(Material.BONE)) return
-
-                        val duration = 20 * difficultyConfig.getBone(itemGameType).duration
-
-                        p.setCooldown(Material.BONE, duration + 20 * 5)
-                        if (p.inventory.itemInOffHand.amount == 1) {
-                            p.inventory.setItemInOffHand(null)
-                        } else {
-                            p.inventory.itemInOffHand.amount = p.inventory.itemInOffHand.amount - 1
-                            p.inventory.setItemInOffHand(p.inventory.itemInOffHand)
-                        }
-
-                        p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
-                        p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, duration, 1, false, false))
-
-                        for (entity in p.world.entities)
-                            if (entity is Zombie && entity.target is Player && (entity.target as Player).uniqueId == p.uniqueId)
-                                entity.target = null
-
-                        Main.invisibleSet.add(p.uniqueId)
-                        for (player in Bukkit.getOnlinePlayers())
-                            TosoGameAPI.showPlayers(player)
-                        Bukkit.getScheduler().runTaskLater(Main.pluginInstance, Runnable {
-                            Main.invisibleSet.remove(p.uniqueId)
-                            for (player in Bukkit.getOnlinePlayers())
-                                TosoGameAPI.showPlayers(player)
-                        }, duration.toLong())
-                        return
+                        bone(p, false, difficultyConfig, itemGameType)
                     } else if (p.inventory.itemInMainHand.type == Material.FEATHER) {
-                        if (!GameManager.isGame(GameState.GAME) || p.hasPotionEffect(PotionEffectType.SPEED) || p.hasCooldown(Material.FEATHER)) return
-
-                        val duration = 20 * difficultyConfig.getFeather(itemGameType).duration
-
-                        p.setCooldown(Material.FEATHER, duration + 20 * 5)
-                        if (p.inventory.itemInMainHand.amount == 1) {
-                            p.inventory.setItemInMainHand(null)
-                        } else {
-                            p.inventory.itemInMainHand.amount = p.inventory.itemInMainHand.amount - 1
-                            p.inventory.setItemInMainHand(p.inventory.itemInMainHand)
-                        }
-
-                        p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
-                        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, duration, 1, false, false))
-                        return
+                        feather(p, true, difficultyConfig, itemGameType)
                     } else if (p.inventory.itemInOffHand.type == Material.FEATHER) {
-                        if (!GameManager.isGame(GameState.GAME) || p.hasPotionEffect(PotionEffectType.SPEED) || p.hasCooldown(Material.FEATHER)) return
-
-                        val duration = 20 * difficultyConfig.getFeather(itemGameType).duration
-
-                        p.setCooldown(Material.FEATHER, duration + 20 * 5)
-                        if (p.inventory.itemInOffHand.amount == 1) {
-                            p.inventory.setItemInOffHand(null)
-                        } else {
-                            p.inventory.itemInOffHand.amount = p.inventory.itemInOffHand.amount - 1
-                            p.inventory.setItemInOffHand(p.inventory.itemInOffHand)
-                        }
-
-                        p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
-                        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, duration, 1, false, false))
-                        return
+                        feather(p, false, difficultyConfig, itemGameType)
                     }
-                } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, p)) {
+                    return
+                } else if (p.isJailTeam) {
                     if (p.inventory.itemInMainHand.type == Material.ENDER_PEARL) {
-                        e.isCancelled = true
-
-                        for (player in Bukkit.getOnlinePlayers())
-                            if (!TosoGameAPI.isAdmin(player))
-                                p.hidePlayer(player)
-
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}周りを非表示にしました。")
-
-                        val itemMeta = p.inventory.itemInMainHand.itemMeta!!
-                        itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを表示")
-                        itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを表示します。")
-                        p.inventory.itemInMainHand.type = Material.ENDER_EYE
-                        p.inventory.itemInMainHand.itemMeta = itemMeta
+                        enderPearl(p, e, true)
                     } else if (p.inventory.itemInOffHand.type == Material.ENDER_PEARL) {
-                        e.isCancelled = true
-
-                        for (player in Bukkit.getOnlinePlayers())
-                            if (!TosoGameAPI.isAdmin(player))
-                                p.hidePlayer(player)
-
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}周りを非表示にしました。")
-
-                        val itemMeta = p.inventory.itemInOffHand.itemMeta!!
-                        itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを表示")
-                        itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを表示します。")
-                        p.inventory.itemInOffHand.type = Material.ENDER_EYE
-                        p.inventory.itemInOffHand.itemMeta = itemMeta
+                        enderPearl(p, e, false)
                     } else if (p.inventory.itemInMainHand.type == Material.ENDER_EYE) {
-                        e.isCancelled = true
-
-                        for (player in Bukkit.getOnlinePlayers())
-                            p.showPlayer(player)
-
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}周りを表示しました。")
-
-                        val itemMeta = p.inventory.itemInMainHand.itemMeta!!
-                        itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを表示")
-                        itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを非表示にします。")
-                        p.inventory.itemInMainHand.type = Material.ENDER_PEARL
-                        p.inventory.itemInMainHand.itemMeta = itemMeta
+                        enderEye(p, e, true)
                     } else if (p.inventory.itemInOffHand.type == Material.ENDER_EYE) {
-                        e.isCancelled = true
-
-                        for (player in Bukkit.getOnlinePlayers())
-                            p.showPlayer(player)
-
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}周りを表示しました。")
-
-                        val itemMeta = p.inventory.itemInOffHand.itemMeta!!
-                        itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを非表示")
-                        itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを非表示にします。")
-                        p.inventory.itemInOffHand.type = Material.ENDER_PEARL
-                        p.inventory.itemInOffHand.itemMeta = itemMeta
+                        enderEye(p, e, false)
                     }
+                    return
                 }
             }
         }
+
         if (e.action == Action.RIGHT_CLICK_BLOCK) {
             if (p.inventory.itemInMainHand.type != Material.AIR) return
             if (p.gameMode != GameMode.SPECTATOR && clickedBlock != null && clickedBlock.blockData is Stairs
@@ -459,8 +325,8 @@ class onInteract : Listener {
                     }
                 }.runTaskTimer(Main.pluginInstance, 0, 0)
             } else {
-                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p)) {
-                    if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p)) {
+                if (p.isPlayerGroup) {
+                    if (p.isPlayerTeam) {
                         if (clickedBlock == null) return
                         if (clickedBlock.type == Material.OAK_SIGN || clickedBlock.type == Material.SPRUCE_SIGN || clickedBlock.type == Material.BIRCH_SIGN || clickedBlock.type == Material.JUNGLE_SIGN || clickedBlock.type == Material.ACACIA_SIGN || clickedBlock.type == Material.DARK_OAK_SIGN || clickedBlock.type == Material.OAK_WALL_SIGN || clickedBlock.type == Material.SPRUCE_WALL_SIGN || clickedBlock.type == Material.BIRCH_WALL_SIGN || clickedBlock.type == Material.JUNGLE_WALL_SIGN || clickedBlock.type == Material.ACACIA_WALL_SIGN || clickedBlock.type == Material.DARK_OAK_WALL_SIGN) {
                             val sign = clickedBlock.state as Sign
@@ -468,13 +334,13 @@ class onInteract : Listener {
                                     && ChatColor.stripColor(sign.getLine(3)).equals("クリック", true)) {
                                 TosoGameAPI.teleport(p, worldConfig.respawnLocationConfig.locations.values)
 
-                                Teams.joinTeam(OnlineTeam.TOSO_SUCCESS, p)
+                                Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)
                                 p.gameMode = GameMode.SPECTATOR
 
                                 p.inventory.clear()
 
-                                p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを生存者 (自首)に追加しました。")
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${p.name}が自首しました。")
+                                p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを生存者 (自首)に追加しました。")
+                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}が自首しました。")
                                 return
                             }
                         } else {
@@ -483,17 +349,17 @@ class onInteract : Listener {
                                         || clickedBlock.type == Material.BIRCH_BUTTON || clickedBlock.type == Material.JUNGLE_BUTTON
                                         || clickedBlock.type == Material.ACACIA_BUTTON || clickedBlock.type == Material.DARK_OAK_BUTTON
                                         || clickedBlock.type == Material.STONE_BUTTON) {
-                                    if (!GameManager.isGame(GameState.GAME)) return
+                                    if (!GameManager.isGame(GameManager.GameState.GAME)) return
 
                                     val directional = clickedBlock.blockData as Directional
                                     val block = clickedBlock.getRelative(getAttachmentFace(directional))
 
                                     if (block.type == Material.EMERALD_BLOCK) {
                                         if (block.location.blockX == successBlockLoc!!.blockX && block.location.blockY == successBlockLoc!!.blockY && block.location.blockZ == successBlockLoc!!.blockZ) {
-                                            Teams.joinTeam(OnlineTeam.TOSO_SUCCESS, p)
+                                            Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)
                                             p.sendMessage("""
-                                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを生存者に追加しました。
-                                                ${MainAPI.getPrefix(PrefixType.WARNING)}サーバーから退出した場合は逃走者になります。
+                                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを生存者に追加しました。
+                                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}サーバーから退出した場合は逃走者になります。
                                             """.trimIndent())
                                         }
                                     }
@@ -515,7 +381,7 @@ class onInteract : Listener {
                                         || clickedBlock.type == Material.BIRCH_BUTTON || clickedBlock.type == Material.JUNGLE_BUTTON
                                         || clickedBlock.type == Material.ACACIA_BUTTON || clickedBlock.type == Material.DARK_OAK_BUTTON
                                         || clickedBlock.type == Material.STONE_BUTTON) {
-                                    if (!GameManager.isGame(GameState.GAME)) return
+                                    if (!GameManager.isGame(GameManager.GameState.GAME)) return
 
                                     val directional = clickedBlock.blockData as Directional
                                     val block = clickedBlock.getRelative(getAttachmentFace(directional))
@@ -523,16 +389,16 @@ class onInteract : Listener {
                                     if (block.type == Material.BONE_BLOCK) {
                                         if (block.location.blockX == hunterZoneBlockLoc!!.blockX && block.location.blockY == hunterZoneBlockLoc!!.blockY && block.location.blockZ == hunterZoneBlockLoc!!.blockZ) {
                                             p.sendMessage("""
-                                                ${MainAPI.getPrefix(PrefixType.WARNING)}ハンターゾーンミッションのコード: ${HunterZone.code}
-                                                ${MainAPI.getPrefix(PrefixType.WARNING)}"/code ${HunterZone.code}"と入力してミッションを完了してください。
-                                                ${MainAPI.getPrefix(PrefixType.WARNING)}このコードを他の逃走者に教えるかどうかはあなた次第です。
+                                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ハンターゾーンミッションのコード: ${HunterZone.code}
+                                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}"/code ${HunterZone.code}"と入力してミッションを完了してください。
+                                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}このコードを他の逃走者に教えるかどうかはあなた次第です。
                                             """.trimIndent())
                                         }
                                     }
                                 }
                             }
                         }
-                    } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p)) {
+                    } else if (p.isSuccessTeam) {
                         if (clickedBlock == null) return
                         if (MissionManager.isMission(MissionManager.MissionState.AREA_EXTEND)) {
                             if (clickedBlock.type == Material.GOLD_BLOCK) {
@@ -551,7 +417,7 @@ class onInteract : Listener {
                                     || clickedBlock.type == Material.BIRCH_BUTTON || clickedBlock.type == Material.JUNGLE_BUTTON
                                     || clickedBlock.type == Material.ACACIA_BUTTON || clickedBlock.type == Material.DARK_OAK_BUTTON
                                     || clickedBlock.type == Material.STONE_BUTTON) {
-                                if (!GameManager.isGame(GameState.GAME)) return
+                                if (!GameManager.isGame(GameManager.GameState.GAME)) return
 
                                 val directional = clickedBlock.blockData as Directional
                                 val block = clickedBlock.getRelative(getAttachmentFace(directional))
@@ -559,9 +425,9 @@ class onInteract : Listener {
                                 if (block.type == Material.BONE_BLOCK) {
                                     if (block.location.blockX == hunterZoneBlockLoc!!.blockX && block.location.blockY == hunterZoneBlockLoc!!.blockY && block.location.blockZ == hunterZoneBlockLoc!!.blockZ) {
                                         p.sendMessage("""
-                                            ${MainAPI.getPrefix(PrefixType.WARNING)}ハンターゾーンミッションのコード: ${HunterZone.code}
-                                            ${MainAPI.getPrefix(PrefixType.WARNING)}"/code ${HunterZone.code}"と入力してミッションを完了してください。
-                                            ${MainAPI.getPrefix(PrefixType.WARNING)}このコードを他の逃走者に教えるかどうかはあなた次第です。
+                                            ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ハンターゾーンミッションのコード: ${HunterZone.code}
+                                            ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}"/code ${HunterZone.code}"と入力してミッションを完了してください。
+                                            ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}このコードを他の逃走者に教えるかどうかはあなた次第です。
                                         """.trimIndent())
                                     }
                                 }
@@ -580,33 +446,213 @@ class onInteract : Listener {
         val worldConfig = Main.worldConfig
 
         if (e.rightClicked is ItemFrame) {
-            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, damager)) return
+            if (damager.isAdminTeam) return
+
             e.isCancelled = true
         } else if (e.rightClicked is Player) {
             val player = e.rightClicked as Player
-            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, damager)) {
+
+            if (damager.isAdminTeam) {
                 val difficultyConfig = worldConfig.getDifficultyConfig(player)
                 if (damager.inventory.itemInMainHand.type == Material.GOLD_NUGGET || damager.inventory.itemInOffHand.type == Material.GOLD_NUGGET) {
                     e.isCancelled = true
                     damager.sendMessage("""
-                        ${MainAPI.getPrefix(PrefixType.SUCCESS)}${player.name}の情報
-                        ${MainAPI.getPrefix(PrefixType.PRIMARY)}${ChatColor.UNDERLINE}権限所持者${ChatColor.GRAY}: ${if (TosoGameAPI.hasPermission(player)) "はい" else "いいえ"}
-                        ${MainAPI.getPrefix(PrefixType.PRIMARY)}${ChatColor.UNDERLINE}配信者${ChatColor.GRAY}: ${if (TosoGameAPI.isBroadCaster(player)) "はい" else "いいえ"}
-                        ${MainAPI.getPrefix(PrefixType.PRIMARY)}${ChatColor.UNDERLINE}チーム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${Teams.getTeamLabel(Teams.DisplaySlot.SIDEBAR, player)}
-                        ${MainAPI.getPrefix(PrefixType.PRIMARY)}${ChatColor.UNDERLINE}難易度${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyConfig.difficulty.displayName}
-                        ${MainAPI.getPrefix(PrefixType.PRIMARY)}${ChatColor.UNDERLINE}賞金${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${MoneyManager.getReward(player)}${ChatColor.GRAY}円 (${MoneyManager.getRate(player)}円/秒)
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${player.name}の情報
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.PRIMARY)}${ChatColor.UNDERLINE}権限所持者${ChatColor.GRAY}: ${if (TosoGameAPI.hasPermission(player)) "はい" else "いいえ"}
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.PRIMARY)}${ChatColor.UNDERLINE}配信者${ChatColor.GRAY}: ${if (TosoGameAPI.isBroadCaster(player)) "はい" else "いいえ"}
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.PRIMARY)}${ChatColor.UNDERLINE}チーム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${Teams.getTeamLabel(Teams.DisplaySlot.SIDEBAR, player)}
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.PRIMARY)}${ChatColor.UNDERLINE}難易度${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyConfig.difficulty.displayName}
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.PRIMARY)}${ChatColor.UNDERLINE}賞金${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${MoneyManager.getReward(player)}${ChatColor.GRAY}円 (${MoneyManager.getRate(player)}円/秒)
                     """.trimIndent())
+                }
+            } else if (damager.isPlayerGroup && player.isPlayerGroup
+                    && (damager.inventory.itemInMainHand.type == Material.PAPER || damager.inventory.itemInOffHand.type == Material.PAPER)) {
+                e.isCancelled = true
+
+                if (player.hasPotionEffect(PotionEffectType.INVISIBILITY) || !TimedDevice.isStart) return
+
+                val itemType = Material.PAPER
+
+                val itemStackDamager = if (damager.inventory.itemInMainHand.type == itemType) damager.inventory.itemInMainHand
+                else damager.inventory.itemInOffHand
+                val itemStackPlayer = player.inventory.contents.firstOrNull { it != null && it.type == itemType }
+                        ?: return
+
+                val itemMetaDamager = itemStackDamager.itemMeta!!
+                val itemMetaPlayer = itemStackPlayer.itemMeta!!
+
+                if (!itemMetaDamager.hasCustomModelData() || !itemMetaPlayer.hasCustomModelData()) return
+
+                if (itemMetaDamager.customModelData == itemMetaPlayer.customModelData) {
+                    damager.inventory.remove(itemStackDamager)
+                    player.inventory.remove(itemStackPlayer)
+
+                    TimedDevice.addClearedNumberSet(damager)
+
+                    damager.playSound(damager.location, Sound.ENTITY_PLAYER_LEVELUP, 1F, 1F)
+                    player.playSound(damager.location, Sound.ENTITY_PLAYER_LEVELUP, 1F, 1F)
+
+                    damager.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}同じ番号のカードキーを所持していたため${ChatColor.BOLD}${ChatColor.UNDERLINE}${player.name}${ChatColor.RESET}${ChatColor.GREEN}の認証に成功しました。")
+                    player.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}同じ番号のカードキーを所持していたため${ChatColor.BOLD}${ChatColor.UNDERLINE}${damager.name}${ChatColor.RESET}${ChatColor.GREEN}の認証に成功しました。")
+                } else {
+                    damager.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}同じ番号のカードキーを所持していないため認証に失敗しました。")
                 }
             }
         }
     }
 
-    fun getAttachmentFace(directional: Directional): BlockFace {
-        val faceAttachable = directional as FaceAttachable
-        return when (faceAttachable.attachedFace) {
+    @EventHandler
+    fun onAnimation(e: PlayerAnimationEvent) {
+        val p = e.player
+
+        if (!p.isPlayerTeam || p.eyeLocation.block.type.toString().contains("AIR")) return
+
+        val worldConfig = Main.worldConfig
+        val difficultyConfig = worldConfig.getDifficultyConfig(p)
+
+        val itemGameType = RespawnRunnable.getGameType(p)
+
+        if (p.inventory.itemInMainHand.type == Material.BONE) {
+            bone(p, true, difficultyConfig, itemGameType)
+        } else if (p.inventory.itemInOffHand.type == Material.BONE) {
+            bone(p, false, difficultyConfig, itemGameType)
+        } else if (p.inventory.itemInMainHand.type == Material.FEATHER) {
+            feather(p, true, difficultyConfig, itemGameType)
+        } else if (p.inventory.itemInOffHand.type == Material.FEATHER) {
+            feather(p, false, difficultyConfig, itemGameType)
+        }
+        return
+    }
+
+
+    private fun getAttachmentFace(directional: Directional): BlockFace {
+        return when ((directional as FaceAttachable).attachedFace) {
             FaceAttachable.AttachedFace.CEILING -> BlockFace.UP
             FaceAttachable.AttachedFace.WALL -> directional.facing.oppositeFace
             FaceAttachable.AttachedFace.FLOOR -> BlockFace.DOWN
         }
+    }
+
+    private fun bone(p: Player, isMainHand: Boolean, difficultyConfig: WorldConfig.DifficultyConfig, itemGameType: WorldManager.GameType) {
+        if (!GameManager.isGame(GameManager.GameState.GAME) || p.hasPotionEffect(PotionEffectType.INVISIBILITY) || p.hasCooldown(Material.BONE)) return
+
+        val duration = 20 * difficultyConfig.getBone(itemGameType).duration
+
+        p.setCooldown(Material.BONE, duration + 20 * 5)
+
+        if (isMainHand) {
+            if (p.inventory.itemInMainHand.amount == 1) {
+                p.inventory.setItemInMainHand(null)
+            } else {
+                p.inventory.itemInMainHand.amount = p.inventory.itemInMainHand.amount - 1
+                p.inventory.setItemInMainHand(p.inventory.itemInMainHand)
+            }
+        } else {
+            if (p.inventory.itemInOffHand.amount == 1) {
+                p.inventory.setItemInOffHand(null)
+            } else {
+                p.inventory.itemInOffHand.amount = p.inventory.itemInOffHand.amount - 1
+                p.inventory.setItemInOffHand(p.inventory.itemInOffHand)
+            }
+        }
+
+        p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
+        p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, duration, 1, false, false))
+
+        for (entity in p.world.entities)
+            if (entity is Zombie && entity.target is Player && (entity.target as Player).uniqueId == p.uniqueId)
+                entity.target = null
+
+        TosoGameAPI.hidePlayer(p, duration.toLong())
+    }
+
+    private fun feather(p: Player, isMainHand: Boolean, difficultyConfig: WorldConfig.DifficultyConfig, itemGameType: WorldManager.GameType) {
+        if (!GameManager.isGame(GameManager.GameState.GAME) || p.hasPotionEffect(PotionEffectType.SPEED) || p.hasCooldown(Material.FEATHER)) return
+
+        val duration = 20 * difficultyConfig.getFeather(itemGameType).duration
+
+        p.setCooldown(Material.FEATHER, duration + 20 * 5)
+
+        if (isMainHand) {
+            if (p.inventory.itemInMainHand.amount == 1) {
+                p.inventory.setItemInMainHand(null)
+            } else {
+                p.inventory.itemInMainHand.amount = p.inventory.itemInMainHand.amount - 1
+                p.inventory.setItemInMainHand(p.inventory.itemInMainHand)
+            }
+        } else {
+            if (p.inventory.itemInOffHand.amount == 1) {
+                p.inventory.setItemInOffHand(null)
+            } else {
+                p.inventory.itemInOffHand.amount = p.inventory.itemInOffHand.amount - 1
+                p.inventory.setItemInOffHand(p.inventory.itemInOffHand)
+            }
+        }
+
+        p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
+        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, duration, 1, false, false))
+    }
+
+    private fun enderPearl(p: Player, e: PlayerInteractEvent, isMainHand: Boolean) {
+        if (!GameManager.isGame(GameManager.GameState.GAME) || p.hasCooldown(Material.ENDER_PEARL) || p.hasCooldown(Material.ENDER_EYE)) return
+
+        e.isCancelled = true
+
+        VisibilityManager.addJailHide(p)
+
+        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}周りを非表示にしました。")
+
+        if (isMainHand) {
+            val itemStack = p.inventory.itemInMainHand
+            val itemMeta = itemStack.itemMeta!!
+            itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを表示")
+            itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを表示します。")
+            itemStack.type = Material.ENDER_EYE
+            itemStack.itemMeta = itemMeta
+        } else {
+            val itemStack = p.inventory.itemInOffHand
+            val itemMeta = itemStack.itemMeta!!
+            itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを表示")
+            itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを表示します。")
+            itemStack.type = Material.ENDER_EYE
+            itemStack.itemMeta = itemMeta
+        }
+
+        setJailItemCoolTime(p)
+    }
+
+    private fun enderEye(p: Player, e: PlayerInteractEvent, isMainHand: Boolean) {
+        if (!GameManager.isGame(GameManager.GameState.GAME) || p.hasCooldown(Material.ENDER_PEARL) || p.hasCooldown(Material.ENDER_EYE)) return
+
+        e.isCancelled = true
+
+        VisibilityManager.removeJailHide(p)
+
+        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}周りを表示しました。")
+
+        if (isMainHand) {
+            val itemStack = p.inventory.itemInMainHand
+            val itemMeta = itemStack.itemMeta!!
+            itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを非表示")
+            itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを非表示にします。")
+            itemStack.type = Material.ENDER_PEARL
+            itemStack.itemMeta = itemMeta
+        } else {
+            val itemStack = p.inventory.itemInOffHand
+            val itemMeta = itemStack.itemMeta!!
+            itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを非表示")
+            itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを非表示にします。")
+            itemStack.type = Material.ENDER_PEARL
+            itemStack.itemMeta = itemMeta
+        }
+
+        setJailItemCoolTime(p)
+    }
+
+    private fun setJailItemCoolTime(p: Player) {
+        val time = 20 * 1
+
+        p.setCooldown(Material.ENDER_PEARL, time)
+        p.setCooldown(Material.ENDER_EYE, time)
     }
 }

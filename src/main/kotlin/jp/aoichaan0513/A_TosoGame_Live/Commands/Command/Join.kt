@@ -1,17 +1,13 @@
 package jp.aoichaan0513.A_TosoGame_Live.Commands.Command
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
-import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.ErrorMessage
-import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
-import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.setTeam
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.GameMode
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
 import org.bukkit.command.ConsoleCommandSender
@@ -26,28 +22,14 @@ class Join(name: String) : ICommand(name) {
                     for (name in args) {
                         val p = Bukkit.getPlayerExact(name)
                         if (p != null) {
-                            if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p)) {
-                                Teams.joinTeam(OnlineTeam.TOSO_PLAYER, p)
-                                p.gameMode = GameMode.ADVENTURE
+                            if (!p.isPlayerTeam) {
+                                p.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
-                                TosoGameAPI.setItem(GameType.START, p)
-                                TosoGameAPI.setPotionEffect(p)
-                                TosoGameAPI.removeOp(p)
-
-                                TosoGameAPI.showPlayers(p)
-                                TosoGameAPI.hidePlayers(p)
-
-                                for (effect in p.activePotionEffects)
-                                    p.removePotionEffect(effect.type)
-
-                                MissionManager.bossBar?.addPlayer(p)
-
-                                sp.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
-                                p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを逃走者に追加しました。")
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GRAY}がゲームに参加しました。")
+                                sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
+                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                                 continue
                             }
-                            sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}${p.name}はすでにゲームに参加しています。")
+                            sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでにゲームに参加しています。")
                             continue
                         }
                         MainAPI.sendOfflineMessage(sp, name)
@@ -55,35 +37,19 @@ class Join(name: String) : ICommand(name) {
                     }
                     return
                 }
-                MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
-                return
+                MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS)
             } else {
-                if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, sp)) {
-                    Teams.joinTeam(OnlineTeam.TOSO_PLAYER, sp)
-                    sp.gameMode = GameMode.ADVENTURE
+                if (!sp.isPlayerTeam) {
+                    sp.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
-                    TosoGameAPI.setItem(GameType.START, sp)
-                    TosoGameAPI.setPotionEffect(sp)
-                    TosoGameAPI.removeOp(sp)
-
-                    TosoGameAPI.showPlayers(sp)
-                    TosoGameAPI.hidePlayers(sp)
-
-                    for (effect in sp.activePotionEffects)
-                        sp.removePotionEffect(effect.type)
-
-                    if (MissionManager.isBossBar)
-                        MissionManager.bossBar!!.addPlayer(sp)
-
-                    sp.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを逃走者に追加しました。")
-                    Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${sp.name}${ChatColor.RESET}${ChatColor.GRAY}がゲームに参加しました。")
+                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${sp.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                     return
                 }
-                sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}すでにゲームに参加しています。")
-                return
+                sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}すでにゲームに参加しています。")
             }
+            return
         }
-        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
+        MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS)
         return
     }
 
@@ -92,29 +58,14 @@ class Join(name: String) : ICommand(name) {
             for (name in args) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
-                    if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p)) {
-                        Teams.joinTeam(OnlineTeam.TOSO_PLAYER, p)
-                        p.gameMode = GameMode.ADVENTURE
+                    if (!p.isPlayerTeam) {
+                        p.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
-                        TosoGameAPI.setItem(GameType.START, p)
-                        TosoGameAPI.setPotionEffect(p)
-                        TosoGameAPI.removeOp(p)
-
-                        TosoGameAPI.showPlayers(p)
-                        TosoGameAPI.hidePlayers(p)
-
-                        for (effect in p.activePotionEffects)
-                            p.removePotionEffect(effect.type)
-
-                        if (MissionManager.isBossBar)
-                            MissionManager.bossBar!!.addPlayer(p)
-
-                        bs.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを逃走者に追加しました。")
-                        Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GRAY}がゲームに参加しました。")
+                        bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
+                        Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                         continue
                     }
-                    bs.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}${p.name}はすでにゲームに参加しています。")
+                    bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでにゲームに参加しています。")
                     continue
                 }
                 MainAPI.sendOfflineMessage(bs, name)
@@ -122,7 +73,7 @@ class Join(name: String) : ICommand(name) {
             }
             return
         }
-        MainAPI.sendMessage(bs, ErrorMessage.ARGS_PLAYER)
+        MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_PLAYER)
         return
     }
 
@@ -131,29 +82,14 @@ class Join(name: String) : ICommand(name) {
             for (name in args) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
-                    if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p)) {
-                        Teams.joinTeam(OnlineTeam.TOSO_PLAYER, p)
-                        p.gameMode = GameMode.ADVENTURE
+                    if (!p.isPlayerTeam) {
+                        p.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
-                        TosoGameAPI.setItem(GameType.START, p)
-                        TosoGameAPI.setPotionEffect(p)
-                        TosoGameAPI.removeOp(p)
-
-                        TosoGameAPI.showPlayers(p)
-                        TosoGameAPI.hidePlayers(p)
-
-                        for (effect in p.activePotionEffects)
-                            p.removePotionEffect(effect.type)
-
-                        if (MissionManager.isBossBar)
-                            MissionManager.bossBar!!.addPlayer(p)
-
-                        cs.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたを逃走者に追加しました。")
-                        Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GRAY}がゲームに参加しました。")
+                        cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
+                        Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                         continue
                     }
-                    cs.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}${p.name}はすでにゲームに参加しています。")
+                    cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでにゲームに参加しています。")
                     continue
                 }
                 MainAPI.sendOfflineMessage(cs, name)
@@ -161,7 +97,7 @@ class Join(name: String) : ICommand(name) {
             }
             return
         }
-        MainAPI.sendMessage(cs, ErrorMessage.ARGS_PLAYER)
+        MainAPI.sendMessage(cs, MainAPI.ErrorMessage.ARGS_PLAYER)
         return
     }
 

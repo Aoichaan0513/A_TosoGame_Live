@@ -15,9 +15,10 @@ import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffectType
 
 class Code(name: String) : ICommand(name) {
+
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
         if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, sp) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, sp)) {
-            if (GameManager.isGame() && HunterZone.isStart) {
+            if (GameManager.isGame(GameManager.GameState.GAME) && HunterZone.isStart) {
                 if (args.isNotEmpty()) {
                     if (!HunterZone.containsCodeSet(sp)) {
                         if (HunterZone.code.equals(args[0])) {

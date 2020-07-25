@@ -92,12 +92,14 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                         player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_SNARE, 1f, 1f)
                     }
                 }
-                if (TimeFormat.formatSec(gameTime) == 0) {
+
+                if (gameTime % 60 == 0) {
                     Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム終了まで残り${TimeFormat.formatMin(gameTime)}分")
                     for (p in Bukkit.getOnlinePlayers())
                         p.playSound(p.location, Sound.BLOCK_NOTE_BLOCK_SNARE, 1f, 1f)
                 }
-                if (TimeFormat.formatMin(gameTime) % 2 != 0 && TimeFormat.formatSec(gameTime) == 30) {
+
+                if (TimeFormat.formatMin(gameTime) % 2 != 0 && gameTime % 30 == 0) {
                     for (player in Bukkit.getOnlinePlayers()) {
                         if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, player)) {
                             if (!TosoGameAPI.isRes) {
@@ -115,19 +117,22 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                         }
                     }
                 }
-                if (TimeFormat.formatSec(gameTime) % 5 == 0) {
-                    setHealths(worldConfig, TimeFormat.formatSec(gameTime) % 10 == 0)
+
+                if (gameTime % 5 == 0) {
+                    setHealths(worldConfig, gameTime % 10 == 0)
                 } else {
                     for (player in Bukkit.getOnlinePlayers())
                         if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, player) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, player))
                             setHealth(player)
                 }
+
                 if (gameTime == respawnDenyTime) {
                     Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.WARNING)}残り${TimeFormat.formatMin(respawnDenyTime)}分になったため途中参加・復活を禁止します。")
                     for (p in Bukkit.getOnlinePlayers())
                         p.playSound(p.location, Sound.BLOCK_NOTE_BLOCK_SNARE, 1f, 1f)
                 }
             }
+
             if (gameTime == 0 || Teams.getOnlineCount(OnlineTeam.TOSO_PLAYER) == 0) {
                 // ゲーム時間が0になるか、逃走者が0人になった場合
                 if (worldConfig.gameConfig.successMission) {
@@ -139,7 +144,6 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
 
                             GameManager.endGame()
                             HunterZone.endMission()
-                            sendResult()
                             BossBarManager.showBar()
 
                             for (p in Bukkit.getOnlinePlayers()) {
@@ -182,6 +186,8 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                                     player.spigot().sendMessage(textComponent1)
                                 }
                             }
+
+                            sendResult()
                         } else {
                             // ゲーム時間が0以外の場合、全員のレートを一時的に変更
 
@@ -210,7 +216,6 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
 
                         GameManager.endGame()
                         HunterZone.endMission()
-                        sendResult()
                         BossBarManager.showBar()
 
                         for (p in Bukkit.getOnlinePlayers()) {
@@ -249,13 +254,14 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                                 player.spigot().sendMessage(textComponent1)
                             }
                         }
+
+                        sendResult()
                     }
                 } else {
                     // 生存ミッションが無効の場合
 
                     GameManager.endGame()
                     HunterZone.endMission()
-                    sendResult()
                     BossBarManager.showBar()
 
                     if (Teams.getOnlineCount(OnlineTeam.TOSO_PLAYER) > 0) {
@@ -310,6 +316,8 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                             ${MainAPI.getPrefix(PrefixType.WARNING)}今回の生存者はいませんでした。
                         """.trimIndent())
                     }
+
+                    sendResult()
                 }
             }
         } else {
@@ -358,14 +366,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                         p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 20 * 15, 1, false, false))
                         p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 20 * 15, 1, false, false))
 
-                        Main.invisibleSet.add(p.uniqueId)
-                        for (player in Bukkit.getOnlinePlayers())
-                            TosoGameAPI.showPlayers(player)
-                        Bukkit.getScheduler().runTaskLater(Main.pluginInstance, Runnable {
-                            Main.invisibleSet.remove(p.uniqueId)
-                            for (player in Bukkit.getOnlinePlayers())
-                                TosoGameAPI.showPlayers(player)
-                        }, 20 * 10)
+                        TosoGameAPI.hidePlayer(p)
                     }
                 }
             } else if (countDown <= 5) {
@@ -493,23 +494,31 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
      * ゲーム終了
      */
     private fun sendResult() {
+        val rewardMap = MoneyManager.rewardMap.entries.filter { MainAPI.isOnline(it.key) }.sortedBy { it.value * -1 }
+
+        /*
         val rewardList = MoneyManager.rewardMap.entries.toMutableList()
         rewardList.sortWith(Comparator { obj1, obj2 -> obj2.value.compareTo(obj1.value) })
+        */
+
         var rewardCount = 1
         val rewardBuilder = StringBuilder()
-        for ((key, value) in rewardList)
-            if (Bukkit.getPlayer(key) != null && Bukkit.getPlayer(key)!!.isOnline)
-                rewardBuilder.append("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GOLD}${rewardCount++}位${ChatColor.GRAY}: ${ChatColor.YELLOW}${Bukkit.getPlayer(key)!!.name}${ChatColor.GRAY} (${MoneyManager.formatMoney(value)})\n")
-        val rewardResult = rewardBuilder.toString().trim { it <= ' ' }
+
+        for ((key, value) in rewardMap)
+            rewardBuilder.append("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GOLD}${rewardCount++}位${ChatColor.GRAY}: ${ChatColor.YELLOW}${Bukkit.getPlayer(key)!!.name}${ChatColor.GRAY} (${MoneyManager.formatMoney(value)})\n")
+
+        val rewardResult = rewardBuilder.toString().trim()
         Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}賞金ランキング\n${if (!rewardResult.isEmpty()) rewardResult else "${MainAPI.getPrefix(PrefixType.SECONDARY)}なし"}")
 
+        val hunterMap = onDamage.hunterMap.entries.filter { MainAPI.isOnline(it.key) }.sortedBy { it.value * -1 }
+        /*
         val hunterList = onDamage.hunterMap.entries.toMutableList()
         hunterList.sortWith(Comparator { obj1, obj2 -> obj2.value.compareTo(obj1.value) })
+        */
         var hunterCount = 1
         val hunterBuilder = StringBuilder()
-        for ((key, value) in hunterList)
-            if (Bukkit.getPlayer(key) != null && Bukkit.getPlayer(key)!!.isOnline)
-                hunterBuilder.append("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GOLD}${hunterCount++}位${ChatColor.GRAY}: ${ChatColor.YELLOW}${Bukkit.getPlayer(key)!!.name}${ChatColor.GRAY} ($value)\n")
+        for ((key, value) in hunterMap)
+            hunterBuilder.append("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GOLD}${hunterCount++}位${ChatColor.GRAY}: ${ChatColor.YELLOW}${Bukkit.getPlayer(key)!!.name}${ChatColor.GRAY} ($value)\n")
         val hunterResult = hunterBuilder.toString().trim { it <= ' ' }
         Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}確保数ランキング\n${if (!hunterResult.isEmpty()) hunterResult else "${MainAPI.getPrefix(PrefixType.SECONDARY)}なし"}")
     }

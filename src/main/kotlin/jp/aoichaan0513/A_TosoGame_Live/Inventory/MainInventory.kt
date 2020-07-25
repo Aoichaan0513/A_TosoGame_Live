@@ -11,17 +11,16 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
-import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Hunter
-import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Tuho
+import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Team
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.inventory.meta.SkullMeta
@@ -34,7 +33,6 @@ class MainInventory {
 
         val title = "${ChatColor.DARK_GRAY}> ${ChatColor.BOLD}ホーム"
 
-        private val itemFlags = arrayOf(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS)
 
         fun getInventory(p: Player): Inventory {
             val inv = Bukkit.createInventory(null, 9 * 6, title)
@@ -43,7 +41,7 @@ class MainInventory {
 
             val itemStackBorder = ItemStack(Material.BLACK_STAINED_GLASS_PANE)
             val itemMetaBorder = itemStackBorder.itemMeta!!
-            itemMetaBorder.addItemFlags(*itemFlags)
+            itemMetaBorder.addItemFlags(*ItemUtil.itemFlags)
             itemMetaBorder.setDisplayName("${ChatColor.BOLD}")
             itemStackBorder.itemMeta = itemMetaBorder
             for (i in 9..17)
@@ -53,7 +51,7 @@ class MainInventory {
 
             val itemStackPlayerInfo = ItemStack(Item.PLAYER_INFO.material, 1)
             val itemMetaPlayerInfo = (itemStackPlayerInfo.itemMeta as SkullMeta)
-            itemMetaPlayerInfo.addItemFlags(*itemFlags)
+            itemMetaPlayerInfo.addItemFlags(*ItemUtil.itemFlags)
             itemMetaPlayerInfo.owningPlayer = p
             itemMetaPlayerInfo.setDisplayName("${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}あなたの情報")
             itemMetaPlayerInfo.lore = Arrays.asList(
@@ -73,7 +71,7 @@ class MainInventory {
             if (GameManager.isGame(GameManager.GameState.NONE)) {
                 val itemStackPlayerSettings = ItemStack(Item.PLAYER_SETTINGS.material, 1)
                 val itemMetaPlayerSettings = itemStackPlayerSettings.itemMeta!!
-                itemMetaPlayerSettings.addItemFlags(*itemFlags)
+                itemMetaPlayerSettings.addItemFlags(*ItemUtil.itemFlags)
                 itemMetaPlayerSettings.setDisplayName("${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}プレイヤー設定")
                 itemMetaPlayerSettings.lore = listOf("${ChatColor.GRAY}クリックして${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}プレイヤー設定アプリ${ChatColor.RESET}${ChatColor.GRAY}を開きます。")
                 itemStackPlayerSettings.itemMeta = itemMetaPlayerSettings
@@ -83,7 +81,7 @@ class MainInventory {
             if (TosoGameAPI.isAdmin(p)) {
                 val itemStackMapSettings = ItemStack(Item.MAP_SETTINGS.material, 1)
                 val itemMetaMapSettings = itemStackMapSettings.itemMeta!!
-                itemMetaMapSettings.addItemFlags(*itemFlags)
+                itemMetaMapSettings.addItemFlags(*ItemUtil.itemFlags)
                 itemMetaMapSettings.setDisplayName("${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップ設定")
                 itemMetaMapSettings.lore = listOf("${ChatColor.GRAY}クリックして${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップ設定アプリ${ChatColor.RESET}${ChatColor.GRAY}を開きます。")
                 itemStackMapSettings.itemMeta = itemMetaMapSettings
@@ -92,7 +90,7 @@ class MainInventory {
 
             val itemStackNotification = ItemStack(Item.NOTIFICATION.material)
             val itemMetaNotification = itemStackNotification.itemMeta!!
-            itemMetaNotification.addItemFlags(*itemFlags)
+            itemMetaNotification.addItemFlags(*ItemUtil.itemFlags)
             itemMetaNotification.setDisplayName("${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}通知")
             itemMetaNotification.lore = listOf("${ChatColor.GRAY}クリックして${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}通知メニュー${ChatColor.RESET}${ChatColor.GRAY}を開きます。")
             itemStackNotification.itemMeta = itemMetaNotification
@@ -101,7 +99,7 @@ class MainInventory {
             // 電話アプリ
             val itemStackCall = ItemStack(Item.CALL_APP.material, 1)
             val itemMetaCall = itemStackCall.itemMeta!!
-            itemMetaCall.addItemFlags(*itemFlags)
+            itemMetaCall.addItemFlags(*ItemUtil.itemFlags)
             itemMetaCall.setCustomModelData(1001)
             itemMetaCall.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}Coming soon...")
             itemMetaCall.lore = listOf()
@@ -112,7 +110,7 @@ class MainInventory {
             // ミッションアプリ
             val itemStackMission = ItemStack(Item.MISSION_APP.material, 1)
             val itemMetaMission = itemStackMission.itemMeta!!
-            itemMetaMission.addItemFlags(*itemFlags)
+            itemMetaMission.addItemFlags(*ItemUtil.itemFlags)
             itemMetaMission.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ミッション")
             itemMetaMission.lore = listOf("${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ミッションアプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きます。")
             itemStackMission.itemMeta = itemMetaMission
@@ -121,7 +119,7 @@ class MainInventory {
             // マップアプリ
             val itemStackMap = ItemStack(Item.MAP_APP.material, 1)
             val itemMetaMap = itemStackMap.itemMeta!!
-            itemMetaMap.addItemFlags(*itemFlags)
+            itemMetaMap.addItemFlags(*ItemUtil.itemFlags)
             itemMetaMap.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップ")
             itemMetaMap.lore = listOf("${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップアプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きます。")
             itemStackMap.itemMeta = itemMetaMap
@@ -130,7 +128,7 @@ class MainInventory {
             // 観戦モード切り替え
             val itemStackSpec = ItemStack(Item.SPEC_MODE.material, 1)
             val itemMetaSpec = (itemStackSpec.itemMeta as PotionMeta)
-            itemMetaSpec.addItemFlags(*itemFlags)
+            itemMetaSpec.addItemFlags(*ItemUtil.itemFlags)
             if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, p))
                 itemMetaSpec.addCustomEffect(PotionEffect(PotionEffectType.INVISIBILITY, 200, 1), true)
             itemMetaSpec.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}観戦モード切り替え")
@@ -144,7 +142,7 @@ class MainInventory {
             // Discord 連携
             val itemStackDiscordIntegration = ItemStack(Item.DISCORD_INTEGRATION.material, 1)
             val itemMetaDiscordIntegration = itemStackDiscordIntegration.itemMeta!!
-            itemMetaDiscordIntegration.addItemFlags(*itemFlags)
+            itemMetaDiscordIntegration.addItemFlags(*ItemUtil.itemFlags)
             if (DiscordManager.integrationMap.containsKey(p.uniqueId))
                 itemMetaDiscordIntegration.addEnchant(Enchantment.DURABILITY, 1, true)
             itemMetaDiscordIntegration.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}Discord連携")
@@ -161,15 +159,15 @@ class MainInventory {
             // ハンター抽選
             val itemStackHunter = ItemStack(Item.REQUEST_HUNTER.material, 1)
             val itemMetaHunter = itemStackHunter.itemMeta!!
-            itemMetaHunter.addItemFlags(*itemFlags)
-            if (Hunter.num > 0 && Main.hunterShuffleSet.contains(p.uniqueId))
+            itemMetaHunter.addItemFlags(*ItemUtil.itemFlags)
+            if (Team.isHunterRandom && Main.hunterShuffleSet.contains(p.uniqueId))
                 itemMetaHunter.addEnchant(Enchantment.DURABILITY, 1, true)
             itemMetaHunter.setDisplayName("${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}ハンター抽選に応募")
             itemMetaHunter.lore = listOf(
                     "${ChatColor.YELLOW}クリックして${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}ハンター抽選${ChatColor.RESET}${ChatColor.YELLOW}を切り替えます。",
                     "${ChatColor.GRAY}この機能は${ChatColor.BOLD}${ChatColor.UNDERLINE}ハンター抽選が実行${ChatColor.RESET}${ChatColor.GRAY}されている場合のみ使用可能です。",
                     "",
-                    "${ChatColor.UNDERLINE}${if (Hunter.num > 0) if (Main.hunterShuffleSet.contains(p.uniqueId)) "${ChatColor.GOLD}抽選に応募しています。" else "${ChatColor.YELLOW}抽選に応募していません。" else "${ChatColor.RED}現在使用できません。"}"
+                    "${ChatColor.UNDERLINE}${if (Team.isHunterRandom) if (Main.hunterShuffleSet.contains(p.uniqueId)) "${ChatColor.GOLD}抽選に応募しています。" else "${ChatColor.YELLOW}抽選に応募していません。" else "${ChatColor.RED}現在使用できません。"}"
             )
             itemStackHunter.itemMeta = itemMetaHunter
             inv.setItem(Item.REQUEST_HUNTER.index, itemStackHunter)
@@ -177,15 +175,15 @@ class MainInventory {
             // 通報部隊抽選
             val itemStackTuho = ItemStack(Item.REQUEST_TUHO.material, 1)
             val itemMetaTuho = itemStackTuho.itemMeta!!
-            itemMetaTuho.addItemFlags(*itemFlags)
-            if (Tuho.num > 0 && Main.tuhoShuffleSet.contains(p.uniqueId))
+            itemMetaTuho.addItemFlags(*ItemUtil.itemFlags)
+            if (Team.isTuhoRandom && Main.tuhoShuffleSet.contains(p.uniqueId))
                 itemMetaTuho.addEnchant(Enchantment.DURABILITY, 1, true)
             itemMetaTuho.setDisplayName("${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}通報部隊抽選に応募")
             itemMetaTuho.lore = listOf(
                     "${ChatColor.YELLOW}クリックして${ChatColor.AQUA}${ChatColor.BOLD}${ChatColor.UNDERLINE}通報部隊抽選${ChatColor.RESET}${ChatColor.YELLOW}を切り替えます。",
                     "${ChatColor.GRAY}この機能は${ChatColor.BOLD}${ChatColor.UNDERLINE}通報部隊抽選が実行${ChatColor.RESET}${ChatColor.GRAY}されている場合のみ使用可能です。",
                     "",
-                    "${ChatColor.UNDERLINE}${if (Tuho.num > 0) if (Main.tuhoShuffleSet.contains(p.uniqueId)) "${ChatColor.GOLD}抽選に応募しています。" else "${ChatColor.YELLOW}抽選に応募していません。" else "${ChatColor.RED}現在使用できません。"}"
+                    "${ChatColor.UNDERLINE}${if (Team.isTuhoRandom) if (Main.tuhoShuffleSet.contains(p.uniqueId)) "${ChatColor.GOLD}抽選に応募しています。" else "${ChatColor.YELLOW}抽選に応募していません。" else "${ChatColor.RED}現在使用できません。"}"
             )
             itemStackTuho.itemMeta = itemMetaTuho
             inv.setItem(Item.REQUEST_TUHO.index, itemStackTuho)
@@ -193,7 +191,7 @@ class MainInventory {
             val difficultyEasyConfig = worldConfig.getDifficultyConfig(WorldManager.Difficulty.EASY)
             val itemStackDifficultyEasy = ItemStack(Item.DIFFICULTY_EASY.material, 1)
             val itemMetaDifficultyEasy = itemStackDifficultyEasy.itemMeta!!
-            itemMetaDifficultyEasy.addItemFlags(*itemFlags)
+            itemMetaDifficultyEasy.addItemFlags(*ItemUtil.itemFlags)
             if (DifficultyManager.isDifficulty(p) && DifficultyManager.getDifficulty(p) == WorldManager.Difficulty.EASY)
                 itemMetaDifficultyEasy.addEnchant(Enchantment.DURABILITY, 1, true)
             itemMetaDifficultyEasy.setDisplayName("${ChatColor.GREEN}${ChatColor.BOLD}${ChatColor.UNDERLINE}${ChatColor.stripColor(WorldManager.Difficulty.EASY.displayName)}")
@@ -224,7 +222,7 @@ class MainInventory {
             val difficultyNormalConfig = worldConfig.getDifficultyConfig(WorldManager.Difficulty.NORMAL)
             val itemStackDifficultyNormal = ItemStack(Item.DIFFICULTY_NORMAL.material, 1)
             val itemMetaDifficultyNormal = itemStackDifficultyNormal.itemMeta!!
-            itemMetaDifficultyNormal.addItemFlags(*itemFlags)
+            itemMetaDifficultyNormal.addItemFlags(*ItemUtil.itemFlags)
             if (DifficultyManager.isDifficulty(p) && DifficultyManager.getDifficulty(p) == WorldManager.Difficulty.NORMAL)
                 itemMetaDifficultyNormal.addEnchant(Enchantment.DURABILITY, 1, true)
             itemMetaDifficultyNormal.setDisplayName("${ChatColor.YELLOW}${ChatColor.BOLD}${ChatColor.UNDERLINE}${ChatColor.stripColor(WorldManager.Difficulty.NORMAL.displayName)}")
@@ -255,7 +253,7 @@ class MainInventory {
             val difficultyHardConfig = worldConfig.getDifficultyConfig(WorldManager.Difficulty.HARD)
             val itemStackDifficultyHard = ItemStack(Item.DIFFICULTY_HARD.material, 1)
             val itemMetaDifficultyHard = itemStackDifficultyHard.itemMeta!!
-            itemMetaDifficultyHard.addItemFlags(*itemFlags)
+            itemMetaDifficultyHard.addItemFlags(*ItemUtil.itemFlags)
             if (DifficultyManager.isDifficulty(p) && DifficultyManager.getDifficulty(p) == WorldManager.Difficulty.HARD)
                 itemMetaDifficultyHard.addEnchant(Enchantment.DURABILITY, 1, true)
             itemMetaDifficultyHard.setDisplayName("${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${ChatColor.stripColor(WorldManager.Difficulty.HARD.displayName)}")
@@ -286,7 +284,7 @@ class MainInventory {
             val difficultyHardCoreConfig = worldConfig.getDifficultyConfig(WorldManager.Difficulty.HARDCORE)
             val itemStackDifficultyHardCore = ItemStack(Item.DIFFICULTY_HARDCORE.material, 1)
             val itemMetaDifficultyHardCore = itemStackDifficultyHardCore.itemMeta!!
-            itemMetaDifficultyHardCore.addItemFlags(*itemFlags)
+            itemMetaDifficultyHardCore.addItemFlags(*ItemUtil.itemFlags)
             if (DifficultyManager.isDifficulty(p) && DifficultyManager.getDifficulty(p) == WorldManager.Difficulty.HARDCORE)
                 itemMetaDifficultyHardCore.addEnchant(Enchantment.DURABILITY, 1, true)
             itemMetaDifficultyHardCore.setDisplayName("${ChatColor.DARK_RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${ChatColor.stripColor(WorldManager.Difficulty.HARDCORE.displayName)}")
@@ -330,8 +328,8 @@ class MainInventory {
         DISCORD_INTEGRATION(7, 3, if (GameManager.isGame()) Material.BLUE_WOOL else Material.GRAY_WOOL),
         ADVANCEMENT(9, 3, Material.CHEST),
 
-        REQUEST_HUNTER(1, 5, if (Hunter.num > 0) Material.DIAMOND_SWORD else Material.STONE_SWORD),
-        REQUEST_TUHO(2, 5, if (Tuho.num > 0) Material.GOLDEN_SWORD else Material.STONE_SWORD),
+        REQUEST_HUNTER(1, 5, if (Team.isHunterRandom) Material.DIAMOND_SWORD else Material.STONE_SWORD),
+        REQUEST_TUHO(2, 5, if (Team.isTuhoRandom) Material.GOLDEN_SWORD else Material.STONE_SWORD),
         DIFFICULTY_EASY(6, 5, Material.LIME_CONCRETE),
         DIFFICULTY_NORMAL(7, 5, Material.YELLOW_CONCRETE),
         DIFFICULTY_HARD(8, 5, Material.RED_CONCRETE),

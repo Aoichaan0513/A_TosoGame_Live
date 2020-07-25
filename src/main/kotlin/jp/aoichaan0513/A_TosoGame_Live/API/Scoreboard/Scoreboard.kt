@@ -18,6 +18,7 @@ import java.util.*
 
 class Scoreboard {
     companion object {
+
         val boardMap = mutableMapOf<UUID, Scoreboard>()
 
         fun setBoard(p: Player): Scoreboard {

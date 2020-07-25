@@ -3,6 +3,7 @@ package jp.aoichaan0513.A_TosoGame_Live.Mission
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
+import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
 import org.apache.commons.lang.RandomStringUtils
@@ -52,6 +53,15 @@ class HunterZone {
 
             timer = null
             hunterZoneRunnable = null
+
+            val worldConfig = Main.worldConfig
+            MainAPI.getOnlinePlayers(joinedPlayerSet).forEach {
+                it.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 20 * 15, 1, false, false))
+                TosoGameAPI.teleport(it, worldConfig.respawnLocationConfig.locations.values)
+
+                TosoGameAPI.hidePlayer(it)
+            }
+            joinedPlayerSet.clear()
         }
 
         fun resetMission() {
@@ -111,6 +121,7 @@ class HunterZone {
         }
 
         private class HunterZoneRunnable(private val initialMissionTime: Int) : BukkitRunnable() {
+
             var missionTime: Int
                 private set
 
@@ -133,7 +144,6 @@ class HunterZone {
                         }
                     }
                     MissionManager.endMission(MissionManager.MissionState.HUNTER_ZONE)
-                    endMission()
                 } else if (missionTime == 60) {
                     Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ハンターゾーンミッション終了まで残り${TimeFormat.formatMin(missionTime)}分")
                 }

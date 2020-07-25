@@ -1,11 +1,9 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard
 
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
-import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.PlayerUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.scoreboard.Team
 
@@ -249,30 +247,7 @@ class Teams {
                 setTeamOption(it)
             }
 
-            for (player in Bukkit.getOnlinePlayers()) {
-                val board = Scoreboard.getBoard(player)
-                if (GameManager.isGame() && (hasJoinedTeam(OnlineTeam.TOSO_PLAYER, player) || hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, player))) {
-                    if (player.inventory.itemInMainHand.type == Material.BOOK) {
-                        val itemMeta = player.inventory.itemInMainHand.itemMeta
-
-                        if (itemMeta != null && ChatColor.stripColor(itemMeta.displayName) == Main.PHONE_ITEM_NAME)
-                            board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                        else
-                            board.clearSlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                    } else if (player.inventory.itemInOffHand.type == Material.BOOK) {
-                        val itemMeta = player.inventory.itemInOffHand.itemMeta
-
-                        if (itemMeta != null && ChatColor.stripColor(itemMeta.displayName) == Main.PHONE_ITEM_NAME)
-                            board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                        else
-                            board.clearSlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                    } else {
-                        board.clearSlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                    }
-                } else {
-                    board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                }
-            }
+            PlayerUtil.setSidebar()
             return
         }
 
@@ -284,30 +259,7 @@ class Teams {
             for (board in Scoreboard.boardMap.values)
                 team.getTeam(board).removeEntry(p.name)
 
-            for (player in Bukkit.getOnlinePlayers()) {
-                val board = Scoreboard.getBoard(player)
-                if (GameManager.isGame() && (hasJoinedTeam(OnlineTeam.TOSO_PLAYER, player) || hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, player))) {
-                    if (player.inventory.itemInMainHand.type == Material.BOOK) {
-                        val itemMeta = player.inventory.itemInMainHand.itemMeta
-
-                        if (itemMeta != null && ChatColor.stripColor(itemMeta.displayName) == Main.PHONE_ITEM_NAME)
-                            board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                        else
-                            board.clearSlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                    } else if (player.inventory.itemInOffHand.type == Material.BOOK) {
-                        val itemMeta = player.inventory.itemInOffHand.itemMeta
-
-                        if (itemMeta != null && ChatColor.stripColor(itemMeta.displayName) == Main.PHONE_ITEM_NAME)
-                            board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                        else
-                            board.clearSlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                    } else {
-                        board.clearSlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                    }
-                } else {
-                    board.getObjective(TosoGameAPI.Objective.SIDEBAR.objectName)?.setDisplaySlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR)
-                }
-            }
+            PlayerUtil.setSidebar()
             return
         }
 
@@ -329,6 +281,9 @@ class Teams {
                 team.setCanSeeFriendlyInvisibles(true)
                 team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER)
                 team.setOption(Team.Option.NAME_TAG_VISIBILITY, if (team.displayName.equals(OnlineTeam.TOSO_ADMIN.name, true) || team.displayName.equals(OnlineTeam.TOSO_JAIL.name, true)) Team.OptionStatus.ALWAYS else Team.OptionStatus.NEVER)
+
+                for (entry in Bukkit.getScoreboardManager()!!.mainScoreboard.getTeam(team.name)?.entries ?: continue)
+                    team.addEntry(entry)
             }
         }
 

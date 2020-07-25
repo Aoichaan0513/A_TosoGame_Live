@@ -4,6 +4,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.ErrorMessage
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
 import org.bukkit.Bukkit
@@ -80,7 +81,7 @@ class BroadCaster(name: String) : ICommand(name) {
             return
         } else if (label.equals("lhide", true)) {
             if (TosoGameAPI.isBroadCaster(sp)) {
-                TosoGameAPI.addHidePlayer(sp)
+                VisibilityManager.add(sp, VisibilityManager.VisibilityType.LIVE)
                 sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}あなたを非表示にしました。")
                 return
             }
@@ -88,7 +89,7 @@ class BroadCaster(name: String) : ICommand(name) {
             return
         } else if (label.equals("lshow", true)) {
             if (TosoGameAPI.isBroadCaster(sp)) {
-                TosoGameAPI.removeHidePlayer(sp)
+                VisibilityManager.remove(sp, VisibilityManager.VisibilityType.LIVE)
                 sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}あなたを表示しました。")
                 return
             }

@@ -16,19 +16,20 @@ import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
 
 class H(name: String) : ICommand(name) {
+
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
-        if (Hunter.num > 0) {
+        if (Team.isHunterRandom) {
             if (GameManager.isGame(GameState.GAME)) {
                 if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, sp)) {
                     if (!Main.hunterShuffleSet.contains(sp.uniqueId)) Main.hunterShuffleSet.add(sp.uniqueId) else Main.hunterShuffleSet.remove(sp.uniqueId)
-                    sp.sendMessage(MainAPI.getPrefix(PrefixType.WARNING) + ChatColor.UNDERLINE + "ハンター募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (if (Main.hunterShuffleSet.contains(sp.uniqueId)) "に応募" else "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。")
+                    sp.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}${ChatColor.UNDERLINE}ハンター募集${ChatColor.GOLD}${ChatColor.UNDERLINE}${if (Main.hunterShuffleSet.contains(sp.uniqueId)) "に応募" else "の応募をキャンセル"}${ChatColor.RESET}${ChatColor.YELLOW}しました。")
                     return
                 }
                 MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS_TEAM_JAIL)
                 return
             } else {
                 if (!Main.hunterShuffleSet.contains(sp.uniqueId)) Main.hunterShuffleSet.add(sp.uniqueId) else Main.hunterShuffleSet.remove(sp.uniqueId)
-                sp.sendMessage(MainAPI.getPrefix(PrefixType.WARNING) + ChatColor.UNDERLINE + "ハンター募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (if (Main.hunterShuffleSet.contains(sp.uniqueId)) "に応募" else "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。")
+                sp.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}${ChatColor.UNDERLINE}ハンター募集${ChatColor.GOLD}${ChatColor.UNDERLINE}${if (Main.hunterShuffleSet.contains(sp.uniqueId)) "に応募" else "の応募をキャンセル"}${ChatColor.RESET}${ChatColor.YELLOW}しました。")
                 return
             }
         }

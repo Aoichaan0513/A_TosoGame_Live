@@ -20,8 +20,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Map.MapUtility
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
-import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Hunter
-import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Tuho
+import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Team
 import jp.aoichaan0513.A_TosoGame_Live.Inventory.*
 import jp.aoichaan0513.A_TosoGame_Live.Inventory.MapInventory.ActionType
 import jp.aoichaan0513.A_TosoGame_Live.Main
@@ -181,7 +180,7 @@ class onInventoryGui : Listener {
                 p.openInventory(MainInventory.getInventory(p))
             }
             MainInventory.Item.REQUEST_HUNTER -> {
-                if (Hunter.num > 0) {
+                if (Team.isHunterRandom) {
                     if (!Main.hunterShuffleSet.contains(p.uniqueId)) Main.hunterShuffleSet.add(p.uniqueId) else Main.hunterShuffleSet.remove(p.uniqueId)
                     p.openInventory(MainInventory.getInventory(p))
                     p.sendMessage(MainAPI.getPrefix(PrefixType.WARNING) + ChatColor.UNDERLINE + "ハンター募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (if (Main.hunterShuffleSet.contains(p.uniqueId)) "に応募" else "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。")
@@ -190,7 +189,7 @@ class onInventoryGui : Listener {
                 p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ハンターを募集していないため実行できません。")
             }
             MainInventory.Item.REQUEST_TUHO -> {
-                if (Tuho.num > 0) {
+                if (Team.isTuhoRandom) {
                     if (!Main.tuhoShuffleSet.contains(p.uniqueId)) Main.tuhoShuffleSet.add(p.uniqueId) else Main.tuhoShuffleSet.remove(p.uniqueId)
                     p.openInventory(MainInventory.getInventory(p))
                     p.sendMessage(MainAPI.getPrefix(PrefixType.WARNING) + ChatColor.UNDERLINE + "通報部隊募集" + ChatColor.GOLD + ChatColor.UNDERLINE + (if (Main.tuhoShuffleSet.contains(p.uniqueId)) "に応募" else "の応募をキャンセル") + ChatColor.RESET + ChatColor.YELLOW + "しました。")
@@ -333,6 +332,54 @@ class onInventoryGui : Listener {
                             p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}Discordと連携していないプレイヤーに発信することはできません。")
                             return
                         }
+                    }
+                }
+            }
+            Material.WHITE_STAINED_GLASS_PANE -> {
+                val itemMeta = itemStack.itemMeta
+                if (itemMeta == null || !itemMeta.displayName.equals("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム")) return
+                p.openInventory(MainInventory.getInventory(p))
+                ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
+            }
+        }
+    }
+
+    @EventHandler
+    fun onResultInventoryClick(e: InventoryClickEvent) {
+        val p = e.whoClicked as Player
+        val inventory = e.inventory
+        val inventoryView = e.view
+        val itemStack = e.currentItem
+        val slot = e.slot
+
+        if (inventory.type != InventoryType.CHEST || !inventoryView.title.startsWith(ResultInventory.title)) return
+
+        e.isCancelled = true
+        if (itemStack == null || itemStack.type == Material.AIR) return
+
+        val resultType = if (inventoryView.title.startsWith(ResultInventory.rewardTitle))
+            ResultInventory.ResultType.REWARD
+        else
+            ResultInventory.ResultType.ENSURE
+
+        when (itemStack.type) {
+            Material.PLAYER_HEAD -> {
+                val itemMetaPlayerHead = itemStack.itemMeta as SkullMeta
+
+                val currentPageCount = (inventoryView.title.substring(
+                        if (inventoryView.title.startsWith(ResultInventory.rewardTitle))
+                            ResultInventory.rewardTitle.length
+                        else
+                            ResultInventory.ensureTitle.length
+                ).toIntOrNull() ?: 1) - 1
+
+                when (itemMetaPlayerHead.owningPlayer?.name) {
+                    ResultInventory.arrowLeft -> {
+                        if (currentPageCount < 1) return
+                        p.openInventory(ResultInventory.getInventory(p, resultType, currentPageCount - 1))
+                    }
+                    ResultInventory.arrowRight -> {
+                        p.openInventory(ResultInventory.getInventory(p, resultType, currentPageCount + 1))
                     }
                 }
             }
@@ -953,6 +1000,7 @@ class onInventoryGui : Listener {
             }
         }
     }
+
 
     private fun runAction(p: Player, worldConfig: WorldConfig, difficultyConfig: DifficultyConfig, difficultyName: String, inventoryTitle: String) {
         if (ActionType.RATE.displayName.equals(inventoryTitle, true)) {

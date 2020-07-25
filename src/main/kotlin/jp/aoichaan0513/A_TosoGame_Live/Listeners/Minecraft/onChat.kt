@@ -3,6 +3,7 @@ package jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
@@ -96,7 +97,7 @@ class onChat : Listener {
     }
 
     private fun sendMessage(chatType: ChatType, sp: Player, p: Player, msg: String) {
-        val basePrefix = "${(if (TosoGameAPI.isBroadCaster(sp)) "${ChatColor.GOLD}${ChatColor.BOLD} * ${ChatColor.RESET}" else "")}${Teams.getTeamLabel(Teams.DisplaySlot.CHAT, sp)}${ChatColor.RESET}${(if (!MainAPI.isHidePlayer(p)) " ${sp.displayName}" else "")}${ChatColor.GREEN}: ${ChatColor.RESET}"
+        val basePrefix = "${(if (TosoGameAPI.isBroadCaster(sp)) "${ChatColor.GOLD}${ChatColor.BOLD} * ${ChatColor.RESET}" else "")}${Teams.getTeamLabel(Teams.DisplaySlot.CHAT, sp)}${ChatColor.RESET}${(if (!VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) " ${sp.displayName}" else "")}${ChatColor.GREEN}: ${ChatColor.RESET}"
         val globalMessagePrefix = "${ChatType.GLOBAL.prefix}$basePrefix"
         val rangeMessagePrefix = "${ChatType.RANGE.prefix}$basePrefix"
         val teamMessagePrefix = "${ChatType.TEAM.prefix}$basePrefix"

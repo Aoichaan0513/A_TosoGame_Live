@@ -5,12 +5,12 @@ import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerConfig
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
+import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 
 class PlayerSettingsInventory {
@@ -20,8 +20,6 @@ class PlayerSettingsInventory {
         val inventoryTitle = "${ChatColor.DARK_GRAY}> ${ChatColor.BOLD}設定${ChatColor.RESET}${ChatColor.DARK_GRAY} > ${ChatColor.BOLD}インベントリ${ChatColor.RESET}${ChatColor.DARK_GRAY}"
         val itemSelectTitle = "${ChatColor.DARK_GRAY}> ${ChatColor.BOLD}インベントリ${ChatColor.RESET}${ChatColor.DARK_GRAY} > ${ChatColor.BOLD}アイテムを選択"
 
-        private val itemFlags = arrayOf(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS)
-
 
         fun getInventory(p: Player): Inventory {
             val inv = Bukkit.createInventory(null, 9 * 3, title)
@@ -30,7 +28,7 @@ class PlayerSettingsInventory {
 
             val itemStackBorder = ItemStack(Material.BLACK_STAINED_GLASS_PANE)
             val itemMetaBorder = itemStackBorder.itemMeta!!
-            itemMetaBorder.addItemFlags(*itemFlags)
+            itemMetaBorder.addItemFlags(*ItemUtil.itemFlags)
             itemMetaBorder.setDisplayName("${ChatColor.BOLD}")
             itemStackBorder.itemMeta = itemMetaBorder
             for (i in 0..8)
@@ -40,7 +38,7 @@ class PlayerSettingsInventory {
 
             val itemStackHome = ItemStack(Item.HOME.material)
             val itemMetaHome = itemStackHome.itemMeta!!
-            itemMetaHome.addItemFlags(*itemFlags)
+            itemMetaHome.addItemFlags(*ItemUtil.itemFlags)
             itemMetaHome.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム")
             itemMetaHome.lore = listOf("${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示します。")
             itemStackHome.itemMeta = itemMetaHome
@@ -48,7 +46,7 @@ class PlayerSettingsInventory {
 
             val itemStackInventory = ItemStack(Item.INVENTORY_SETTINGS.material, 1)
             val itemMetaInventory = itemStackInventory.itemMeta!!
-            itemMetaInventory.addItemFlags(*itemFlags)
+            itemMetaInventory.addItemFlags(*ItemUtil.itemFlags)
             itemMetaInventory.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}インベントリ設定")
             itemMetaInventory.lore = listOf("${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}インベントリ設定${ChatColor.RESET}${ChatColor.YELLOW}を開きます。")
             itemStackInventory.itemMeta = itemMetaInventory
@@ -66,7 +64,7 @@ class PlayerSettingsInventory {
 
             val itemStackBookForeground = ItemStack(Item.BOOK_FOREGROUND.material, 1)
             val itemMetaBookForeground = itemStackBookForeground.itemMeta!!
-            itemMetaBookForeground.addItemFlags(*itemFlags)
+            itemMetaBookForeground.addItemFlags(*ItemUtil.itemFlags)
             itemMetaBookForeground.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}本の文字色設定")
             itemMetaBookForeground.lore = listOf(
                     "${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}本の文字色${ChatColor.RESET}${ChatColor.YELLOW}を${color1.color}${ChatColor.BOLD}${ChatColor.UNDERLINE}${name1}${ChatColor.RESET}${ChatColor.YELLOW}に変更します。",
@@ -84,7 +82,7 @@ class PlayerSettingsInventory {
 
             val itemStackBlackBorder = ItemStack(Material.BLACK_STAINED_GLASS_PANE)
             val itemMetaBlackBorder = itemStackBlackBorder.itemMeta!!
-            itemMetaBlackBorder.addItemFlags(*itemFlags)
+            itemMetaBlackBorder.addItemFlags(*ItemUtil.itemFlags)
             itemMetaBlackBorder.setDisplayName("${ChatColor.BOLD}")
             itemStackBlackBorder.itemMeta = itemMetaBlackBorder
             for (i in 0..8)
@@ -94,7 +92,7 @@ class PlayerSettingsInventory {
 
             val itemStackGrayBorder = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
             val itemMetaGrayBorder = itemStackGrayBorder.itemMeta!!
-            itemMetaGrayBorder.addItemFlags(*itemFlags)
+            itemMetaGrayBorder.addItemFlags(*ItemUtil.itemFlags)
             itemMetaGrayBorder.setDisplayName("${ChatColor.BOLD}")
             itemStackGrayBorder.itemMeta = itemMetaGrayBorder
             for (i in 18..35)
@@ -102,7 +100,7 @@ class PlayerSettingsInventory {
 
             val itemStackHome = ItemStack(Item.HOME.material)
             val itemMetaHome = itemStackHome.itemMeta!!
-            itemMetaHome.addItemFlags(*itemFlags)
+            itemMetaHome.addItemFlags(*ItemUtil.itemFlags)
             itemMetaHome.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム")
             itemMetaHome.lore = listOf("${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示します。")
             itemStackHome.itemMeta = itemMetaHome
@@ -110,7 +108,7 @@ class PlayerSettingsInventory {
 
             val itemStackPaper = ItemStack(Material.PAPER)
             val itemMetaPaper = itemStackPaper.itemMeta!!
-            itemMetaPaper.addItemFlags(*itemFlags)
+            itemMetaPaper.addItemFlags(*ItemUtil.itemFlags)
             itemMetaPaper.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}未設定")
             itemMetaPaper.lore = listOf("${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}このスロットに配置するアイテム${ChatColor.RESET}${ChatColor.YELLOW}を変更します。")
 
@@ -131,7 +129,7 @@ class PlayerSettingsInventory {
                 if (slot == -1) continue
                 val itemStack = ItemStack(itemType.material)
                 val itemMeta = itemStack.itemMeta!!
-                itemMeta.addItemFlags(*itemFlags)
+                itemMeta.addItemFlags(*ItemUtil.itemFlags)
                 itemMeta.lore = listOf("${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}このスロットに配置するアイテム${ChatColor.RESET}${ChatColor.YELLOW}を変更します。")
                 itemMeta.setCustomModelData(slot)
                 itemStack.itemMeta = itemMeta
@@ -147,7 +145,7 @@ class PlayerSettingsInventory {
 
             val itemStackBlackBorder = ItemStack(Material.BLACK_STAINED_GLASS_PANE)
             val itemMetaBlackBorder = itemStackBlackBorder.itemMeta!!
-            itemMetaBlackBorder.addItemFlags(*itemFlags)
+            itemMetaBlackBorder.addItemFlags(*ItemUtil.itemFlags)
             itemMetaBlackBorder.setDisplayName("${ChatColor.BOLD}")
             itemStackBlackBorder.itemMeta = itemMetaBlackBorder
             for (i in 0..8)
@@ -158,7 +156,7 @@ class PlayerSettingsInventory {
 
             val itemStackGrayBorder = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
             val itemMetaGrayBorder = itemStackGrayBorder.itemMeta!!
-            itemMetaGrayBorder.addItemFlags(*itemFlags)
+            itemMetaGrayBorder.addItemFlags(*ItemUtil.itemFlags)
             itemMetaGrayBorder.setDisplayName("${ChatColor.BOLD}")
             itemStackGrayBorder.itemMeta = itemMetaGrayBorder
             for (i in 18..35)
@@ -166,7 +164,7 @@ class PlayerSettingsInventory {
 
             val itemStackHome = ItemStack(Item.HOME.material)
             val itemMetaHome = itemStackHome.itemMeta!!
-            itemMetaHome.addItemFlags(*itemFlags)
+            itemMetaHome.addItemFlags(*ItemUtil.itemFlags)
             itemMetaHome.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム")
             itemMetaHome.lore = listOf("${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示します。")
             itemStackHome.itemMeta = itemMetaHome
@@ -174,7 +172,7 @@ class PlayerSettingsInventory {
 
             val itemStackCancel = ItemStack(Material.BARRIER)
             val itemMetaCancel = itemStackCancel.itemMeta!!
-            itemMetaCancel.addItemFlags(*itemFlags)
+            itemMetaCancel.addItemFlags(*ItemUtil.itemFlags)
             itemMetaCancel.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}キャンセル")
             itemMetaCancel.lore = listOf("${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}設定をキャンセル${ChatColor.RESET}${ChatColor.YELLOW}します。")
             itemStackCancel.itemMeta = itemMetaCancel
@@ -183,7 +181,7 @@ class PlayerSettingsInventory {
             for (itemType in ItemType.values()) {
                 val itemStack = ItemStack(itemType.material)
                 val itemMeta = itemStack.itemMeta!!
-                itemMeta.addItemFlags(*itemFlags)
+                itemMeta.addItemFlags(*ItemUtil.itemFlags)
                 itemMeta.lore = listOf(
                         "${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}このスロットに配置するアイテムを設定${ChatColor.RESET}${ChatColor.YELLOW}します。",
                         "${ChatColor.GRAY}このスロットにすでに配置されているアイテムがある場合は設定できません。"

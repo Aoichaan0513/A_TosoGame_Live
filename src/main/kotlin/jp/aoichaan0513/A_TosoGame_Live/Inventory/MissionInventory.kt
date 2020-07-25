@@ -3,13 +3,13 @@ package jp.aoichaan0513.A_TosoGame_Live.Inventory
 import jp.aoichaan0513.A_TosoGame_Live.API.Interfaces.IMission
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
+import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.BookMeta
 
@@ -20,7 +20,6 @@ class MissionInventory {
         val tutatuHintTitle = "${ChatColor.DARK_GRAY}> ${ChatColor.BOLD}ホーム${ChatColor.RESET}${ChatColor.DARK_GRAY} > ${ChatColor.BOLD}ミッションアプリ (通達・ヒント)"
         val endTitle = "${ChatColor.DARK_GRAY}> ${ChatColor.BOLD}ホーム${ChatColor.RESET}${ChatColor.DARK_GRAY} > ${ChatColor.BOLD}ミッションアプリ (終了)"
 
-        private val itemFlags = arrayOf(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS)
 
         fun getInventory(type: MissionManager.MissionType): Inventory {
             val inv = when (type) {
@@ -31,7 +30,7 @@ class MissionInventory {
 
             val itemStackBorder = ItemStack(Material.BLACK_STAINED_GLASS_PANE)
             val itemMetaBorder = itemStackBorder.itemMeta!!
-            itemMetaBorder.addItemFlags(*itemFlags)
+            itemMetaBorder.addItemFlags(*ItemUtil.itemFlags)
             itemMetaBorder.setDisplayName("${ChatColor.BOLD}")
             itemStackBorder.itemMeta = itemMetaBorder
             for (i in 9..17)
@@ -42,7 +41,7 @@ class MissionInventory {
 
             val itemStackHome = ItemStack(Material.WHITE_STAINED_GLASS_PANE)
             val itemMetaHome = itemStackHome.itemMeta!!
-            itemMetaHome.addItemFlags(*itemFlags)
+            itemMetaHome.addItemFlags(*ItemUtil.itemFlags)
             itemMetaHome.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム")
             itemMetaHome.lore = listOf("${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示します。")
             itemStackHome.itemMeta = itemMetaHome
@@ -50,7 +49,7 @@ class MissionInventory {
 
             val itemStackMission = ItemStack(Material.RED_CONCRETE)
             val itemMetaMission = itemStackMission.itemMeta!!
-            itemMetaMission.addItemFlags(*itemFlags)
+            itemMetaMission.addItemFlags(*ItemUtil.itemFlags)
             if (type == MissionManager.MissionType.MISSION)
                 itemMetaMission.addEnchant(Enchantment.DURABILITY, 1, true)
             itemMetaMission.setDisplayName("${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}ミッション")
@@ -61,7 +60,7 @@ class MissionInventory {
 
             val itemStackTutatuHint = ItemStack(Material.YELLOW_CONCRETE)
             val itemMetaTutatuHint = itemStackTutatuHint.itemMeta!!
-            itemMetaTutatuHint.addItemFlags(*itemFlags)
+            itemMetaTutatuHint.addItemFlags(*ItemUtil.itemFlags)
             if (type == MissionManager.MissionType.TUTATU_HINT)
                 itemMetaTutatuHint.addEnchant(Enchantment.DURABILITY, 1, true)
             itemMetaTutatuHint.setDisplayName("${ChatColor.YELLOW}${ChatColor.BOLD}${ChatColor.UNDERLINE}通達・ヒント")
@@ -72,7 +71,7 @@ class MissionInventory {
 
             val itemStackEnd = ItemStack(Material.LIME_CONCRETE)
             val itemMetaEnd = itemStackEnd.itemMeta!!
-            itemMetaEnd.addItemFlags(*itemFlags)
+            itemMetaEnd.addItemFlags(*ItemUtil.itemFlags)
             if (type == MissionManager.MissionType.END)
                 itemMetaEnd.addEnchant(Enchantment.DURABILITY, 1, true)
             itemMetaEnd.setDisplayName("${ChatColor.GREEN}${ChatColor.BOLD}${ChatColor.UNDERLINE}終了したミッション")
@@ -86,7 +85,7 @@ class MissionInventory {
 
                 val itemStackMissionDetail = ItemStack(mission.material, mission.id)
                 val itemMetaMissionDetail = itemStackMissionDetail.itemMeta!!
-                itemMetaMissionDetail.addItemFlags(*itemFlags)
+                itemMetaMissionDetail.addItemFlags(*ItemUtil.itemFlags)
                 itemMetaMissionDetail.setCustomModelData(mission.id)
 
                 itemMetaMissionDetail.setDisplayName(when (type) {

@@ -20,51 +20,13 @@ class MainAPI {
     companion object {
 
         fun makePositive(i: Int): Int {
-            return Math.max(i, 0)
+            return i.coerceAtLeast(0)
         }
 
         fun getOnlinePlayers(collection: Collection<UUID>): Set<Player> {
             val set = mutableSetOf<Player>()
-            collection.filter { Bukkit.getPlayer(it) != null && Bukkit.getPlayer(it)!!.isOnline }.forEach { set.add(Bukkit.getPlayer(it)!!) }
+            collection.filter { Bukkit.getPlayer(it)?.isOnline ?: false }.forEach { set.add(Bukkit.getPlayer(it)!!) }
             return set
-        }
-
-        /**
-         * プレイヤー非表示関連
-         */
-        private val hidePlayerSet = mutableSetOf<UUID>()
-
-        fun hidePlayers(p: Player) {
-            for (player in getOnlinePlayers(hidePlayerSet))
-                p.hidePlayer(player)
-        }
-
-        fun getHidePlayerSet(): Set<UUID> {
-            return hidePlayerSet
-        }
-
-        fun isHidePlayer(p: Player): Boolean {
-            return hidePlayerSet.contains(p.uniqueId)
-        }
-
-        @JvmOverloads
-        fun addHidePlayer(p: Player, b: Boolean = true) {
-            hidePlayerSet.add(p.uniqueId)
-
-            if (!b) return
-            for (player in Bukkit.getOnlinePlayers())
-                hidePlayers(player)
-        }
-
-        @JvmOverloads
-        fun removeHidePlayer(p: Player, b: Boolean = true) {
-            hidePlayerSet.remove(p.uniqueId)
-
-            if (!b) return
-            for (player in Bukkit.getOnlinePlayers()) {
-                player.showPlayer(p)
-                hidePlayers(player)
-            }
         }
 
         /**
@@ -81,17 +43,20 @@ class MainAPI {
         /**
          * プレイヤー系
          */
-        fun isOnlinePlayer(p: Player?): Boolean {
+        fun isOnline(p: Player?): Boolean {
             return p != null && p.isOnline
         }
 
-        fun isOnlinePlayer(p: OfflinePlayer?): Boolean {
+        fun isOnline(p: OfflinePlayer?): Boolean {
             return p != null && p.isOnline
         }
 
-        fun isOnlinePlayer(name: String): Boolean {
-            val target = Bukkit.getPlayerExact(name)
-            return target != null && target.isOnline
+        fun isOnline(name: String): Boolean {
+            return isOnline(Bukkit.getPlayerExact(name))
+        }
+
+        fun isOnline(uuid: UUID): Boolean {
+            return isOnline(Bukkit.getPlayer(uuid))
         }
 
         fun isPlayed(p: Player): Boolean {
@@ -215,7 +180,7 @@ class MainAPI {
          * その他
          */
         fun <T> divide(origin: List<T>?, size: Int): List<List<T>> {
-            if (origin == null || origin.isEmpty() || size <= 0)
+            if (origin == null || origin.isEmpty() || size < 1)
                 return Collections.emptyList()
 
             val block = origin.size / size + if (origin.size % size > 0) 1 else 0
@@ -225,6 +190,26 @@ class MainAPI {
                         val end = (start + size).coerceAtMost(origin.size)
                         origin.subList(start, end)
                     }.toList()
+        }
+
+        fun <K, V> divide(map: Map<K, V>?, size: Int): List<List<Map<K, V>>> {
+            return if (map == null || map.isEmpty() || size < 1) {
+                emptyList()
+            } else {
+                val dividedList = mutableListOf<List<Map<K, V>>>()
+
+                divide(map.toList(), size).forEach {
+                    val list = mutableListOf<Map<K, V>>()
+                    it.forEach { list.add(mapOf(it)) }
+                    dividedList.add(list)
+                }
+
+                dividedList
+            }
+        }
+
+        fun <T> getValue(boolean: Boolean, v1: T, v2: T): T {
+            return if (boolean) v1 else v2
         }
     }
 

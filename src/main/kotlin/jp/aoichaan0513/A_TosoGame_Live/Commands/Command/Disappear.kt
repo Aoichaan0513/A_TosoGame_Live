@@ -1,9 +1,7 @@
 package jp.aoichaan0513.A_TosoGame_Live.Commands.Command
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
-import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.ErrorMessage
-import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.ActionBarManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
 import org.bukkit.Bukkit
@@ -19,112 +17,94 @@ class Disappear(name: String) : ICommand(name) {
         if (TosoGameAPI.isAdmin(sp)) {
             if (args.isNotEmpty()) {
                 for (name in args) {
-                    val target = Bukkit.getPlayerExact(name)
-                    if (target == null) {
-                        MainAPI.sendOfflineMessage(sp, name)
-                        continue
-                    } else {
-                        val p = Bukkit.getPlayerExact(name)!!
-                        if (!MainAPI.isHidePlayer(p)) {
-                            for (player in Bukkit.getOnlinePlayers())
-                                player.hidePlayer(p)
-                            MainAPI.addHidePlayer(p, true)
-                            sp.sendMessage(MainAPI.getPrefix(PrefixType.SUCCESS) + p.name + "の姿を非表示にしました。")
-                            ActionBarManager.sendActionBar(p, ChatColor.RED.toString() + "あなたの姿は非表示になっています。")
+                    val p = Bukkit.getPlayerExact(name)
+                    if (p != null) {
+                        if (!VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) {
+                            VisibilityManager.add(p, VisibilityManager.VisibilityType.ADMIN)
+                            sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}の姿を非表示にしました。")
                             continue
                         }
-                        sp.sendMessage(MainAPI.getPrefix(PrefixType.SECONDARY) + ChatColor.RED + ChatColor.UNDERLINE + p.name + ChatColor.RESET + ChatColor.GRAY + "はすでに姿が非表示になっています。")
+                        sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでに姿が非表示になっています。")
                         continue
                     }
+                    MainAPI.sendOfflineMessage(sp, name)
+                    continue
                 }
                 return
             } else {
-                if (!MainAPI.isHidePlayer(sp)) {
-                    for (player in Bukkit.getOnlinePlayers())
-                        player.hidePlayer(sp)
-                    MainAPI.addHidePlayer(sp, true)
-                    sp.sendMessage(MainAPI.getPrefix(PrefixType.SUCCESS) + ChatColor.GREEN + "あなたの姿を非表示にしました。")
-                    ActionBarManager.sendActionBar(sp, ChatColor.RED.toString() + "あなたの姿は非表示になっています。")
+                if (!VisibilityManager.isHide(sp, VisibilityManager.VisibilityType.ADMIN)) {
+                    VisibilityManager.add(sp, VisibilityManager.VisibilityType.ADMIN)
+                    sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}あなたの姿を非表示にしました。")
                     return
                 }
-                sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}すでに姿が非表示になっています。")
+                sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}すでに姿が非表示になっています。")
                 return
             }
         }
-        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
+        MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS)
         return
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
         if (args.isNotEmpty()) {
             for (name in args) {
-                val target = Bukkit.getPlayerExact(name)
-                if (target == null) {
-                    MainAPI.sendOfflineMessage(bs, name)
-                    continue
-                } else {
-                    val p = Bukkit.getPlayerExact(name)!!
-                    if (!MainAPI.isHidePlayer(p)) {
-                        for (player in Bukkit.getOnlinePlayers())
-                            player.hidePlayer(p)
-                        MainAPI.addHidePlayer(p, true)
-                        bs.sendMessage(MainAPI.getPrefix(PrefixType.SUCCESS) + p.name + "の姿を非表示にしました。")
-                        ActionBarManager.sendActionBar(p, ChatColor.RED.toString() + "あなたの姿は非表示になっています。")
+                val p = Bukkit.getPlayerExact(name)
+                if (p != null) {
+                    if (!VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) {
+                        VisibilityManager.add(p, VisibilityManager.VisibilityType.ADMIN)
+                        bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}の姿を非表示にしました。")
                         continue
                     }
-                    bs.sendMessage(MainAPI.getPrefix(PrefixType.SECONDARY) + ChatColor.RED + ChatColor.UNDERLINE + p.name + ChatColor.RESET + ChatColor.GRAY + "はすでに姿が非表示になっています。")
+                    bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでに姿が非表示になっています。")
                     continue
                 }
+                MainAPI.sendOfflineMessage(bs, name)
+                continue
             }
             return
         }
-        MainAPI.sendMessage(bs, ErrorMessage.ARGS_PLAYER)
+        MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_PLAYER)
         return
     }
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         if (args.isNotEmpty()) {
             for (name in args) {
-                val target = Bukkit.getPlayerExact(name)
-                if (target == null) {
-                    MainAPI.sendOfflineMessage(cs, name)
-                    continue
-                } else {
-                    val p = Bukkit.getPlayerExact(name)!!
-                    if (!MainAPI.isHidePlayer(p)) {
-                        for (player in Bukkit.getOnlinePlayers())
-                            player.hidePlayer(p)
-                        MainAPI.addHidePlayer(p, true)
-                        cs.sendMessage(MainAPI.getPrefix(PrefixType.SUCCESS) + p.name + "の姿を非表示にしました。")
-                        ActionBarManager.sendActionBar(p, ChatColor.RED.toString() + "あなたの姿は非表示になっています。")
+                val p = Bukkit.getPlayerExact(name)
+                if (p != null) {
+                    if (!VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) {
+                        VisibilityManager.add(p, VisibilityManager.VisibilityType.ADMIN)
+                        cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}の姿を非表示にしました。")
                         continue
                     }
-                    cs.sendMessage(MainAPI.getPrefix(PrefixType.SECONDARY) + ChatColor.RED + ChatColor.UNDERLINE + p.name + ChatColor.RESET + ChatColor.GRAY + "はすでに姿が非表示になっています。")
+                    cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでに姿が非表示になっています。")
                     continue
                 }
+                MainAPI.sendOfflineMessage(cs, name)
+                continue
             }
             return
         }
-        MainAPI.sendMessage(cs, ErrorMessage.ARGS_PLAYER)
+        MainAPI.sendMessage(cs, MainAPI.ErrorMessage.ARGS_PLAYER)
         return
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
         if (!TosoGameAPI.isAdmin(sp)) return null
         val set = mutableSetOf<String>()
-        Bukkit.getOnlinePlayers().filter { !MainAPI.isHidePlayer(it) }.forEach { set.add(it.name) }
+        Bukkit.getOnlinePlayers().filter { !VisibilityManager.isHide(it, VisibilityManager.VisibilityType.ADMIN) }.forEach { set.add(it.name) }
         return getTabList(args[args.size - 1], set)
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
         val set = mutableSetOf<String>()
-        Bukkit.getOnlinePlayers().filter { !MainAPI.isHidePlayer(it) }.forEach { set.add(it.name) }
+        Bukkit.getOnlinePlayers().filter { !VisibilityManager.isHide(it, VisibilityManager.VisibilityType.ADMIN) }.forEach { set.add(it.name) }
         return getTabList(args[args.size - 1], set)
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
         val set = mutableSetOf<String>()
-        Bukkit.getOnlinePlayers().filter { !MainAPI.isHidePlayer(it) }.forEach { set.add(it.name) }
+        Bukkit.getOnlinePlayers().filter { !VisibilityManager.isHide(it, VisibilityManager.VisibilityType.ADMIN) }.forEach { set.add(it.name) }
         return getTabList(args[args.size - 1], set)
     }
 }

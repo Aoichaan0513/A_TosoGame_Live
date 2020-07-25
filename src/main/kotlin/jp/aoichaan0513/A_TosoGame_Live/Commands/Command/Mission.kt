@@ -39,10 +39,10 @@ class Mission(name: String) : ICommand(name) {
                                     folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                             .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                                     sp.sendMessage("""
-                                            ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
-                                            ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
-                                            ${stringBuilder.toString().trim { it <= ' ' }}
-                                        """.trimIndent())
+                                        ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
+                                        ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
+                                        ${stringBuilder.toString().trim()}
+                                    """.trimIndent())
                                     return
                                 }
                             } else {
@@ -51,10 +51,10 @@ class Mission(name: String) : ICommand(name) {
                                 folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                         .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                                 sp.sendMessage("""
-                                        ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
-                                        ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
-                                        ${stringBuilder.toString().trim { it <= ' ' }}
-                                    """.trimIndent())
+                                    ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
+                                    ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
+                                    ${stringBuilder.toString().trim()}
+                                """.trimIndent())
                                 return
                             }
                         } else {
@@ -63,10 +63,10 @@ class Mission(name: String) : ICommand(name) {
                             folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                     .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                             sp.sendMessage("""
-                                    ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
-                                    ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
-                                    ${stringBuilder.toString().trim { it <= ' ' }}
-                                """.trimIndent())
+                                ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
+                                ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
+                                ${stringBuilder.toString().trim()}
+                            """.trimIndent())
                             return
                         }
                     } else if (args[0].equals("tutatu", true)) {
@@ -151,10 +151,10 @@ class Mission(name: String) : ICommand(name) {
                                 folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                         .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                                 bs.sendMessage("""
-                                        ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
-                                        ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
-                                        ${stringBuilder.toString().trim { it <= ' ' }}
-                                    """.trimIndent())
+                                    ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
+                                    ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
+                                    ${stringBuilder.toString().trim()}
+                                """.trimIndent())
                                 return
                             }
                         } else {
@@ -163,10 +163,10 @@ class Mission(name: String) : ICommand(name) {
                             folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                     .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                             bs.sendMessage("""
-                                    ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
-                                    ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
-                                    ${stringBuilder.toString().trim { it <= ' ' }}
-                                """.trimIndent())
+                                ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
+                                ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
+                                ${stringBuilder.toString().trim()}
+                            """.trimIndent())
                             return
                         }
                     } else {
@@ -175,10 +175,10 @@ class Mission(name: String) : ICommand(name) {
                         folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                 .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                         bs.sendMessage("""
-                                ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
-                                ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
-                                ${stringBuilder.toString().trim { it <= ' ' }}
-                            """.trimIndent())
+                            ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。そのようなファイルはありません。
+                            ${MainAPI.getPrefix(PrefixType.ERROR)}ミッションリスト:
+                            ${stringBuilder.toString().trim()}
+                        """.trimIndent())
                         return
                     }
                 } else if (args[0].equals("tutatu", true)) {
