@@ -15,6 +15,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
+import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
 import java.io.File
@@ -130,8 +131,7 @@ class Mission(name: String) : ICommand(name) {
             MainAPI.sendMessage(sp, ErrorMessage.NOT_GAME)
             return
         }
-        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
-        return
+        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS_TEAM_ADMIN)
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
@@ -240,30 +240,26 @@ class Mission(name: String) : ICommand(name) {
             return
         }
         MainAPI.sendMessage(bs, ErrorMessage.NOT_GAME)
-        return
     }
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         MainAPI.sendMessage(cs, ErrorMessage.NOT_PLAYER)
-        return
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (!TosoGameAPI.isAdmin(sp)) return null
-        if (args.size == 1) {
-            return getTabList(args[0], "send", "tutatu", "hint", "chest", "end")
-        } else if (args.size == 2) {
-            if (args[0].equals("send", true)) {
-                val set = mutableSetOf<String>()
-                val file = File("plugins${Main.FILE_SEPARATOR}A_TosoGame_Live${Main.FILE_SEPARATOR}missions")
-                file.listFiles().filter { it.isFile && it.extension.equals("txt", true) }.forEach { set.add(it.nameWithoutExtension) }
-                return getTabList(args[1], set)
-            }
-        }
-        return null
+        return getTabList(sp, args)
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
+        return getTabList(bs, args)
+    }
+
+    override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
+        return emptyList()
+    }
+
+    private fun getTabList(sender: CommandSender, args: Array<String>): List<String>? {
+        if (TosoGameAPI.isPlayer(sender) && !TosoGameAPI.isAdmin(sender as Player)) return emptyList()
         if (args.size == 1) {
             return getTabList(args[0], "send", "tutatu", "hint", "chest", "end")
         } else if (args.size == 2) {
@@ -274,10 +270,6 @@ class Mission(name: String) : ICommand(name) {
                 return getTabList(args[1], set)
             }
         }
-        return null
-    }
-
-    override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 }

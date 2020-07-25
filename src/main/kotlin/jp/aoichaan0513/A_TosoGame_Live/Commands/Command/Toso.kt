@@ -238,7 +238,7 @@ class Toso(name: String) : ICommand(name) {
             sendHelpMessage(sp)
             return
         }
-        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
+        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS_TEAM_ADMIN)
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
@@ -457,14 +457,14 @@ class Toso(name: String) : ICommand(name) {
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (!TosoGameAPI.isAdmin(sp)) return null
+        if (!TosoGameAPI.isAdmin(sp)) return emptyList()
         if (args.size == 1) {
             return getTabList(args[0], "help", "reload", "rl", "time", "rate")
         } else if (args.size == 2) {
             if (args[0].equals("time", true) || args[0].equals("rate", true))
                 return getTabList(args[0], "add", "remove", "set")
         }
-        return null
+        return emptyList()
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
@@ -474,11 +474,11 @@ class Toso(name: String) : ICommand(name) {
             if (args[0].equals("time", true) || args[0].equals("rate", true))
                 return getTabList(args[0], "add", "remove", "set")
         }
-        return null
+        return emptyList()
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (args.size == 1) return null
+        if (args.size == 1) return emptyList()
         return getTabList(args[0], "help", "reload", "rl", "time", "rate")
     }
 

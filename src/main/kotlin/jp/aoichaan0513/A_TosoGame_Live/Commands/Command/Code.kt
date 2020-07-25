@@ -41,28 +41,25 @@ class Code(name: String) : ICommand(name) {
             return
         }
         MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
-        return
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
         MainAPI.sendMessage(bs, ErrorMessage.NOT_PLAYER)
-        return
     }
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         MainAPI.sendMessage(cs, ErrorMessage.NOT_PLAYER)
-        return
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 }

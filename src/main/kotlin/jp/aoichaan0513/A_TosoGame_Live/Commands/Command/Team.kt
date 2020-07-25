@@ -39,16 +39,15 @@ class Team(name: String) : ICommand(name) {
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (!TosoGameAPI.isAdmin(sp)) return null
-        return getTabList(args)
+        return getTabList(sp, args)
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return getTabList(args)
+        return getTabList(bs, args)
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return getTabList(args)
+        return getTabList(cs, args)
     }
 
 
@@ -255,7 +254,8 @@ class Team(name: String) : ICommand(name) {
     }
 
 
-    private fun getTabList(args: Array<String>): List<String>? {
+    private fun getTabList(sender: CommandSender, args: Array<String>): List<String>? {
+        if (TosoGameAPI.isPlayer(sender) && !TosoGameAPI.isAdmin(sender as Player)) return emptyList()
         if (args.size == 1) {
             val set = mutableSetOf("random", "rand")
             teamNameSet.forEach { set.add(it) }
@@ -280,7 +280,7 @@ class Team(name: String) : ICommand(name) {
                 emptySet<String>()
             })
         }
-        return null
+        return emptyList()
     }
 
 

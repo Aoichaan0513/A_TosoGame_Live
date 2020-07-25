@@ -41,8 +41,7 @@ class Appear(name: String) : ICommand(name) {
                 return
             }
         }
-        MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS)
-        return
+        MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS_TEAM_ADMIN)
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
@@ -64,7 +63,6 @@ class Appear(name: String) : ICommand(name) {
             return
         }
         MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_PLAYER)
-        return
     }
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
@@ -86,11 +84,10 @@ class Appear(name: String) : ICommand(name) {
             return
         }
         MainAPI.sendMessage(cs, MainAPI.ErrorMessage.ARGS_PLAYER)
-        return
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (!TosoGameAPI.isAdmin(sp)) return null
+        if (!TosoGameAPI.isAdmin(sp)) return emptyList()
         val set = mutableSetOf<String>()
         Bukkit.getOnlinePlayers().filter { VisibilityManager.isHide(it, VisibilityManager.VisibilityType.ADMIN) }.forEach { set.add(it.name) }
         return getTabList(args[args.size - 1], set)

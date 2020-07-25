@@ -50,7 +50,6 @@ class Join(name: String) : ICommand(name) {
             return
         }
         MainAPI.sendMessage(sp, MainAPI.ErrorMessage.PERMISSIONS)
-        return
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
@@ -74,7 +73,6 @@ class Join(name: String) : ICommand(name) {
             return
         }
         MainAPI.sendMessage(bs, MainAPI.ErrorMessage.ARGS_PLAYER)
-        return
     }
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
@@ -98,7 +96,6 @@ class Join(name: String) : ICommand(name) {
             return
         }
         MainAPI.sendMessage(cs, MainAPI.ErrorMessage.ARGS_PLAYER)
-        return
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {

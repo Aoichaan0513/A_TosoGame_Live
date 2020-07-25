@@ -122,47 +122,42 @@ class Map(name: String) : ICommand(name) {
             """.trimIndent())
             return
         }
-        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
-        return
+        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS_TEAM_ADMIN)
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
         MainAPI.sendMessage(bs, ErrorMessage.NOT_PLAYER)
-        return
     }
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         MainAPI.sendMessage(cs, ErrorMessage.NOT_PLAYER)
-        return
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (TosoGameAPI.isAdmin(sp)) {
-            if (args.size == 1) {
-                return getTabList(args[0], HashSet(Arrays.asList("load", "unload", "generate", "edit", "list")))
-            } else if (args.size == 2) {
-                if (args[1].length == 0) {
-                    if (args[0].equals("load", true)) {
-                        val set = mutableSetOf<String>()
-                        if (Bukkit.getWorldContainer().listFiles() != null) {
-                            for (file in Bukkit.getWorldContainer().listFiles())
-                                if (file.isDirectory)
-                                    if (File("${file.name}${Main.FILE_SEPARATOR}map.yml").exists())
-                                        set.add(file.name)
-                        }
-                        return set.toList()
+        if (!TosoGameAPI.isAdmin(sp)) return emptyList()
+        if (args.size == 1) {
+            return getTabList(args[0], HashSet(Arrays.asList("load", "unload", "generate", "edit", "list")))
+        } else if (args.size == 2) {
+            if (args[1].isEmpty()) {
+                if (args[0].equals("load", true)) {
+                    val set = mutableSetOf<String>()
+                    if (Bukkit.getWorldContainer().listFiles() != null) {
+                        Bukkit.getWorldContainer().listFiles()
+                                .filter { it.isDirectory && File("${it.name}${Main.FILE_SEPARATOR}map.yml").exists() }
+                                .forEach { set.add(it.name) }
                     }
+                    return set.toList()
                 }
             }
         }
-        return null
+        return emptyList()
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 }

@@ -60,14 +60,14 @@ class Resource(name: String) : ICommand(name) {
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 }

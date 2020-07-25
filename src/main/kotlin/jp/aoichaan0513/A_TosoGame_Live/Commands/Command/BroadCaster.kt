@@ -77,7 +77,7 @@ class BroadCaster(name: String) : ICommand(name) {
                 """.trimIndent())
                 return
             }
-            MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
+            MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS_TEAM_ADMIN)
             return
         } else if (label.equals("lhide", true)) {
             if (TosoGameAPI.isBroadCaster(sp)) {
@@ -233,17 +233,17 @@ class BroadCaster(name: String) : ICommand(name) {
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (!TosoGameAPI.isAdmin(sp) || args.size != 1) return null
+        if (!TosoGameAPI.isAdmin(sp) || args.size != 1) return emptyList()
         return getTabList(args[0], "add", "remove", "list")
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (args.size != 1) return null
+        if (args.size != 1) return emptyList()
         return getTabList(args[0], "add", "remove", "list")
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (args.size != 1) return null
+        if (args.size != 1) return emptyList()
         return getTabList(args[0], "add", "remove", "list")
     }
 }

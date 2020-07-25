@@ -169,42 +169,38 @@ class Location(name: String) : ICommand(name) {
             """.trimIndent())
             return
         }
-        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
-        return
+        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS_TEAM_ADMIN)
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
         MainAPI.sendMessage(bs, ErrorMessage.NOT_PLAYER)
-        return
     }
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         MainAPI.sendMessage(cs, ErrorMessage.NOT_PLAYER)
-        return
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (TosoGameAPI.isAdmin(sp)) {
-            if (args.size == 1) {
-                return getTabList(args[0], "opgame", "opg", "gopgame", "gopg", "hunter", "door", "jail", "respawn", "res")
-            } else if (args.size == 2) {
-                if (args[0].equals("door", true)) {
-                    val worldConfig = Main.worldConfig
-                    val set = mutableSetOf("all")
-                    for (i in worldConfig.hunterDoorConfig.doors.keys)
-                        set.add(i.toString())
-                    return getTabList(args[1], set)
-                }
+        if (!TosoGameAPI.isAdmin(sp)) return emptyList()
+        if (args.size == 1) {
+            return getTabList(args[0], "opgame", "opg", "gopgame", "gopg", "hunter", "door", "jail", "respawn", "res")
+        } else if (args.size == 2) {
+            if (args[0].equals("door", true)) {
+                val worldConfig = Main.worldConfig
+                val set = mutableSetOf("all")
+                for (i in worldConfig.hunterDoorConfig.doors.keys)
+                    set.add(i.toString())
+                return getTabList(args[1], set)
             }
         }
-        return null
+        return emptyList()
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 }

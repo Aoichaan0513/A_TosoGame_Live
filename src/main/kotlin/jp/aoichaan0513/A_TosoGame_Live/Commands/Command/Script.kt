@@ -64,22 +64,19 @@ class Script(name: String) : ICommand(name) {
             return
         }
         sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}管理者によってスクリプト機能が無効にされています。")
-        return
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
         MainAPI.sendMessage(bs, ErrorMessage.NOT_PLAYER)
-        return
     }
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         MainAPI.sendMessage(cs, ErrorMessage.NOT_PLAYER)
-        return
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
         val worldConfig = Main.worldConfig
-        if (!worldConfig.gameConfig.script || args.size != 1) return null
+        if (!worldConfig.gameConfig.script || args.size != 1) return emptyList()
 
         val set = mutableSetOf<String>()
         val file = File("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}scripts${Main.FILE_SEPARATOR}commands")
@@ -88,10 +85,10 @@ class Script(name: String) : ICommand(name) {
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 }

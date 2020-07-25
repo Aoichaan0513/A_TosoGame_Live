@@ -57,8 +57,7 @@ class OPGame(name: String) : ICommand(name) {
             sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ゲームが実行されているため実行できません。")
             return
         }
-        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
-        return
+        MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS_TEAM_ADMIN)
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
@@ -97,25 +96,23 @@ class OPGame(name: String) : ICommand(name) {
             return
         }
         bs.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ゲームが実行されているため実行できません。")
-        return
     }
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         MainAPI.sendMessage(cs, ErrorMessage.NOT_PLAYER)
-        return
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (!TosoGameAPI.isAdmin(sp) || args.size != 1) return null
+        if (!TosoGameAPI.isAdmin(sp) || args.size != 1) return emptyList()
         return getTabList(args[0], "1", "2")
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (args.size != 1) return null
+        if (args.size != 1) return emptyList()
         return getTabList(args[0], "1", "2")
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        return null
+        return emptyList()
     }
 }

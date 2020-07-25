@@ -1,7 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
-import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.ActionBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
@@ -106,11 +105,11 @@ class Main : JavaPlugin(), Listener {
         private fun loadFile(folderName: String, fileName: String) {
             val file = File("${pluginInstance.dataFolder}$FILE_SEPARATOR$folderName", fileName)
             if (!file.exists()) {
-                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ファイル  \"$folderName$FILE_SEPARATOR$fileName\" を作成します…")
+                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ファイル  \"$folderName$FILE_SEPARATOR$fileName\" を作成します…")
                 pluginInstance.saveResource("$folderName$FILE_SEPARATOR$fileName", false)
-                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ファイル \"$folderName$FILE_SEPARATOR$fileName\" を作成しました。")
+                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ファイル \"$folderName$FILE_SEPARATOR$fileName\" を作成しました。")
             } else {
-                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ファイル \"$folderName$FILE_SEPARATOR$fileName\" が見つかったためスルーしました。")
+                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ファイル \"$folderName$FILE_SEPARATOR$fileName\" が見つかったためスルーしました。")
             }
         }
 
@@ -118,37 +117,37 @@ class Main : JavaPlugin(), Listener {
             val file = File("${pluginInstance.dataFolder}$FILE_SEPARATOR$folderName")
             if (!file.exists()) {
                 if (file.mkdir())
-                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}フォルダ \"$folderName\" を作成しました。")
+                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}フォルダ \"$folderName\" を作成しました。")
                 else
-                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}フォルダ \"$folderName\" を作成できませんでした。")
+                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}フォルダ \"$folderName\" を作成できませんでした。")
             } else {
-                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}フォルダ \"$folderName\" が見つかったためスルーしました。")
+                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}フォルダ \"$folderName\" が見つかったためスルーしました。")
             }
         }
 
         private fun loadBuiltinMission(fileName: String) {
             val file = File("${pluginInstance.dataFolder}${FILE_SEPARATOR}missions", fileName)
             if (!file.exists()) {
-                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ビルトインミッション \"$fileName\" を作成します…")
+                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ビルトインミッション \"$fileName\" を作成します…")
                 pluginInstance.saveResource("missions$FILE_SEPARATOR$fileName", false)
-                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ビルトインミッション \"$fileName\" を作成しました。")
+                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ビルトインミッション \"$fileName\" を作成しました。")
             } else {
-                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ビルトインミッション \"$fileName\" が見つかったためスルーしました。")
+                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ビルトインミッション \"$fileName\" が見つかったためスルーしました。")
             }
         }
 
         private fun loadMap() {
             if (worldConfig.config.contains("border.map.p1.x") && worldConfig.config.contains("border.map.p1.z")
                     && worldConfig.config.contains("border.map.p2.x") && worldConfig.config.contains("border.map.p2.z")) {
-                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}地図を生成しています…")
+                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}地図を生成しています…")
                 if (MapUtility.generateMap())
-                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}地図の生成が完了しました。")
+                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}地図の生成が完了しました。")
                 else
-                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}地図の生成ができませんでした。")
+                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}地図の生成ができませんでした。")
             } else {
                 Bukkit.getConsoleSender().sendMessage("""
-                    ${MainAPI.getPrefix(PrefixType.ERROR)}マップの設定が完了していないため地図の生成ができませんでした。
-                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}マップの設定をした後に"/map generate"を実行してください。
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}マップの設定が完了していないため地図の生成ができませんでした。
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}マップの設定をした後に"/map generate"を実行してください。
                 """.trimIndent())
             }
         }
@@ -195,16 +194,14 @@ class Main : JavaPlugin(), Listener {
 
 
     private fun loadCommand() {
-        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}コマンドを読み込んでいます…")
+        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}コマンドを読み込んでいます…")
 
         commands = hashMapOf(
                 // メインコマンド
                 "toso" to Toso("toso"),
 
                 // ゲーム進行コマンド (運営用)
-                "start" to Start("start"), // コマンドブロック対応
-                "end" to End("end"), // コマンドブロック対応
-                "reset" to Reset("reset"), // コマンドブロック対応
+                "game" to Game("game"), // コマンドブロック対応
                 "mission" to Mission("mission"), // コマンドブロック対応
                 "team" to Team("team"), // コマンドブロック対応
 
@@ -250,7 +247,7 @@ class Main : JavaPlugin(), Listener {
 
         commands.forEach { getCommand(it.key)!!.setExecutor(it.value) }
 
-        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}コマンドを${ChatColor.GREEN}${ChatColor.UNDERLINE}${commands.size}件${ChatColor.RESET}${ChatColor.GRAY}読み込みました。")
+        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}コマンドを${ChatColor.GREEN}${ChatColor.UNDERLINE}${commands.size}件${ChatColor.RESET}${ChatColor.GRAY}読み込みました。")
         return
     }
 
@@ -284,7 +281,7 @@ class Main : JavaPlugin(), Listener {
     }
 
     private fun loadListener() {
-        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}リスナーを読み込んでいます…")
+        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}リスナーを読み込んでいます…")
 
         listeners = arrayListOf(
                 // プレイヤー系
@@ -325,20 +322,20 @@ class Main : JavaPlugin(), Listener {
         val pluginManager = Bukkit.getPluginManager()
         listeners.forEach { pluginManager.registerEvents(it, pluginInstance) }
 
-        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}リスナーを${ChatColor.GREEN}${ChatColor.UNDERLINE}${listeners.size}件${ChatColor.RESET}${ChatColor.GRAY}読み込みました。")
+        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}リスナーを${ChatColor.GREEN}${ChatColor.UNDERLINE}${listeners.size}件${ChatColor.RESET}${ChatColor.GRAY}読み込みました。")
         return
     }
 
     private fun loadWorld() {
         if (!WorldManager.worldName.startsWith("world")) {
-            Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ワールドを読み込んでいます…")
+            Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ワールドを読み込んでいます…")
             val world = Bukkit.createWorld(WorldCreator(WorldManager.worldName))!!
             world.difficulty = Difficulty.EASY
             world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false)
             world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
             world.setGameRule(GameRule.DO_MOB_SPAWNING, false)
             worldConfig = WorldConfig(world)
-            Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ワールドを読み込みました。")
+            Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ワールドを読み込みました。")
             return
         } else {
             val world = WorldManager.world
@@ -364,15 +361,15 @@ class Main : JavaPlugin(), Listener {
     private fun download() {
         val urlStr = "https://incha.work/services/files/plugins/org/aoichaan0513/a_tosogame_live/"
         val strPostUrl = "${urlStr}api"
-        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}更新を確認しています…")
+        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}更新を確認しています…")
         val jsonObject = JSONObject(HttpConnection(strPostUrl, "{\"channel\":\"$projectChannel\", \"current\":\"$projectVersion\"}").result)
         if (jsonObject.getBoolean("result")) {
             Bukkit.getConsoleSender().sendMessage("""
-                    ${MainAPI.getPrefix(PrefixType.WARNING)}更新が見つかりました。
-                    ${MainAPI.getPrefix(PrefixType.WARNING)}プラグインチャンネル: $projectChannel
-                    ${MainAPI.getPrefix(PrefixType.WARNING)}現在のバージョン: $projectVersion
-                    ${MainAPI.getPrefix(PrefixType.WARNING)}最新のバージョン: ${jsonObject.getString("latest")}
-                    ${MainAPI.getPrefix(PrefixType.WARNING)}最新のバージョンをダウンロードしています…
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}更新が見つかりました。
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}プラグインチャンネル: $projectChannel
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}現在のバージョン: $projectVersion
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}最新のバージョン: ${jsonObject.getString("latest")}
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}最新のバージョンをダウンロードしています…
                 """.trimIndent())
             try {
                 val url = URL("$urlStr${jsonObject.getString("file")}")
@@ -401,57 +398,57 @@ class Main : JavaPlugin(), Listener {
                     dataOutStream.close()
 
                     Bukkit.getConsoleSender().sendMessage("""
-                        ${MainAPI.getPrefix(PrefixType.SUCCESS)}最新のバージョンをダウンロードしました。
-                        ${MainAPI.getPrefix(PrefixType.SECONDARY)}プラグインを最新のバージョンに置き換えています…
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}最新のバージョンをダウンロードしました。
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}プラグインを最新のバージョンに置き換えています…
                     """.trimIndent())
 
                     try {
                         val sourcePath = Paths.get("$dataFolder${FILE_SEPARATOR}updates${FILE_SEPARATOR}${jsonObject.getString("file")}")
                         val targetPath = Paths.get("${server.worldContainer.absolutePath}${FILE_SEPARATOR}plugins${FILE_SEPARATOR}${jsonObject.getString("file")}")
                         Files.move(sourcePath, targetPath)
-                        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}最新のバージョンを移動しました。")
+                        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}最新のバージョンを移動しました。")
                         try {
                             val targetPath2 = Paths.get("${server.worldContainer.absolutePath}${FILE_SEPARATOR}plugins${FILE_SEPARATOR}A_TosoGame_Live-${description.version}.jar")
                             if (Files.deleteIfExists(targetPath2)) {
                                 Bukkit.getConsoleSender().sendMessage("""
-                                    ${MainAPI.getPrefix(PrefixType.SUCCESS)}現在のバージョンを削除しました。
-                                    ${MainAPI.getPrefix(PrefixType.WARNING)}サーバーを再起動しています…
+                                    ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}現在のバージョンを削除しました。
+                                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}サーバーを再起動しています…
                                 """.trimIndent())
                                 server.reload()
                             } else {
-                                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}サーバーを再起動しています…")
+                                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}サーバーを再起動しています…")
                                 server.reload()
                             }
                         } catch (e: IOException) {
                             Bukkit.getConsoleSender().sendMessage("""
-                                ${MainAPI.getPrefix(PrefixType.ERROR)}更新に失敗しました。以前のバージョンのプラグインを削除できませんでした。
-                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}詳細は下記のエラーログを確認してください。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}更新に失敗しました。以前のバージョンのプラグインを削除できませんでした。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}詳細は下記のエラーログを確認してください。
                             """.trimIndent())
                             e.printStackTrace()
                             return
                         }
                     } catch (e: IOException) {
                         Bukkit.getConsoleSender().sendMessage("""
-                            ${MainAPI.getPrefix(PrefixType.ERROR)}更新に失敗しました。プラグインの移動に失敗しました。
-                            ${MainAPI.getPrefix(PrefixType.SECONDARY)}詳細は下記のエラーログを確認してください。
+                            ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}更新に失敗しました。プラグインの移動に失敗しました。
+                            ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}詳細は下記のエラーログを確認してください。
                         """.trimIndent())
                         e.printStackTrace()
                         return
                     }
                 } else {
-                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}更新に失敗しました。サーバーへのアクセスに失敗しました。")
+                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}更新に失敗しました。サーバーへのアクセスに失敗しました。")
                     return
                 }
             } catch (e: Exception) {
                 Bukkit.getConsoleSender().sendMessage("""
-                    ${MainAPI.getPrefix(PrefixType.ERROR)}更新に失敗しました。予期しないエラーが発生しました。
-                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}詳細は下記のエラーログを確認してください。
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}更新に失敗しました。予期しないエラーが発生しました。
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}詳細は下記のエラーログを確認してください。
                 """.trimIndent())
                 e.printStackTrace()
                 return
             }
         } else {
-            Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}更新はありませんでした。")
+            Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}更新はありませんでした。")
             return
         }
     }

@@ -38,8 +38,8 @@ abstract class ICommand(private val name: String) : TabExecutor {
         return (if (str.isEmpty()) set else set.filter { it.toLowerCase().startsWith(str.toLowerCase()) }).toList()
     }
 
-    fun getTabList(str: String, list: List<String>): List<String> {
-        return getTabList(str, list.toSet())
+    fun getTabList(str: String, collection: Collection<String>): List<String> {
+        return getTabList(str, collection.toSet())
     }
 
     fun getTabList(str: String, vararg args: String): List<String> {

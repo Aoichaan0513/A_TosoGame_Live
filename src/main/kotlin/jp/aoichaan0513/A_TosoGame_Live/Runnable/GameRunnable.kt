@@ -31,8 +31,8 @@ import org.bukkit.scheduler.BukkitRunnable
 import java.util.*
 
 class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable() {
-    companion object {
 
+    companion object {
         var countDown = 0
         var gameTime = 0
         var settingCountDown = 0
@@ -494,7 +494,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
      * ゲーム終了
      */
     private fun sendResult() {
-        val rewardMap = MoneyManager.rewardMap.entries.filter { MainAPI.isOnline(it.key) }.sortedBy { it.value * -1 }
+        val rewardMap = MoneyManager.rewardMap.entries.filter { MainAPI.isOnline(it.key) }.sortedBy { it.value * -1 }.subList(0, 4)
 
         /*
         val rewardList = MoneyManager.rewardMap.entries.toMutableList()
@@ -510,7 +510,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
         val rewardResult = rewardBuilder.toString().trim()
         Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}賞金ランキング\n${if (!rewardResult.isEmpty()) rewardResult else "${MainAPI.getPrefix(PrefixType.SECONDARY)}なし"}")
 
-        val hunterMap = onDamage.hunterMap.entries.filter { MainAPI.isOnline(it.key) }.sortedBy { it.value * -1 }
+        val hunterMap = onDamage.hunterMap.entries.filter { MainAPI.isOnline(it.key) }.sortedBy { it.value * -1 }.subList(0, 4)
         /*
         val hunterList = onDamage.hunterMap.entries.toMutableList()
         hunterList.sortWith(Comparator { obj1, obj2 -> obj2.value.compareTo(obj1.value) })

@@ -19,31 +19,28 @@ class GameMode(name: String) : ICommand(name) {
             return
         }
         MainAPI.sendMessage(sp, ErrorMessage.PERMISSIONS)
-        return
     }
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
         runCommand(bs, cmd, label, args)
-        return
     }
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         runCommand(cs, cmd, label, args)
-        return
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (!MainAPI.isAdmin(sp) || !alias.equals("gamemode", true) && !alias.equals("gm", true) || args.size != 1) return null
+        if (!MainAPI.isAdmin(sp) || !alias.equals("gamemode", true) && !alias.equals("gm", true) || args.size != 1) return emptyList()
         return getTabList(args[0], "survival", "creative", "adventure", "spectator")
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (!alias.equals("gamemode", true) && !alias.equals("gm", true) || args.size != 1) return null
+        if (!alias.equals("gamemode", true) && !alias.equals("gm", true) || args.size != 1) return emptyList()
         return getTabList(args[0], "survival", "creative", "adventure", "spectator")
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (!alias.equals("gamemode", true) && !alias.equals("gm", true) || args.size != 1) return null
+        if (!alias.equals("gamemode", true) && !alias.equals("gm", true) || args.size != 1) return emptyList()
         return getTabList(args[0], "survival", "creative", "adventure", "spectator")
     }
 

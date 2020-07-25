@@ -4,27 +4,26 @@ api-version: 1.13
 main: jp.aoichaan0513.A_TosoGame_Live.Main
 authors: [Aoichaan0513]
 website: https://aoichaan0513.jp
-description: TosoGame (Run for Money) Plugin for Minecraft Java Edition 1.15.2. (Build 20.0721.1538)
+description: TosoGame (Run for Money) Plugin for Minecraft Java Edition 1.15.2. (Build 20.0725.2349)
 
 commands:
   toso:
-    usage: TosoGame Plugin Management Command.
+    description: TosoGame Plugin Management Command.
 
-  start:
-    usage: Game Start Command.
-  end:
-    usage: Game End Command.
+  game:
+    description: Game Management Command.
     aliases:
+      - start
+      - end
       - g_end
-  reset:
-    usage: Game Reset Command.
+      - reset
   mission:
-    usage: Run Mission Command.
+    description: Mission Management Command.
   team:
-    usage: Team Management Command.
+    description: Team Management Command.
 
   broadcaster:
-    usage: Broadcaster Management Command.
+    description: Broadcaster Management Command.
     aliases:
       - yt
       - lhide
@@ -39,33 +38,33 @@ commands:
   shuffle:
 
   location:
-    usage: Location Settings Command.
+    description: Location Settings Command.
     aliases:
       - loc
   map:
-    usage: Map Settings Command.
+    description: Map Settings Command.
 
   btp:
   resource:
-    usage: Load Resource Pack Command.
+    description: Load Resource Pack Command.
     aliases:
       - texture
   menu:
 
   join:
-    usage: Game Join Command.
+    description: Game Join Command.
   leave:
-    usage: Game Leave Command.
+    description: Game Leave Command.
   disappear:
-    usage: Player Full Invisible Mode Command.
+    description: Player Full Invisible Mode Command.
     aliases:
       - vanish
   appear:
-    usage: Player Full UnInvisible Mode Command.
+    description: Player Full UnInvisible Mode Command.
     aliases:
       - unvanish
   gamemode:
-    usage: Change GameMode Command.
+    description: Change GameMode Command.
     aliases:
       - gm
       - gms
@@ -77,11 +76,11 @@ commands:
       - gmsp
       - gm3
   hide:
-    usage: Hide Other Players Command.
+    description: Hide Other Players Command.
   show:
-    usage: Show Other Players Command.
+    description: Show Other Players Command.
   spec:
-    usage: Toggle Spectator Mode Command.
+    description: Toggle Spectator Mode Command.
   sidebar:
 
   script:
