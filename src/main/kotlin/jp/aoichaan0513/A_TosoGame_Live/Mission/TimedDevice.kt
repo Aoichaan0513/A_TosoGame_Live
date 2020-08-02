@@ -2,10 +2,10 @@ package jp.aoichaan0513.A_TosoGame_Live.Mission
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -33,8 +33,7 @@ class TimedDevice {
             if (timer != null) return
 
             val playerList = mutableListOf<UUID>()
-            Bukkit.getOnlinePlayers().filter { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, it) }
-                    .forEach { playerList.add(it.uniqueId) }
+            Bukkit.getOnlinePlayers().filter { it.isPlayerGroup }.forEach { playerList.add(it.uniqueId) }
 
             val divideList = MainAPI.divide(playerList, 2)
             if (divideList.size > 30) return
@@ -174,10 +173,7 @@ class TimedDevice {
             }
 
             private fun getPlayers(collection: Collection<UUID>): Set<Player> {
-                return MainAPI.getOnlinePlayers(collection).filter {
-                    (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, it))
-                            && !it.hasPotionEffect(PotionEffectType.INVISIBILITY)
-                }.toSet()
+                return MainAPI.getOnlinePlayers(collection).filter { it.isPlayerGroup && !it.hasPotionEffect(PotionEffectType.INVISIBILITY) }.toSet()
             }
         }
     }

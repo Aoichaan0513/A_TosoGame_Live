@@ -4,10 +4,9 @@ import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.ErrorMessage
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
 import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
 import org.bukkit.command.ConsoleCommandSender
@@ -17,7 +16,7 @@ import org.bukkit.potion.PotionEffectType
 class Code(name: String) : ICommand(name) {
 
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
-        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, sp) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, sp)) {
+        if (sp.isPlayerGroup) {
             if (GameManager.isGame(GameManager.GameState.GAME) && HunterZone.isStart) {
                 if (args.isNotEmpty()) {
                     if (!HunterZone.containsCodeSet(sp)) {

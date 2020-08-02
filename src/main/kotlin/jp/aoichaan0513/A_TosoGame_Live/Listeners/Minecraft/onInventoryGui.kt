@@ -12,21 +12,24 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.DifficultyManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerConfig
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig.DifficultyConfig
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.API.Map.MapUtility
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Team
 import jp.aoichaan0513.A_TosoGame_Live.Inventory.*
 import jp.aoichaan0513.A_TosoGame_Live.Inventory.MapInventory.ActionType
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
+import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ParseUtil
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -83,11 +86,13 @@ class onInventoryGui : Listener {
                 ActionBarManager.sendActionBar(p, "${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップ設定アプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
             }
             MainInventory.Item.CALL_APP -> {
+                /*
                 if (Teams.hasJoinedTeams(p) && DiscordManager.integrationMap.isNotEmpty()) {
                     p.openInventory(CallInventory.getInventory(p))
                     ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}電話アプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
                     return
                 }
+                */
                 p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在開くことができません。")
             }
             MainInventory.Item.MISSION_APP -> {
@@ -95,7 +100,7 @@ class onInventoryGui : Listener {
                 ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ミッションアプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
             }
             MainInventory.Item.MAP_APP -> {
-                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p)) {
+                if (p.isAdminTeam || p.isPlayerGroup) {
                     p.closeInventory()
                     if (p.inventory.itemInOffHand.type == Material.AIR) {
                         val baseStack = MapUtility.map
@@ -124,16 +129,17 @@ class onInventoryGui : Listener {
             }
             MainInventory.Item.SPEC_MODE -> {
                 if (GameManager.isGame(GameState.GAME)) {
-                    if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, p)) {
-                        if (!TosoGameAPI.isRes) {
+                    if (p.isJailTeam) {
+                        if (!TosoGameAPI.isRespawn || !RespawnRunnable.isAllowRespawn(p)) {
                             if (p.gameMode == GameMode.ADVENTURE) {
                                 p.gameMode = GameMode.SPECTATOR
                                 p.inventory.heldItemSlot = 0
+                                VisibilityManager.removeJailHide(p)
                                 TosoGameAPI.teleport(p, worldConfig.respawnLocationConfig.locations.values)
                                 p.sendMessage("""
-                                        ${MainAPI.getPrefix(PrefixType.WARNING)}観戦モードになりました。
-                                        ${MainAPI.getPrefix(PrefixType.SECONDARY)}"/spec"で観戦モードから戻れます。
-                                    """.trimIndent())
+                                    ${MainAPI.getPrefix(PrefixType.WARNING)}観戦モードになりました。
+                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}"/spec"で観戦モードから戻れます。
+                                """.trimIndent())
                                 return
                             } else {
                                 p.gameMode = GameMode.ADVENTURE

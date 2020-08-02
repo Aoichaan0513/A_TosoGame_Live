@@ -1,11 +1,11 @@
 package jp.aoichaan0513.A_TosoGame_Live.Mission
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
-import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.apache.commons.lang.RandomStringUtils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -25,6 +25,9 @@ class HunterZone {
         var isStart = false
             private set
 
+        // ハンターのリスト
+        private val hunterSet = mutableSetOf<UUID>()
+
         // コードを入力したプレイヤー
         private val codeSet = mutableSetOf<UUID>()
 
@@ -35,8 +38,29 @@ class HunterZone {
         var code = ""
             private set
 
-        fun startMission() {
-            if (timer != null) return
+        fun startMission(hunterCount: Int = 1) {
+            if (timer != null || hunterSet.isEmpty()) return
+
+            val worldConfig = Main.worldConfig
+            val loc = worldConfig.hunterLocationConfig.getLocation()
+
+            val hunters = mutableSetOf<UUID>()
+
+            val players = MainAPI.getOnlinePlayers(hunterSet).filter { it.isHunterTeam }.shuffled()
+            for (i in 0 until hunterCount) {
+                val player = players[i]
+                hunters.add(player.uniqueId)
+
+                Bukkit.getScheduler().runTaskLaterAsynchronously(Main.pluginInstance, Runnable { TosoGameAPI.teleport(player, loc) }, 20 * 3)
+
+                player.sendMessage("""
+                    ${MainAPI.getPrefix(ChatColor.YELLOW)}あなたを${ChatColor.GOLD}${ChatColor.UNDERLINE}ハンターゾーンのハンター${ChatColor.RESET}${ChatColor.YELLOW}に追加しました。
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}3秒後にハンターゾーンにテレポートします。 
+                """.trimIndent())
+            }
+
+            hunterSet.clear()
+            hunters.forEach { hunterSet.add(it) }
 
             code = RandomStringUtils.randomNumeric(4)
 
@@ -55,23 +79,54 @@ class HunterZone {
             hunterZoneRunnable = null
 
             val worldConfig = Main.worldConfig
+            val loc = worldConfig.hunterLocationConfig.getLocation(1)
+
+            MainAPI.getOnlinePlayers(hunterSet).filter { it.isHunterTeam }.forEach {
+                Bukkit.getScheduler().runTaskLaterAsynchronously(Main.pluginInstance, Runnable { TosoGameAPI.teleport(it, loc) }, 20 * 3)
+
+                it.sendMessage("""
+                    ${MainAPI.getPrefix(ChatColor.YELLOW)}あなたを${ChatColor.GOLD}${ChatColor.UNDERLINE}ハンターゾーンのハンター${ChatColor.RESET}${ChatColor.YELLOW}から削除しました。
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}3秒後にハンターボックスにテレポートします。 
+                """.trimIndent())
+            }
+
+            hunterSet.clear()
+
             MainAPI.getOnlinePlayers(joinedPlayerSet).forEach {
                 it.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 20 * 15, 1, false, false))
                 TosoGameAPI.teleport(it, worldConfig.respawnLocationConfig.locations.values)
 
                 TosoGameAPI.hidePlayer(it)
             }
+
             joinedPlayerSet.clear()
         }
 
         fun resetMission() {
             if (timer != null) return
 
+            hunterSet.clear()
             code = ""
             codeSet.clear()
             joinedPlayerSet.clear()
             leavedPlayerSet.clear()
             isStart = false
+        }
+
+
+        val hunterSetCount: Int
+            get() = hunterSet.size
+
+        fun addHunterSet(p: Player) {
+            hunterSet.add(p.uniqueId)
+        }
+
+        fun removeHunterSet(p: Player) {
+            hunterSet.remove(p.uniqueId)
+        }
+
+        fun containsHunterSet(p: Player): Boolean {
+            return hunterSet.contains(p.uniqueId)
         }
 
 
@@ -133,19 +188,19 @@ class HunterZone {
                 missionTime--
 
                 if (missionTime == 0) {
-                    Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ハンターゾーンミッションが終了しました。")
-                    for (player in Bukkit.getOnlinePlayers().filter { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, it) }) {
+                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッションが終了しました。")
+                    for (player in Bukkit.getOnlinePlayers().filter { it.isPlayerGroup }) {
                         if (!codeSet.contains(player.uniqueId)) {
                             player.sendMessage("""
-                                ${MainAPI.getPrefix(PrefixType.WARNING)}あなたはコードを入力していないため発光しました。
-                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}解除するには"${ChatColor.UNDERLINE}/code 入手したコード${ChatColor.RESET}${ChatColor.GRAY}"と入力して装置を解除してください。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}あなたはコードを入力していないため発光しました。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}解除するには"${ChatColor.UNDERLINE}/code 入手したコード${ChatColor.RESET}${ChatColor.GRAY}"と入力して装置を解除してください。
                             """.trimIndent())
                             player.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, 200000, 1, false, false))
                         }
                     }
                     MissionManager.endMission(MissionManager.MissionState.HUNTER_ZONE)
                 } else if (missionTime == 60) {
-                    Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ハンターゾーンミッション終了まで残り${TimeFormat.formatMin(missionTime)}分")
+                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッション終了まで残り${TimeFormat.formatMin(missionTime)}分")
                 }
             }
         }

@@ -8,6 +8,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import org.bukkit.Bukkit
@@ -77,7 +78,7 @@ fun Player.setTeam(team: Teams.OnlineTeam, isTeleport: Boolean = true, isSendTea
     }
 
     if (isSendTeamChangeMessage)
-        sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを${team.color}${ChatColor.UNDERLINE}${ChatColor.stripColor(team.displayName)}${ChatColor.RESET}${ChatColor.GRAY}に追加しました。")
+        sendTeamMessage(team)
 }
 
 fun Player.setSidebar() {
@@ -108,6 +109,24 @@ fun Player.setSidebar() {
         }
     } else {
         objective.displaySlot = DisplaySlot.SIDEBAR
+    }
+}
+
+private fun Player.sendTeamMessage(team: Teams.OnlineTeam) {
+    sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを${team.color}${ChatColor.UNDERLINE}${ChatColor.stripColor(team.displayName)}${ChatColor.RESET}${ChatColor.GRAY}に変更しました。")
+    when (team) {
+        /*
+        Teams.OnlineTeam.TOSO_PLAYER, Teams.OnlineTeam.TOSO_SUCCESS -> {
+            sendMessage("""
+                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ルール
+                ${MainAPI.getPrefix(ChatColor.YELLOW)}・${ChatColor.BOLD}${ChatColor.BOLD}木の上に登らない事
+            """.trimIndent())
+        }
+        */
+        Teams.OnlineTeam.TOSO_HUNTER -> {
+            if (!HunterZone.isStart)
+                sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンのハンターに応募するには\"/hz\"と入力してください。")
+        }
     }
 }
 

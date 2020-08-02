@@ -9,7 +9,6 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.DifficultyManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerConfig
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.API.Map.MapUtility
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard
@@ -21,6 +20,8 @@ import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.setSidebar
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -35,7 +36,7 @@ class onJoin : Listener {
     fun onJoin(e: PlayerJoinEvent) {
         val p = e.player
 
-        e.joinMessage = if (!VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) "${ChatColor.YELLOW}-> ${ChatColor.GOLD}${p.name}" else ""
+        e.joinMessage = if (!PlayerManager.loadConfig(p).visibility) "${ChatColor.YELLOW}-> ${ChatColor.GOLD}${p.name}" else ""
         p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}リソースパックを適用するには\"${ChatColor.GOLD}${ChatColor.UNDERLINE}/resource${ChatColor.RESET}${ChatColor.GRAY}\"と入力してください。")
 
         val worldConfig = Main.worldConfig
@@ -77,7 +78,7 @@ class onJoin : Listener {
         if (MissionManager.isBossBar)
             MissionManager.bossBar!!.addPlayer(p)
 
-        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p)) {
+        if (p.isPlayerTeam) {
             Teams.joinTeam(OnlineTeam.TOSO_PLAYER, p)
             p.gameMode = GameMode.ADVENTURE
 
@@ -89,7 +90,7 @@ class onJoin : Listener {
                 TosoGameAPI.teleport(p, worldConfig.respawnLocationConfig.locations.values)
                 HunterZone.removeLeavedSet(p)
             }
-        } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, p)) {
+        } else if (p.isJailTeam) {
             Teams.joinTeam(OnlineTeam.TOSO_JAIL, p)
             p.gameMode = GameMode.ADVENTURE
 
@@ -103,7 +104,7 @@ class onJoin : Listener {
             TosoGameAPI.teleport(p, worldConfig.jailLocationConfig.locations.values)
         } else if (!Teams.hasJoinedTeams(p)) {
             if (GameManager.isGame()) {
-                if (TosoGameAPI.isRes) {
+                if (TosoGameAPI.isRespawn) {
                     Teams.joinTeam(OnlineTeam.TOSO_PLAYER, p)
                     p.gameMode = GameMode.ADVENTURE
 

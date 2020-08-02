@@ -3,9 +3,9 @@ package jp.aoichaan0513.A_TosoGame_Live.OPGame
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -105,7 +105,7 @@ class Dice {
                                     player.playSound(player.location, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f)
 
                                 Bukkit.getScheduler().runTaskLater(Main.pluginInstance, Runnable {
-                                    for (player in MainAPI.getOnlinePlayers(getSnowballPlayers(5)).filter { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, it) }) {
+                                    for (player in MainAPI.getOnlinePlayers(getSnowballPlayers(5)).filter { it.isPlayerGroup }) {
                                         val itemStack = ItemStack(Material.SNOWBALL)
                                         val itemMeta = itemStack.itemMeta!!
                                         itemMeta.setDisplayName("${ChatColor.GREEN}雪玉 (移動禁止)")
@@ -208,9 +208,7 @@ class Dice {
         fun getSnowballPlayers(i: Int): Set<UUID> {
             val list = mutableListOf<UUID>()
 
-            Bukkit.getOnlinePlayers()
-                    .filter { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, it) }
-                    .forEach { list.add(it.uniqueId) }
+            Bukkit.getOnlinePlayers().filter { it.isPlayerGroup }.forEach { list.add(it.uniqueId) }
 
             for (c in 0..2)
                 list.shuffle()

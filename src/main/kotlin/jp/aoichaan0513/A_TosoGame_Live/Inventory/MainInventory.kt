@@ -1,7 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.Inventory
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.DiscordManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.DifficultyManager
@@ -9,12 +8,12 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Team
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -129,7 +128,7 @@ class MainInventory {
             val itemStackSpec = ItemStack(Item.SPEC_MODE.material, 1)
             val itemMetaSpec = (itemStackSpec.itemMeta as PotionMeta)
             itemMetaSpec.addItemFlags(*ItemUtil.itemFlags)
-            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, p))
+            if (p.isJailTeam)
                 itemMetaSpec.addCustomEffect(PotionEffect(PotionEffectType.INVISIBILITY, 200, 1), true)
             itemMetaSpec.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}観戦モード切り替え")
             itemMetaSpec.lore = listOf(
@@ -140,6 +139,7 @@ class MainInventory {
             inv.setItem(Item.SPEC_MODE.index, itemStackSpec)
 
             // Discord 連携
+            /*
             val itemStackDiscordIntegration = ItemStack(Item.DISCORD_INTEGRATION.material, 1)
             val itemMetaDiscordIntegration = itemStackDiscordIntegration.itemMeta!!
             itemMetaDiscordIntegration.addItemFlags(*ItemUtil.itemFlags)
@@ -154,6 +154,7 @@ class MainInventory {
             )
             itemStackDiscordIntegration.itemMeta = itemMetaDiscordIntegration
             inv.setItem(Item.DISCORD_INTEGRATION.index, itemStackDiscordIntegration)
+            */
 
 
             // ハンター抽選

@@ -9,10 +9,10 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
 import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.onInteract
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
-import org.bukkit.Location
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
 import org.bukkit.command.ConsoleCommandSender
@@ -24,11 +24,10 @@ class Btp(name: String) : ICommand(name) {
             if (!GameManager.isGame()) {
                 val loc = onInteract.successBlockLoc
                 if (loc != null) {
-                    for (p in Bukkit.getOnlinePlayers()) {
-                        if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) {
-                            p.gameMode = GameMode.SPECTATOR
-                            p.teleport(Location(loc.world, loc.blockX + 0.5, loc.blockY.toDouble(), loc.blockZ + 0.5))
-                        }
+                    val l = loc.add(0.5, 0.0, 0.5)
+                    for (p in Bukkit.getOnlinePlayers().filter { !it.isAdminTeam }) {
+                        p.gameMode = GameMode.SPECTATOR
+                        TosoGameAPI.teleport(p, l)
                     }
                     sp.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${Bukkit.getOnlinePlayers().size - Teams.getOnlineCount(OnlineTeam.TOSO_ADMIN)}人${ChatColor.RESET}${ChatColor.GRAY}を生存ブロックの位置にテレポートしました。")
                     return

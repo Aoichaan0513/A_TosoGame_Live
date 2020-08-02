@@ -9,6 +9,8 @@ import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.GameRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -155,10 +157,8 @@ class Scoreboard {
         }
 
         private fun getReward(p: Player): String {
-            return if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, p))
-                "${ChatColor.GRAY}${ChatColor.STRIKETHROUGH}${MoneyManager.formatMoney(MoneyManager.getReward(p))}円"
-            else
-                "${ChatColor.GOLD}${MoneyManager.formatMoney(MoneyManager.getReward(p))}${ChatColor.GRAY}円"
+            return if (p.isAdminTeam || p.isJailTeam) "${ChatColor.GRAY}${ChatColor.STRIKETHROUGH}${MoneyManager.formatMoney(MoneyManager.getReward(p))}円"
+            else "${ChatColor.GOLD}${MoneyManager.formatMoney(MoneyManager.getReward(p))}${ChatColor.GRAY}円"
         }
 
         private val hidePlayerSet = mutableSetOf<UUID>()

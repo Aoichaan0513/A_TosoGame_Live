@@ -26,7 +26,7 @@ class Join(name: String) : ICommand(name) {
                                 p.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
                                 sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
+                                MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                                 continue
                             }
                             sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでにゲームに参加しています。")
@@ -42,7 +42,7 @@ class Join(name: String) : ICommand(name) {
                 if (!sp.isPlayerTeam) {
                     sp.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
-                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${sp.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
+                    MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${sp.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                     return
                 }
                 sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}すでにゲームに参加しています。")
@@ -61,7 +61,7 @@ class Join(name: String) : ICommand(name) {
                         p.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
                         bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
-                        Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
+                        MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                         continue
                     }
                     bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでにゲームに参加しています。")
@@ -84,7 +84,7 @@ class Join(name: String) : ICommand(name) {
                         p.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
                         cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
-                        Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
+                        MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                         continue
                     }
                     cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.RED}はすでにゲームに参加しています。")

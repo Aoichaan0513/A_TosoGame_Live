@@ -7,11 +7,13 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Listener.MissionStartEvent
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.onInteract
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterGroup
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Bukkit
@@ -51,15 +53,18 @@ class MissionManager {
             private set
 
         fun isMission(id: Int): Boolean {
-            return missionStates.contains(id)
+            return missionStates.isNotEmpty() && missionStates.contains(id)
         }
 
         fun isMission(missionState: MissionState): Boolean {
             return isMission(missionState.id)
         }
 
-        val isMission: Boolean
+        val isMission
             get() = missionStates.isNotEmpty() && !isMission(MissionState.NONE)
+
+        val isInventoryAllowOpenMission
+            get() = isMission(MissionState.AREA_EXTEND)
 
         val isBossBar: Boolean
             get() = bossBar != null
@@ -76,7 +81,7 @@ class MissionManager {
             )
             itemStack.itemMeta = itemMeta
 
-            if (GameManager.isGame() && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, p)) {
+            if (GameManager.isGame() && p.isAdminTeam) {
                 p.inventory.setItem(PlayerManager.loadConfig(p).inventoryConfig.getSlot(ItemType.BOOK), itemStack)
             } else {
                 p.inventory.addItem(itemStack)
@@ -87,7 +92,7 @@ class MissionManager {
         }
 
         fun setBook(p: Player): ItemStack? {
-            if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, p)) return null
+            if (p.isHunterGroup) return null
 
             val itemStack = p.inventory.contents.firstOrNull { it != null && it.type == ItemType.BOOK.material && it.itemMeta != null && it.itemMeta!!.hasCustomModelData() && it.itemMeta!!.customModelData == 1001 }
                     ?: addBook(p)
@@ -114,29 +119,38 @@ class MissionManager {
             when (i) {
                 MissionState.SUCCESS.id -> {
                     if (onInteract.successBlockLoc != null) {
-                        sendMission(sender, i)
+                        sender.sendMessage("""
+                            ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}生存ミッションを開始しました。
+                            ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ミッションを開始しました。
+                        """.trimIndent())
+                        sendMissionAPI(sender, i)
                     } else {
                         sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}このミッションはコマンドから実行できません。")
                     }
                 }
                 MissionState.HUNTER_ZONE.id -> {
                     if (onInteract.hunterZoneBlockLoc != null) {
-                        sendMission(sender, i)
+                        if (HunterZone.hunterSetCount > 0) {
+                            sender.sendMessage("""
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッションを開始しました。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ミッションを開始しました。
+                            """.trimIndent())
+                            sendMissionAPI(sender, i)
+                        } else {
+                            sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}応募したハンターがいないためこのミッションは実行できません。")
+                        }
                     } else {
                         sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}このミッションはコマンドから実行できません。")
                     }
                 }
                 MissionState.TIMED_DEVICE.id -> {
                     val playerList = mutableListOf<UUID>()
-                    Bukkit.getOnlinePlayers().filter { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, it) }
-                            .forEach { playerList.add(it.uniqueId) }
+                    Bukkit.getOnlinePlayers().filter { it.isPlayerGroup }.forEach { playerList.add(it.uniqueId) }
 
                     val divideList = MainAPI.divide(playerList, 2)
-                    if (divideList.size in 1..30 && playerList.size % 2 == 0) {
-                        sendMissionAPI(sender, i)
-                    } else {
-                        sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}このミッションは実行できません。")
-                    }
+
+                    if (divideList.size in 1..30 && playerList.size % 2 == 0) sendMissionAPI(sender, i)
+                    else sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}このミッションは実行できません。")
                 }
                 else -> sendMissionAPI(sender, i)
             }
@@ -162,7 +176,7 @@ class MissionManager {
             textComponent1.addExtra(textComponent2)
             textComponent1.addExtra(textComponent3)
 
-            Bukkit.getOnlinePlayers().filterNot { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, it) }.forEach { it.spigot().sendMessage(textComponent1) }
+            Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { it.spigot().sendMessage(textComponent1) }
             return
         }
 
@@ -194,9 +208,7 @@ class MissionManager {
 
                                 bossBar = createBossBar(stringBuilder.toString().trim().substring(0, stringBuilder.toString().trim().length - 5), 1.toDouble(), BarColor.YELLOW, BarStyle.SOLID)
 
-                                Bukkit.getOnlinePlayers()
-                                        .filter { !Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, it) && !Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, it) }
-                                        .forEach { bossBar?.addPlayer(it) }
+                                Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
                             } else {
                                 bossBar?.removeAll()
                                 bossBar = null
@@ -220,9 +232,7 @@ class MissionManager {
                                     BarStyle.SOLID
                             )
 
-                            Bukkit.getOnlinePlayers()
-                                    .filter { !Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, it) && !Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, it) }
-                                    .forEach { bossBar?.addPlayer(it) }
+                            Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
 
                             i--
                         }
@@ -242,9 +252,7 @@ class MissionManager {
                                     BarStyle.SOLID
                             )
 
-                            Bukkit.getOnlinePlayers()
-                                    .filter { !Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, it) && !Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, it) }
-                                    .forEach { bossBar?.addPlayer(it) }
+                            Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
 
                             i--
                         }
@@ -259,9 +267,7 @@ class MissionManager {
 
                             val bossBar = createBossBar("${ChatColor.BOLD}${missionTitleMap[result]}", 1.toDouble(), MissionState.getMission(result).barColor, BarStyle.SOLID)
 
-                            Bukkit.getOnlinePlayers()
-                                    .filter { !Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, it) && !Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, it) }
-                                    .forEach { bossBar?.addPlayer(it) }
+                            Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
 
                             i--
                         }
@@ -391,7 +397,7 @@ class MissionManager {
             textComponent1.addExtra(textComponent2)
             textComponent1.addExtra(textComponent3)
 
-            Bukkit.getOnlinePlayers().filterNot { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, it) }.forEach { it.spigot().sendMessage(textComponent1) }
+            Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { it.spigot().sendMessage(textComponent1) }
         }
 
         private fun sendFileMissionAPI(id: Int, material: Material): Int {

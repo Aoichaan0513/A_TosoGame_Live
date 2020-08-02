@@ -24,36 +24,6 @@ class ResultInventory {
         val arrowLeft = "MHF_ArrowLeft"
         val arrowRight = "MHF_ArrowRight"
 
-
-        fun getPlayers(resultType: ResultType): List<List<Pair<Player, Long>>> {
-            val maxCount = 36
-
-            return when (resultType) {
-                ResultType.REWARD -> {
-                    val dividedList = mutableListOf<List<Pair<Player, Long>>>()
-
-                    MainAPI.divide(MoneyManager.rewardMap.toList(), maxCount).forEach {
-                        val list = mutableListOf<Pair<Player, Long>>()
-                        it.filter { MainAPI.isOnline(it.first) }.toList().sortedBy { it.second * -1 }.forEach { list.add(Bukkit.getPlayer(it.first)!! to it.second) }
-                        dividedList.add(list)
-                    }
-
-                    dividedList
-                }
-                ResultType.ENSURE -> {
-                    val dividedList = mutableListOf<List<Pair<Player, Long>>>()
-
-                    MainAPI.divide(onDamage.hunterMap.toList(), maxCount).forEach {
-                        val list = mutableListOf<Pair<Player, Long>>()
-                        it.filter { MainAPI.isOnline(it.first) }.toList().sortedBy { it.second * -1 }.forEach { list.add(Bukkit.getPlayer(it.first)!! to it.second.toLong()) }
-                        dividedList.add(list)
-                    }
-
-                    dividedList
-                }
-            }
-        }
-
         fun getInventory(p: Player, resultType: ResultType, page: Int = 0): Inventory {
             val inv = Bukkit.createInventory(null, 9 * 6, "${when (resultType) {
                 ResultType.REWARD -> rewardTitle
@@ -110,7 +80,7 @@ class ResultInventory {
                 if (player.uniqueId == p.uniqueId)
                     itemMetaPlayerInfo.addEnchant(Enchantment.DURABILITY, 1, true)
                 itemMetaPlayerInfo.owningPlayer = player
-                itemMetaPlayerInfo.setDisplayName("${ChatColor.GOLD}${ChatColor.UNDERLINE}${i}位${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${player.name}")
+                itemMetaPlayerInfo.setDisplayName("${ChatColor.GOLD}${ChatColor.UNDERLINE}${i + 1}位${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${player.name}")
                 itemMetaPlayerInfo.lore = listOf("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${long}${if (resultType == ResultType.REWARD) "円" else ""}")
                 itemStackPlayerInfo.itemMeta = itemMetaPlayerInfo
                 inv.addItem(itemStackPlayerInfo)
@@ -118,10 +88,47 @@ class ResultInventory {
 
             return inv
         }
+
+        private fun getPlayers(resultType: ResultType): List<List<Pair<Player, Long>>> {
+            val maxCount = 36
+
+            return when (resultType) {
+                ResultType.REWARD -> {
+                    val dividedList = mutableListOf<List<Pair<Player, Long>>>()
+
+                    MainAPI.divide(MoneyManager.rewardMap.toList(), maxCount).forEach {
+                        val list = mutableListOf<Pair<Player, Long>>()
+                        it.filter { MainAPI.isOnline(it.first) && it.second > 0 }.toList().sortedBy { it.second * -1 }.forEach { list.add(Bukkit.getPlayer(it.first)!! to it.second) }
+                        dividedList.add(list)
+                    }
+
+                    dividedList
+                }
+                ResultType.ENSURE -> {
+                    val dividedList = mutableListOf<List<Pair<Player, Long>>>()
+
+                    MainAPI.divide(onDamage.hunterMap.toList(), maxCount).forEach {
+                        val list = mutableListOf<Pair<Player, Long>>()
+                        it.filter { MainAPI.isOnline(it.first) && it.second > 0 }.toList().sortedBy { it.second * -1 }.forEach { list.add(Bukkit.getPlayer(it.first)!! to it.second.toLong()) }
+                        dividedList.add(list)
+                    }
+
+                    dividedList
+                }
+            }
+        }
     }
 
     enum class ResultType {
         REWARD,
-        ENSURE
+        ENSURE;
+
+        companion object {
+
+            fun getType(str: String?): ResultType? {
+                val text = str?.trim()
+                return if (text != null) values().firstOrNull { it.name.equals(text, true) } else null
+            }
+        }
     }
 }

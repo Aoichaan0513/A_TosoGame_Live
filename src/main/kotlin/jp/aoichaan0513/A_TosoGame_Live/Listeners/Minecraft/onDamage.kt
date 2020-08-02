@@ -13,6 +13,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.TimedDevice
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
+import jp.aoichaan0513.A_TosoGame_Live.Utils.*
 import org.bukkit.*
 import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
@@ -43,8 +44,7 @@ class onDamage : Listener {
             val worldConfig = Main.worldConfig
 
             if (GameManager.isGame(GameManager.GameState.GAME)) {
-                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, damager)
-                        || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, damager)) {
+                if (player.isPlayerGroup && damager.isHunterTeam) {
                     if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) return
 
                     e.isCancelled = false
@@ -93,8 +93,7 @@ class onDamage : Listener {
                         Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${player.name}が確保されました。(${ChatColor.UNDERLINE}残り${Teams.getOnlineCount(Teams.OnlineTeam.TOSO_PLAYER) + Teams.getOnlineCount(Teams.OnlineTeam.TOSO_SUCCESS)}人${ChatColor.RESET}${ChatColor.GRAY})")
                     }, 20 * 3)
                     return
-                } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, damager)
-                        || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, damager)) {
+                } else if (player.isPlayerGroup && damager.isTuhoTeam) {
                     if (player.hasPotionEffect(PotionEffectType.INVISIBILITY) || player.hasPotionEffect(PotionEffectType.GLOWING)) return
 
                     e.isCancelled = false
@@ -115,30 +114,22 @@ class onDamage : Listener {
                     }
                 } else {
                     e.isCancelled = true
-                    if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
+                    if (player.isPlayerGroup && damager.isAdminTeam) {
                         TosoGameAPI.teleport(player, worldConfig.respawnLocationConfig.locations.values)
-                    } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                        TosoGameAPI.teleport(player, worldConfig.respawnLocationConfig.locations.values)
-                    } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
+                    } else if (player.isHunterGroup && damager.isAdminTeam) {
+                        TosoGameAPI.teleport(player, worldConfig.hunterLocationConfig.getLocation(1))
+                    } else if (player.isJailTeam && damager.isAdminTeam) {
                         TosoGameAPI.teleport(player, worldConfig.jailLocationConfig.locations.values)
-                    } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                        TosoGameAPI.teleport(player, worldConfig.hunterLocationConfig.getLocation(1))
-                    } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                        TosoGameAPI.teleport(player, worldConfig.hunterLocationConfig.getLocation(1))
                     }
                 }
             } else {
                 e.isCancelled = true
-                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
+                if (player.isPlayerGroup && damager.isAdminTeam) {
                     TosoGameAPI.teleport(player, worldConfig.respawnLocationConfig.locations.values)
-                } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                    TosoGameAPI.teleport(player, worldConfig.respawnLocationConfig.locations.values)
-                } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
+                } else if (player.isHunterGroup && damager.isAdminTeam) {
+                    TosoGameAPI.teleport(player, worldConfig.hunterLocationConfig.getLocation(1))
+                } else if (player.isJailTeam && damager.isAdminTeam) {
                     TosoGameAPI.teleport(player, worldConfig.jailLocationConfig.locations.values)
-                } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                    TosoGameAPI.teleport(player, worldConfig.hunterLocationConfig.getLocation(1))
-                } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, player) && Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) {
-                    TosoGameAPI.teleport(player, worldConfig.hunterLocationConfig.getLocation(1))
                 }
             }
         } else if (e.damager is Zombie && e.entity is Player) {
@@ -146,7 +137,7 @@ class onDamage : Listener {
 
             val worldConfig = Main.worldConfig
 
-            if (GameManager.isGame(GameManager.GameState.GAME) && (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, player) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, player))) {
+            if (GameManager.isGame(GameManager.GameState.GAME) && player.isPlayerGroup) {
                 if (player.hasPotionEffect(PotionEffectType.INVISIBILITY)) return
 
                 e.isCancelled = false
@@ -185,7 +176,7 @@ class onDamage : Listener {
 
         if (entity is ItemFrame) {
             if (damager is Player) {
-                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, damager)) return
+                if (damager.isAdminTeam) return
                 e.isCancelled = true
             }
         } else {
@@ -195,7 +186,7 @@ class onDamage : Listener {
                 val p = entity
 
                 if (damager is Egg) {
-                    if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, p)) {
+                    if (p.isHunterTeam) {
                         e.isCancelled = false
                         e.damage = 0.1
                         p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 20 * 5, 4, false, false))
@@ -204,7 +195,7 @@ class onDamage : Listener {
                         e.isCancelled = true
                     }
                 } else if (damager is Snowball) {
-                    if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, p)) {
+                    if (p.isHunterTeam) {
                         e.isCancelled = false
                         e.damage = 0.1
                         ironFence(p)
@@ -222,9 +213,8 @@ class onDamage : Listener {
 
         if (projectile is EnderPearl) {
             val shooter = e.entity.shooter
-            if (shooter is Player)
-                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, shooter))
-                    e.isCancelled = true
+            if (shooter is Player && shooter.isJailTeam)
+                e.isCancelled = true
         }
     }
 
@@ -242,7 +232,7 @@ class onDamage : Listener {
             if (damageCause == EntityDamageEvent.DamageCause.FALL) {
                 e.isCancelled = true
 
-                if (GameManager.isGame(GameManager.GameState.GAME) && (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, p))) {
+                if (GameManager.isGame(GameManager.GameState.GAME) && (p.isPlayerGroup || p.isHunterGroup)) {
                     if (p.hasPotionEffect(PotionEffectType.SLOW))
                         p.removePotionEffect(PotionEffectType.SLOW)
 
@@ -255,12 +245,12 @@ class onDamage : Listener {
 
                 val worldConfig = Main.worldConfig
 
-                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)) {
+                if (p.isPlayerGroup) {
                     TosoGameAPI.teleport(p, worldConfig.respawnLocationConfig.locations.values)
-                } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_JAIL, p)) {
-                    TosoGameAPI.teleport(p, worldConfig.jailLocationConfig.locations.values)
-                } else if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, p)) {
+                } else if (p.isHunterGroup) {
                     TosoGameAPI.teleport(p, worldConfig.hunterLocationConfig.getLocation(1))
+                } else if (p.isJailTeam) {
+                    TosoGameAPI.teleport(p, worldConfig.jailLocationConfig.locations.values)
                 } else {
                     TosoGameAPI.teleport(p, worldConfig.world.spawnLocation)
                 }

@@ -5,12 +5,14 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.ActionBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.DifficultyManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Map.MapUtility
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
+import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.*
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.GameMode
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Location
@@ -208,12 +210,12 @@ class Main : JavaPlugin(), Listener {
                 // ゲーム進行コマンド (プレイヤー用)
                 "h" to H("h"),
                 "t" to T("t"),
+                "hz" to HZ("hz"),
 
                 // ミッション用コマンド
                 "code" to Code("code"),
 
                 // オープニングゲーム用コマンド
-                "opgame" to OPGame("opgame"), // コマンドブロック対応
                 "shuffle" to Shuffle("shuffle"),
 
                 // 設定用コマンド
@@ -363,14 +365,15 @@ class Main : JavaPlugin(), Listener {
         val strPostUrl = "${urlStr}api"
         Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}更新を確認しています…")
         val jsonObject = JSONObject(HttpConnection(strPostUrl, "{\"channel\":\"$projectChannel\", \"current\":\"$projectVersion\"}").result)
+
         if (jsonObject.getBoolean("result")) {
             Bukkit.getConsoleSender().sendMessage("""
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}更新が見つかりました。
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}プラグインチャンネル: $projectChannel
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}現在のバージョン: $projectVersion
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}最新のバージョン: ${jsonObject.getString("latest")}
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}最新のバージョンをダウンロードしています…
-                """.trimIndent())
+                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}更新が見つかりました。
+                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}プラグインチャンネル: $projectChannel
+                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}現在のバージョン: $projectVersion
+                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}最新のバージョン: ${jsonObject.getString("latest")}
+                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}最新のバージョンをダウンロードしています…
+            """.trimIndent())
             try {
                 val url = URL("$urlStr${jsonObject.getString("file")}")
                 val conn = url.openConnection() as HttpURLConnection
@@ -487,7 +490,7 @@ class Main : JavaPlugin(), Listener {
     private fun getActionbarMessage(p: org.bukkit.entity.Player, decimalFormat: DecimalFormat): String {
         val separator = "${ChatColor.RESET}${ChatColor.GRAY} / ${ChatColor.RESET}"
 
-        val isHiddenMessage = if (VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) "${ChatColor.RED}姿を非表示中" else ""
+        val isHiddenMessage = if (PlayerManager.loadConfig(p).visibility) "${ChatColor.RED}姿を非表示中" else ""
 
         val invisibleMessage = if (p.isPlayerGroup) {
             if (p.hasPotionEffect(PotionEffectType.INVISIBILITY))
@@ -502,7 +505,7 @@ class Main : JavaPlugin(), Listener {
 
         val speedMessage = if (p.isPlayerGroup) {
             if (p.hasPotionEffect(PotionEffectType.SPEED))
-                "${ChatColor.GOLD}${ChatColor.UNDERLINE}移動速度上昇${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${decimalFormat.format(p.getPotionEffect(PotionEffectType.SPEED)!!.duration.toDouble() / 20)}${ChatColor.RESET}${ChatColor.GRAY}秒"
+                "${ChatColor.GOLD}${ChatColor.UNDERLINE}移動速度上昇${ChatColor.GRAY}終了まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${decimalFormat.format(p.getPotionEffect(PotionEffectType.SPEED)!!.duration.toDouble() / 20)}${ChatColor.RESET}${ChatColor.GRAY}秒"
             else if (p.hasCooldown(Material.FEATHER))
                 "${ChatColor.GOLD}${ChatColor.UNDERLINE}移動速度上昇クールダウン${ChatColor.GRAY}終了まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${decimalFormat.format(p.getCooldown(Material.FEATHER).toDouble() / 20)}${ChatColor.RESET}${ChatColor.GRAY}秒"
             else
@@ -514,7 +517,15 @@ class Main : JavaPlugin(), Listener {
         val respawnAutoTime = RespawnRunnable.autoTimeMap[p.uniqueId]
         val respawnCoolTime = RespawnRunnable.coolTimeMap[p.uniqueId]
 
-        val respawnMessage = if (p.isJailTeam) "${if (respawnAutoTime != null && respawnAutoTime > 0) "${ChatColor.GOLD}${ChatColor.UNDERLINE}自動復活${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(respawnAutoTime)}" else ""}${if (respawnAutoTime != null && respawnAutoTime > 0 && respawnCoolTime != null && respawnCoolTime > 0) separator else ""}${if (respawnCoolTime != null && respawnCoolTime > 0) "${ChatColor.GOLD}${ChatColor.UNDERLINE}復活可能${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(respawnCoolTime)}" else ""}" else ""
+        val respawnMessage = if (GameManager.isGame() && p.isJailTeam) {
+            if (TosoGameAPI.isRespawn && RespawnRunnable.isAllowRespawn(p))
+                "${if (respawnAutoTime != null && respawnAutoTime > 0) "${ChatColor.GOLD}${ChatColor.UNDERLINE}自動復活${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(respawnAutoTime)}" else ""}${if (respawnAutoTime != null && respawnAutoTime > 0 && respawnCoolTime != null && respawnCoolTime > 0) separator else ""}${if (respawnCoolTime != null && respawnCoolTime > 0) "${ChatColor.GOLD}${ChatColor.UNDERLINE}復活可能${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(respawnCoolTime)}" else ""}"
+            else
+                "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}復活不可"
+
+        } else {
+            ""
+        }
 
         return "${if (isHiddenMessage.isNotEmpty()) "$isHiddenMessage${if (invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}$invisibleMessage${if (invisibleMessage.isNotEmpty() && speedMessage.isNotEmpty()) separator else ""}$speedMessage${if (respawnMessage.isNotEmpty()) "$respawnMessage${if (invisibleMessage.isNotEmpty() || invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}"
     }

@@ -1,9 +1,8 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Manager
 
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager.GameState
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.*
@@ -43,17 +42,20 @@ class MoneyManager {
 
         fun addReward(p: Player) {
             if (!GameManager.isGame(GameState.GAME)) return
-            if (isPlayer(p)) addReward(p, getRate(p).toLong())
+            if (p.isPlayerGroup)
+                addReward(p, getRate(p).toLong())
         }
 
         fun addReward(p: Player, l: Long) {
             if (!GameManager.isGame(GameState.GAME)) return
-            if (isPlayer(p)) rewardMap[p.uniqueId] = if (rewardMap.containsKey(p.uniqueId)) rewardMap[p.uniqueId]!! + l else getRate(p).toLong()
+            if (p.isPlayerGroup)
+                rewardMap[p.uniqueId] = if (rewardMap.containsKey(p.uniqueId)) rewardMap[p.uniqueId]!! + l else getRate(p).toLong()
         }
 
         fun removeReward(p: Player, l: Long) {
             if (!GameManager.isGame(GameState.GAME)) return
-            if (isPlayer(p)) rewardMap[p.uniqueId] = if (rewardMap.containsKey(p.uniqueId) && l >= rewardMap[p.uniqueId]!!) rewardMap[p.uniqueId]!! - l else 0
+            if (p.isPlayerGroup)
+                rewardMap[p.uniqueId] = if (rewardMap.containsKey(p.uniqueId) && l >= rewardMap[p.uniqueId]!!) rewardMap[p.uniqueId]!! - l else 0
         }
 
         fun resetReward() {
@@ -100,10 +102,6 @@ class MoneyManager {
             if (GameManager.isGame(GameState.GAME)) return
             rateMap.clear()
             for (player in Bukkit.getOnlinePlayers()) setRate(player)
-        }
-
-        fun isPlayer(p: Player): Boolean {
-            return Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p)
         }
 
         fun formatMoney(l: Long): String {

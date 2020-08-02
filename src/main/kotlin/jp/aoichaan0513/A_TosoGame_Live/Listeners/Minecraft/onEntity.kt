@@ -3,8 +3,7 @@ package jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager.GameState
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -31,7 +30,7 @@ class onEntity : Listener {
         val p = e.target as? Player ?: return
 
         if (GameManager.isGame(GameState.GAME)) {
-            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p)) {
+            if (p.isPlayerGroup) {
                 if (!p.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
                     e.isCancelled = false
                 } else {

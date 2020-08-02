@@ -336,6 +336,26 @@ class WorldConfig(val world: World) {
         private val PATH = WorldManager.PathType.LOCATION_HUNTER.path
 
         /**
+         * ハンターがミッションでテレポートされる位置を取得します。
+         *
+         * @return 設定されている位置
+         */
+        fun getLocation(): Location {
+            val path = "$PATH.hunterzone"
+
+            return if (c.contains(path)) {
+                val x = c.getDouble("$path.x")
+                val y = c.getDouble("$path.y")
+                val z = c.getDouble("$path.z")
+                val yaw = c.getInt("$path.yaw")
+                val pitch = c.getInt("$path.pitch")
+                Location(world, x, y, z, yaw.toFloat(), pitch.toFloat())
+            } else {
+                world.spawnLocation
+            }
+        }
+
+        /**
          * ハンターがテレポートされる位置を取得します。
          *
          * @param i 設定されている番号
@@ -354,6 +374,22 @@ class WorldConfig(val world: World) {
             } else {
                 world.spawnLocation
             }
+        }
+
+        /**
+         * ハンターがミッションでテレポートされる位置を設定します。
+         *
+         * @param i        設定する番号
+         * @param location 設定する位置
+         */
+        fun setLocation(location: Location) {
+            val path = "$PATH.hunterzone"
+            c["$path.x"] = location.blockX + 0.5
+            c["$path.y"] = location.blockY
+            c["$path.z"] = location.blockZ + 0.5
+            c["$path.yaw"] = location.yaw
+            c["$path.pitch"] = location.pitch
+            save()
         }
 
         /**

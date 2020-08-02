@@ -2,9 +2,9 @@ package jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -19,8 +19,10 @@ class onVehicle : Listener {
     @EventHandler
     fun onVehicleEnter(e: VehicleEnterEvent) {
         if (e.entered.type != EntityType.PLAYER) return
+
         val p = e.entered as Player
-        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, p)) return
+
+        if (p.isAdminTeam || p.isJailTeam) return
         if (e.vehicle.type == EntityType.MINECART || e.vehicle.type == EntityType.BOAT || e.vehicle.type == EntityType.PIG || e.vehicle.type == EntityType.HORSE) {
             e.isCancelled = true
             p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}乗り物に乗ることはできません。")
@@ -40,7 +42,7 @@ class onVehicle : Listener {
     @EventHandler
     fun onPlayerBedEnter(e: PlayerBedEnterEvent) {
         val p = e.player
-        if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) {
+        if (!p.isAdminTeam) {
             e.isCancelled = true
             p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ベッドに寝ることはできません。")
         }

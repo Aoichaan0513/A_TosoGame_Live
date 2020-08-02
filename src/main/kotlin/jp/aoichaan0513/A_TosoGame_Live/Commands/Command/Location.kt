@@ -29,7 +29,7 @@ class Location(name: String) : ICommand(name) {
                             val i = args[1].toInt()
                             if (i >= 1) {
                                 worldConfig.opGameLocationConfig.setGOPLocation(i, sp.location)
-                                sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}オープニングゲーム集合地点の位置" + i + "を設定しました。")
+                                sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}オープニングゲーム集合地点の位置${i}を設定しました。")
                                 return
                             }
                             sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。1以上で数字を指定してください。")
@@ -42,29 +42,36 @@ class Location(name: String) : ICommand(name) {
                     sp.sendMessage("""
                         ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。
                         ${MainAPI.getPrefix(PrefixType.ERROR)}コマンドの使い方:
-                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/location ${args[0]} <数値>" - オープニングゲーム集合地点の設定
+                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label ${args[0]} <数値>" - オープニングゲーム集合地点の設定
                     """.trimIndent())
                     return
                 } else if (args[0].equals("hunter", true)) {
                     if (args.size != 1) {
-                        if (ParseUtil.isInt(args[1])) {
-                            val i = args[1].toInt()
-                            if (i >= 1) {
-                                worldConfig.hunterLocationConfig.setLocation(i, sp.location)
-                                sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンター集合地点の位置" + i + "を設定しました。")
-                                return
+                        when (args[1].toLowerCase()) {
+                            "hunterzone" -> {
+                                worldConfig.hunterLocationConfig.setLocation(sp.location)
+                                sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンターゾーンのハンター集合位置を設定しました。")
                             }
-                            sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。1以上で数字を指定してください。")
-                            return
-                        } else {
-                            MainAPI.sendMessage(sp, ErrorMessage.ARGS_INTEGER)
-                            return
+                            else -> {
+                                if (ParseUtil.isInt(args[1])) {
+                                    val i = args[1].toInt()
+                                    if (i >= 1) {
+                                        worldConfig.hunterLocationConfig.setLocation(i, sp.location)
+                                        sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンター集合地点の位置${i}を設定しました。")
+                                        return
+                                    }
+                                    sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。1以上で数字を指定してください。")
+                                    return
+                                }
+                                MainAPI.sendMessage(sp, ErrorMessage.ARGS_INTEGER)
+                            }
                         }
+                        return
                     }
                     sp.sendMessage("""
                         ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。
                         ${MainAPI.getPrefix(PrefixType.ERROR)}コマンドの使い方:
-                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/location ${args[0]} <数値>" - ハンター集合地点の設定
+                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label ${args[0]} <数値>" - ハンター集合地点の設定
                     """.trimIndent())
                     return
                 } else if (args[0].equals("door", true)) {
@@ -77,12 +84,12 @@ class Location(name: String) : ICommand(name) {
                             if (ParseUtil.isInt(args[1])) {
                                 val i = args[1].toInt()
                                 if (i >= 1) {
-                                    if (worldConfig.config.contains(WorldManager.PathType.DOOR_HUNTER.path + ".p" + i)) {
+                                    if (worldConfig.config.contains("${WorldManager.PathType.DOOR_HUNTER.path}.p$i")) {
                                         worldConfig.hunterDoorConfig.openHunterDoor(i)
-                                        sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンターボックスのドア" + i + "を開きました。")
+                                        sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンターボックスのドア${i}を開きました。")
                                         return
                                     }
-                                    sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ハンターボックスのドア" + i + "は設定されていないため開くことができません。")
+                                    sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ハンターボックスのドア${i}は設定されていないため開くことができません。")
                                     return
                                 }
                                 sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。1以上で数字を指定してください。")
@@ -96,8 +103,8 @@ class Location(name: String) : ICommand(name) {
                     sp.sendMessage("""
                         ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。
                         ${MainAPI.getPrefix(PrefixType.ERROR)}コマンドの使い方:
-                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/location door open <数値>" - 指定したドアを開く
-                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/location door open all" - 設定したすべてのドアを開く
+                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label ${args[0]} open <数値>" - 指定したドアを開く
+                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label ${args[0]} open all" - 設定したすべてのドアを開く
                     """.trimIndent())
                     return
                 } else if (args[0].equals("jail", true)) {
@@ -106,7 +113,7 @@ class Location(name: String) : ICommand(name) {
                             val i = args[1].toInt()
                             if (i >= 1) {
                                 worldConfig.jailLocationConfig.setLocation(i, sp.location)
-                                sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}牢獄地点の位置" + i + "を設定しました。")
+                                sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}牢獄地点の位置${i}を設定しました。")
                                 return
                             }
                             sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。1以上で数字を指定してください。")
@@ -119,7 +126,7 @@ class Location(name: String) : ICommand(name) {
                     sp.sendMessage("""
                         ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。
                         ${MainAPI.getPrefix(PrefixType.ERROR)}コマンドの使い方:
-                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/location jail <数値>" - 牢獄地点の設定
+                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label ${args[0]} <数値>" - 牢獄地点の設定
                     """.trimIndent())
                     return
                 } else if (args[0].equals("respawn", true) || args[0].equals("res", true)) {
@@ -128,7 +135,7 @@ class Location(name: String) : ICommand(name) {
                             val i = args[1].toInt()
                             if (i >= 1) {
                                 worldConfig.respawnLocationConfig.setLocation(i, sp.location)
-                                sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}復活地点の位置" + i + "を設定しました。")
+                                sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}復活地点の位置${i}を設定しました。")
                                 return
                             }
                             sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。1以上で数字を指定してください。")
@@ -141,31 +148,31 @@ class Location(name: String) : ICommand(name) {
                     sp.sendMessage("""
                         ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。
                         ${MainAPI.getPrefix(PrefixType.ERROR)}コマンドの使い方:
-                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/location ${args[0]} <数値>" - 復活地点の設定
+                        ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label ${args[0]} <数値>" - 復活地点の設定
                     """.trimIndent())
                     return
                 }
                 sp.sendMessage("""
                     ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。
                     ${MainAPI.getPrefix(PrefixType.ERROR)}コマンドの使い方:
-                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/location opgame" または "/location opg" - オープニングゲーム地点の設定
-                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/location gopgame <数値>" または "/location gopg <数値>" - オープニングゲーム集合地点の設定
-                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/location hunter" - ハンター集合地点の設定
-                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/location door <引数…>" - ドア位置の設定
-                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/location jail <数値>" - 牢獄地点の設定
-                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/location respawn <数値>" または "/location res <数値>" - 復活地点の設定
+                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label opgame" または "/$label opg" - オープニングゲーム地点の設定
+                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label gopgame <数値>" または "/$label gopg <数値>" - オープニングゲーム集合地点の設定
+                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label hunter …" - ハンター集合地点の設定
+                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label door …" - ドア位置の設定
+                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label jail <数値>" - 牢獄地点の設定
+                    ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label respawn <数値>" または "/$label res <数値>" - 復活地点の設定
                 """.trimIndent())
                 return
             }
             sp.sendMessage("""
                 ${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。
                 ${MainAPI.getPrefix(PrefixType.ERROR)}コマンドの使い方:
-                ${MainAPI.getPrefix(PrefixType.ERROR)}"/location opgame" または "/location opg" - オープニングゲーム地点の設定
-                ${MainAPI.getPrefix(PrefixType.ERROR)}"/location gopgame <数値>" または "/location gopg <数値>" - オープニングゲーム集合地点の設定
-                ${MainAPI.getPrefix(PrefixType.ERROR)}"/location hunter" - ハンター集合地点の設定
-                ${MainAPI.getPrefix(PrefixType.ERROR)}"/location door <引数…>" - ドア位置の設定
-                ${MainAPI.getPrefix(PrefixType.ERROR)}"/location jail <数値>" - 牢獄地点の設定
-                ${MainAPI.getPrefix(PrefixType.ERROR)}"/location respawn <数値>" または "/location res <数値>" - 復活地点の設定
+                ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label opgame" または "/$label opg" - オープニングゲーム地点の設定
+                ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label gopgame <数値>" または "/$label gopg <数値>" - オープニングゲーム集合地点の設定
+                ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label hunter …" - ハンター集合地点の設定
+                ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label door …" - ドア位置の設定
+                ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label jail <数値>" - 牢獄地点の設定
+                ${MainAPI.getPrefix(PrefixType.ERROR)}"/$label respawn <数値>" または "/$label res <数値>" - 復活地点の設定
             """.trimIndent())
             return
         }
@@ -185,12 +192,16 @@ class Location(name: String) : ICommand(name) {
         if (args.size == 1) {
             return getTabList(args[0], "opgame", "opg", "gopgame", "gopg", "hunter", "door", "jail", "respawn", "res")
         } else if (args.size == 2) {
-            if (args[0].equals("door", true)) {
-                val worldConfig = Main.worldConfig
-                val set = mutableSetOf("all")
-                for (i in worldConfig.hunterDoorConfig.doors.keys)
-                    set.add(i.toString())
-                return getTabList(args[1], set)
+            return when (args[0]) {
+                "door" -> {
+                    val worldConfig = Main.worldConfig
+                    val set = mutableSetOf("all")
+                    for (i in worldConfig.hunterDoorConfig.doors.keys)
+                        set.add(i.toString())
+                    return getTabList(args[1], set)
+                }
+                "hunter" -> getTabList(args[1], "hunterzone")
+                else -> getTabList(args[1], emptySet())
             }
         }
         return emptyList()

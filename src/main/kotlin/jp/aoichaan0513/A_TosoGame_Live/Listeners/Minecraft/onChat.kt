@@ -3,13 +3,12 @@ package jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
-import jp.aoichaan0513.A_TosoGame_Live.Utils.RomajiConverter
+import jp.aoichaan0513.A_TosoGame_Live.Utils.*
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -97,7 +96,7 @@ class onChat : Listener {
     }
 
     private fun sendMessage(chatType: ChatType, sp: Player, p: Player, msg: String) {
-        val basePrefix = "${(if (TosoGameAPI.isBroadCaster(sp)) "${ChatColor.GOLD}${ChatColor.BOLD} * ${ChatColor.RESET}" else "")}${Teams.getTeamLabel(Teams.DisplaySlot.CHAT, sp)}${ChatColor.RESET}${(if (!VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) " ${sp.displayName}" else "")}${ChatColor.GREEN}: ${ChatColor.RESET}"
+        val basePrefix = "${(if (TosoGameAPI.isBroadCaster(sp)) "${ChatColor.GOLD}${ChatColor.BOLD} * ${ChatColor.RESET}" else "")}${Teams.getTeamLabel(Teams.DisplaySlot.CHAT, sp)}${ChatColor.RESET}${(if (!PlayerManager.loadConfig(p).visibility) " ${sp.displayName}" else "")}${ChatColor.GREEN}: ${ChatColor.RESET}"
         val globalMessagePrefix = "${ChatType.GLOBAL.prefix}$basePrefix"
         val rangeMessagePrefix = "${ChatType.RANGE.prefix}$basePrefix"
         val teamMessagePrefix = "${ChatType.TEAM.prefix}$basePrefix"
@@ -106,20 +105,17 @@ class onChat : Listener {
         when (chatType) {
             ChatType.GLOBAL -> Bukkit.broadcastMessage(globalMessagePrefix + msg)
             ChatType.RANGE -> {
-                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, sp) || Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, sp) ||
-                        Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, sp) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, sp)) {
+                if (sp.isPlayerGroup || sp.isHunterGroup) {
 
                     val loc = sp.location
                     Bukkit.getConsoleSender().sendMessage(rangeMessagePrefix + msg)
-                    for (player in Bukkit.getOnlinePlayers())
-                        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, player) || player.location.distance(loc) <= range)
-                            player.sendMessage(rangeMessagePrefix + msg)
-                } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, sp)) {
+                    for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam || it.location.distance(loc) <= range })
+                        player.sendMessage(rangeMessagePrefix + msg)
+                } else if (sp.isJailTeam) {
                     if (sp.gameMode == GameMode.SPECTATOR) {
                         Bukkit.getConsoleSender().sendMessage(teamMessagePrefix + msg)
-                        for (player in Bukkit.getOnlinePlayers())
-                            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, player) || Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, player))
-                                player.sendMessage(teamMessagePrefix + msg)
+                        for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam || it.isJailTeam })
+                            player.sendMessage(teamMessagePrefix + msg)
                     } else {
                         Bukkit.broadcastMessage(globalMessagePrefix + msg)
                     }
@@ -128,46 +124,46 @@ class onChat : Listener {
                 }
             }
             ChatType.TEAM -> {
-                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, sp) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, sp)) {
+                if (sp.isPlayerGroup) {
                     Bukkit.getConsoleSender().sendMessage(teamMessagePrefix + msg)
 
                     if (!MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE) && !MissionManager.isMission(MissionManager.MissionState.TIMED_DEVICE)) {
-                        for (player in Bukkit.getOnlinePlayers().filter { Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, it) || Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, it) })
+                        for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam || it.isPlayerGroup })
                             player.sendMessage(teamMessagePrefix + msg)
                     } else {
                         sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ミッション実施中のため利用できません。")
                     }
-                } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, sp) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, sp)) {
+                } else if (sp.isHunterGroup) {
                     Bukkit.getConsoleSender().sendMessage(teamMessagePrefix + msg)
 
-                    for (player in Bukkit.getOnlinePlayers().filter { Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, it) || Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, it) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, it) })
+                    for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam || it.isHunterGroup })
                         player.sendMessage(teamMessagePrefix + msg)
-                } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, sp)) {
+                } else if (sp.isJailTeam) {
                     Bukkit.getConsoleSender().sendMessage(teamMessagePrefix + msg)
 
-                    for (player in Bukkit.getOnlinePlayers().filter { Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, it) || Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, it) })
+                    for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam || it.isJailTeam })
                         player.sendMessage(teamMessagePrefix + msg)
                 } else {
                     Bukkit.getConsoleSender().sendMessage(teamMessagePrefix + msg)
 
-                    for (player in Bukkit.getOnlinePlayers().filter { Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, it) })
+                    for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam })
                         player.sendMessage(teamMessagePrefix + msg)
                 }
             }
             ChatType.TEAM_GLOBAL -> {
-                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, sp) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, sp)) {
+                if (sp.isPlayerGroup) {
                     Bukkit.getConsoleSender().sendMessage(teamMessagePrefix + msg)
 
                     if (!MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE) && !MissionManager.isMission(MissionManager.MissionState.TIMED_DEVICE)) {
-                        for (player in Bukkit.getOnlinePlayers().filter { Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, it) || Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, it) })
+                        for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam || it.isPlayerGroup })
                             player.sendMessage(teamMessagePrefix + msg)
                     } else {
                         sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ミッション実施中のため利用できません。")
                     }
-                } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, sp) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, sp)) {
+                } else if (sp.isHunterGroup) {
                     Bukkit.getConsoleSender().sendMessage(teamMessagePrefix + msg)
 
-                    for (player in Bukkit.getOnlinePlayers().filter { Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, it) || Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, it) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, it) })
+                    for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam || it.isHunterGroup })
                         player.sendMessage(teamMessagePrefix + msg)
                 } else {
                     Bukkit.broadcastMessage(globalMessagePrefix + msg)
@@ -175,39 +171,47 @@ class onChat : Listener {
             }
             ChatType.PRIVATE -> {
                 if (sp.uniqueId !== p.uniqueId) {
-                    if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, sp) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, sp)) {
-                        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p)) {
+                    if (sp.isPlayerGroup) {
+                        if (p.isAdminTeam || p.isPlayerGroup) {
                             Bukkit.getConsoleSender().sendMessage(privateMessagePrefix + msg)
-                            for (player in Bukkit.getOnlinePlayers()) if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, player)) player.sendMessage(privateMessagePrefix + msg)
+                            for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam })
+                                player.sendMessage(privateMessagePrefix + msg)
+
                             sp.sendMessage(privateMessagePrefix + msg)
                             p.sendMessage(privateMessagePrefix + msg)
                             p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
                         } else {
                             sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}他のチームのプレイヤーにはメッセージを送信できません。")
                         }
-                    } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, sp) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, sp)) {
-                        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, p)) {
+                    } else if (sp.isHunterGroup) {
+                        if (p.isAdminTeam || p.isHunterGroup) {
                             Bukkit.getConsoleSender().sendMessage(privateMessagePrefix + msg)
-                            for (player in Bukkit.getOnlinePlayers()) if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, player)) player.sendMessage(privateMessagePrefix + msg)
+                            for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam })
+                                player.sendMessage(privateMessagePrefix + msg)
+
                             sp.sendMessage(privateMessagePrefix + msg)
                             p.sendMessage(privateMessagePrefix + msg)
                             p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
                         } else {
                             sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}他のチームのプレイヤーにはメッセージを送信できません。")
                         }
-                    } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, sp)) {
-                        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, p)) {
+                    } else if (sp.isJailTeam) {
+                        if (p.isAdminTeam || p.isJailTeam) {
                             Bukkit.getConsoleSender().sendMessage(privateMessagePrefix + msg)
-                            for (player in Bukkit.getOnlinePlayers()) if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, player)) player.sendMessage(privateMessagePrefix + msg)
+                            for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam })
+                                player.sendMessage(privateMessagePrefix + msg)
+
                             sp.sendMessage(privateMessagePrefix + msg)
                             p.sendMessage(privateMessagePrefix + msg)
                             p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
                         } else {
                             sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}他のチームのプレイヤーにはメッセージを送信できません。")
                         }
-                    } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, sp)) {
+                    } else if (sp.isAdminTeam) {
                         Bukkit.getConsoleSender().sendMessage(privateMessagePrefix + msg)
-                        for (player in Bukkit.getOnlinePlayers()) if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, player)) player.sendMessage(privateMessagePrefix + msg)
+                        for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam })
+                            player.sendMessage(privateMessagePrefix + msg)
+
                         sp.sendMessage(privateMessagePrefix + msg)
                         p.sendMessage(privateMessagePrefix + msg)
                         p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
@@ -220,10 +224,8 @@ class onChat : Listener {
     }
 
     fun convertMessage(msg: String): String {
-        return if (msg.toByteArray().size > msg.length || msg.matches(Regex("[ \\uFF61-\\uFF9F]+")))
-            msg
-        else
-            RomajiConverter.toKanji(msg)
+        return if (msg.toByteArray().size > msg.length || msg.matches(Regex("[ \\uFF61-\\uFF9F]+"))) msg
+        else RomajiConverter.toKanji(msg)
     }
 
     enum class ChatType(val prefix: String = "", val description: String = "") {

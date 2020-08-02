@@ -11,6 +11,8 @@ money: 0
 hasPermission: false
 # 配信者モードか
 isBroadCaster: false
+# 「/disappear」で姿を非表示にしたか
+isVisibility: false
 
 # 本のベース文字色
 bookForegroundColor: "black"

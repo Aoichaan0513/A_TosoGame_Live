@@ -4,6 +4,9 @@ import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.DiscordManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -20,30 +23,6 @@ class CallInventory {
 
         val arrowLeft = "MHF_ArrowLeft"
         val arrowRight = "MHF_ArrowRight"
-
-
-        fun getPlayers(p: Player): List<List<Player>> {
-            val maxCount = 36
-
-            return when (Teams.getJoinedTeam(p)) {
-                Teams.OnlineTeam.TOSO_ADMIN -> MainAPI.divide(Bukkit.getOnlinePlayers().filter { DiscordManager.integrationMap.containsKey(it.uniqueId) }.toList(), maxCount)
-                Teams.OnlineTeam.TOSO_PLAYER, Teams.OnlineTeam.TOSO_SUCCESS -> MainAPI.divide(
-                        Bukkit.getOnlinePlayers()
-                                .filter { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, it) }
-                                .filter { DiscordManager.integrationMap.containsKey(it.uniqueId) }
-                                .toList(),
-                        maxCount
-                )
-                Teams.OnlineTeam.TOSO_HUNTER, Teams.OnlineTeam.TOSO_TUHO -> MainAPI.divide(
-                        Bukkit.getOnlinePlayers()
-                                .filter { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_HUNTER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_TUHO, it) }
-                                .filter { DiscordManager.integrationMap.containsKey(it.uniqueId) }
-                                .toList(),
-                        maxCount
-                )
-                else -> mutableListOf()
-            }
-        }
 
         fun getInventory(p: Player, page: Int = 0): Inventory {
             val inv = Bukkit.createInventory(null, 9 * 6, "$title${page + 1}")
@@ -99,6 +78,23 @@ class CallInventory {
                 inv.addItem(itemStackPlayerInfo)
             }
             return inv
+        }
+
+        private fun getPlayers(p: Player): List<List<Player>> {
+            val maxCount = 36
+
+            return when (Teams.getJoinedTeam(p)) {
+                Teams.OnlineTeam.TOSO_ADMIN -> MainAPI.divide(Bukkit.getOnlinePlayers().filter { DiscordManager.integrationMap.containsKey(it.uniqueId) }.toList(), maxCount)
+                Teams.OnlineTeam.TOSO_PLAYER, Teams.OnlineTeam.TOSO_SUCCESS -> MainAPI.divide(
+                        Bukkit.getOnlinePlayers().filter { (it.isAdminTeam || it.isPlayerGroup) && DiscordManager.integrationMap.containsKey(it.uniqueId) }.toList(),
+                        maxCount
+                )
+                Teams.OnlineTeam.TOSO_HUNTER, Teams.OnlineTeam.TOSO_TUHO -> MainAPI.divide(
+                        Bukkit.getOnlinePlayers().filter { (it.isAdminTeam || it.isHunterTeam) && DiscordManager.integrationMap.containsKey(it.uniqueId) }.toList(),
+                        maxCount
+                )
+                else -> mutableListOf()
+            }
         }
     }
 }

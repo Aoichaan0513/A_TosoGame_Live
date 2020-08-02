@@ -5,12 +5,12 @@ import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.ErrorMessage
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager.GameState
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import org.bukkit.GameMode
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
@@ -21,12 +21,13 @@ class Spec(name: String) : ICommand(name) {
 
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
         if (GameManager.isGame(GameState.GAME)) {
-            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, sp)) {
-                if (!TosoGameAPI.isRes || !RespawnRunnable.isAllowRespawn(sp)) {
+            if (sp.isJailTeam) {
+                if (!TosoGameAPI.isRespawn || !RespawnRunnable.isAllowRespawn(sp)) {
                     val worldConfig = Main.worldConfig
                     if (sp.gameMode == GameMode.ADVENTURE) {
                         sp.gameMode = GameMode.SPECTATOR
                         sp.inventory.heldItemSlot = 0
+                        VisibilityManager.removeJailHide(sp)
                         TosoGameAPI.teleport(sp, worldConfig.respawnLocationConfig.locations.values)
                         sp.sendMessage("""
                             ${MainAPI.getPrefix(PrefixType.WARNING)}観戦モードになりました。

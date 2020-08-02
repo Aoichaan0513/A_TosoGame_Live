@@ -3,9 +3,10 @@ package jp.aoichaan0513.A_TosoGame_Live.OPGame
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerTeam
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -29,9 +30,7 @@ class OPGameManager {
             get() {
                 isRunned = false
 
-                val players = Bukkit.getOnlinePlayers()
-                        .filter { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, it) }
-                        .filterNot { runnedSet.contains(it.uniqueId) }.toMutableList()
+                val players = Bukkit.getOnlinePlayers().filter { it.isPlayerGroup && !runnedSet.contains(it.uniqueId) }.toMutableList()
 
                 for (i in 0..2)
                     players.shuffle()
@@ -46,9 +45,7 @@ class OPGameManager {
         // 実行できる参加者が存在するか
         val hasNext: Boolean
             get() {
-                return Bukkit.getOnlinePlayers()
-                        .filter { Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, it) || Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_SUCCESS, it) }
-                        .filterNot { runnedSet.contains(it.uniqueId) }.isNotEmpty()
+                return Bukkit.getOnlinePlayers().any { it.isPlayerGroup && !runnedSet.contains(it.uniqueId) }
             }
 
         fun startOPGame(sender: CommandSender, state: OPGameState) {
@@ -61,9 +58,8 @@ class OPGameManager {
 
             BossBarManager.showBar()
 
-            for (p in Bukkit.getOnlinePlayers())
-                if (Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_PLAYER, p))
-                    TosoGameAPI.teleport(p, worldConfig.opGameLocationConfig.gOPLocations.values)
+            for (p in Bukkit.getOnlinePlayers().filter { it.isPlayerTeam })
+                TosoGameAPI.teleport(p, worldConfig.opGameLocationConfig.gOPLocations.values)
 
             sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}オープニングゲームを開始しました。")
         }

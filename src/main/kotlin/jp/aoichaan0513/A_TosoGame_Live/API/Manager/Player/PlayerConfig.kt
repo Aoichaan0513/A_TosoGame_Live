@@ -74,6 +74,13 @@ class PlayerConfig(val uuid: UUID) {
             save()
         }
 
+    var visibility: Boolean
+        get() = config.getBoolean("isVisibility", false)
+        set(isVisibility) {
+            config["isVisibility"] = isVisibility
+            save()
+        }
+
     var broadCaster: Boolean
         get() = config.getBoolean("isBroadCaster", false)
         set(isBroadCaster) {

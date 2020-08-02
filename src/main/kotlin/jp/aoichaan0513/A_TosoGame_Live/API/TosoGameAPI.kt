@@ -11,16 +11,11 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.API.Map.MapUtility
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
+import jp.aoichaan0513.A_TosoGame_Live.Utils.*
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
-import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterTeam
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.*
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
@@ -31,7 +26,7 @@ import java.util.concurrent.ThreadLocalRandom
 class TosoGameAPI {
     companion object {
 
-        var isRes = true
+        var isRespawn = true
         var isRunnedBonusMission = false
 
         // アイテム配布
@@ -40,7 +35,7 @@ class TosoGameAPI {
 
             inv.clear()
 
-            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) {
+            if (p.isAdminTeam) {
                 val infoStack = ItemStack(Material.GOLD_NUGGET)
                 val infoMeta = infoStack.itemMeta!!
                 infoMeta.setDisplayName(ItemUtil.getItemName("プレイヤー情報"))
@@ -60,9 +55,9 @@ class TosoGameAPI {
                 MissionManager.setBook(p)
             } else {
                 if (GameManager.isGame(GameState.GAME)) {
-                    if (Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, p)) {
+                    if (p.isHunterGroup) {
                         setArmor(p)
-                    } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, p)) {
+                    } else if (p.isJailTeam) {
                         MissionManager.setBook(p)
                         val itemStack = ItemStack(Material.ENDER_PEARL)
                         val itemMeta = itemStack.itemMeta!!
@@ -121,7 +116,7 @@ class TosoGameAPI {
                         MissionManager.setBook(p)
                     }
                 } else {
-                    if (Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, p)) {
+                    if (p.isHunterGroup) {
                         setArmor(p)
                     } else {
                         MissionManager.setBook(p)
@@ -132,13 +127,13 @@ class TosoGameAPI {
 
         // 装備
         fun setArmor(p: Player) {
-            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, p)) {
+            if (p.isHunterTeam) {
                 p.inventory.clear()
                 p.inventory.helmet = ItemStack(Material.DIAMOND_HELMET)
                 p.inventory.chestplate = ItemStack(Material.DIAMOND_CHESTPLATE)
                 p.inventory.leggings = ItemStack(Material.DIAMOND_LEGGINGS)
                 p.inventory.boots = ItemStack(Material.DIAMOND_BOOTS)
-            } else if (Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, p)) {
+            } else if (p.isTuhoTeam) {
                 p.inventory.clear()
                 // p.getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
                 p.inventory.helmet = ItemStack(Material.HONEY_BLOCK)
@@ -181,10 +176,6 @@ class TosoGameAPI {
         }
 
 
-        fun isPlayer(sender: CommandSender): Boolean {
-            return sender is Player
-        }
-
         // 権限管理
         fun isAdmin(p: Player): Boolean {
             return p.isOp && (isBroadCaster(p) || hasPermission(p) || p.isAdminTeam)
@@ -207,12 +198,12 @@ class TosoGameAPI {
         }
 
         fun addOp(p: Player) {
-            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p) || hasPermission(p) || isBroadCaster(p))
+            if (p.isAdminTeam || hasPermission(p) || isBroadCaster(p))
                 p.isOp = true
         }
 
         fun removeOp(p: Player) {
-            if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p) || hasPermission(p) || isBroadCaster(p))
+            if (!p.isAdminTeam || hasPermission(p) || isBroadCaster(p))
                 p.isOp = false
         }
 

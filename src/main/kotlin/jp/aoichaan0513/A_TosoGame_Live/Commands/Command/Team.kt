@@ -52,7 +52,7 @@ class Team(name: String) : ICommand(name) {
 
 
     private fun runCommand(sender: CommandSender, cmd: Command, label: String, args: Array<String>) {
-        if (!TosoGameAPI.isPlayer(sender) || TosoGameAPI.isAdmin(sender as Player)) {
+        if (!MainAPI.isPlayer(sender) || TosoGameAPI.isAdmin(sender as Player)) {
             if (args.isNotEmpty()) {
                 when (args[0].toLowerCase()) {
                     "random", "rand" -> {
@@ -60,11 +60,7 @@ class Team(name: String) : ICommand(name) {
                             if (randomTeamSet.contains(args[1].toLowerCase())) {
                                 if (args.size != 2) {
                                     if (ParseUtil.isInt(args[2]) && args[2].toInt() > 0) {
-                                        random(
-                                                sender,
-                                                args[2].toInt(),
-                                                if (args[1].equals("hunter", true)) RandomType.HUNTER else RandomType.TUHO
-                                        )
+                                        random(sender, args[2].toInt(), RandomType.getType(args[1])!!)
                                         return
                                     }
                                 }
@@ -90,7 +86,7 @@ class Team(name: String) : ICommand(name) {
                                             val list = Bukkit.getOnlinePlayers().filter { !it.isAdminTeam && !it.isTeam(team) }
                                             list.forEach {
                                                 it.setTeam(team, worldConfig = worldConfig)
-                                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${it.name}が${teamName}になりました。")
+                                                MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${it.name}が${teamName}になりました。")
                                             }
 
                                             sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${list.size}人${ChatColor.RESET}${ChatColor.GRAY}を${teamName}に変更しました。")
@@ -102,7 +98,7 @@ class Team(name: String) : ICommand(name) {
                                                 val list = Bukkit.getOnlinePlayers().filter { it.isTeam(selectorTeam) }
                                                 list.forEach {
                                                     it.setTeam(team, worldConfig = worldConfig)
-                                                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${it.name}が${teamName}になりました。")
+                                                    MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${it.name}が${teamName}になりました。")
                                                 }
 
                                                 sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${list.size}人${ChatColor.RESET}${ChatColor.GRAY}を${teamName}に変更しました。")
@@ -119,7 +115,7 @@ class Team(name: String) : ICommand(name) {
                                         if (player != null) {
                                             if (!player.isTeam(team)) {
                                                 player.setTeam(team, worldConfig = worldConfig)
-                                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${player.name}が${teamName}になりました。")
+                                                MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${player.name}が${teamName}になりました。")
                                                 v++
                                             } else {
                                                 sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${player.name}はすでに${teamName}に所属しています。")
@@ -180,7 +176,7 @@ class Team(name: String) : ICommand(name) {
                                 Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}ハンターを${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}選出しています…")
 
                                 for (i in 0 until count.coerceAtMost(list.size)) {
-                                    val p = list.removeAt(i)
+                                    val p = list[i]
                                     p.setTeam(Teams.OnlineTeam.TOSO_HUNTER, worldConfig = worldConfig)
 
                                     Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}がハンターになりました。")
@@ -255,7 +251,7 @@ class Team(name: String) : ICommand(name) {
 
 
     private fun getTabList(sender: CommandSender, args: Array<String>): List<String>? {
-        if (TosoGameAPI.isPlayer(sender) && !TosoGameAPI.isAdmin(sender as Player)) return emptyList()
+        if (MainAPI.isPlayer(sender) && !TosoGameAPI.isAdmin(sender as Player)) return emptyList()
         if (args.size == 1) {
             val set = mutableSetOf("random", "rand")
             teamNameSet.forEach { set.add(it) }
@@ -289,12 +285,12 @@ class Team(name: String) : ICommand(name) {
             ErrorArgType.GENERAL -> """
                     ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}引数が不正です。
                     ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}コマンドの使い方:
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label admin <プレイヤー名... / チームセレクター>" - 運営へのチーム変更
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label player <プレイヤー名... / チームセレクター>" - 逃走者へのチーム変更
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label hunter <プレイヤー名... / チームセレクター>" - ハンターへのチーム変更
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label jail <プレイヤー名... / チームセレクター>" - 確保者へのチーム変更
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label success <プレイヤー名... / チームセレクター>" - 生存者へのチーム変更
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label tuho <プレイヤー名... / チームセレクター>" - 通報部隊へのチーム変更
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label admin <プレイヤー名… / チームセレクター>" - 運営へのチーム変更
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label player <プレイヤー名… / チームセレクター>" - 逃走者へのチーム変更
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label hunter <プレイヤー名… / チームセレクター>" - ハンターへのチーム変更
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label jail <プレイヤー名… / チームセレクター>" - 確保者へのチーム変更
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label success <プレイヤー名… / チームセレクター>" - 生存者へのチーム変更
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label tuho <プレイヤー名… / チームセレクター>" - 通報部隊へのチーム変更
                     ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label random <チーム> <募集人数>" または "/$label rand <チーム> <募集人数>" - ハンター (通報部隊)の応募を開始
                 """.trimIndent()
             ErrorArgType.TEAM -> {
@@ -371,7 +367,14 @@ class Team(name: String) : ICommand(name) {
 
     private enum class RandomType {
         HUNTER,
-        TUHO
+        TUHO;
+
+        companion object {
+
+            fun getType(str: String): RandomType? {
+                return values().firstOrNull { it.name.equals(str, true) }
+            }
+        }
     }
 
     private enum class ErrorArgType {

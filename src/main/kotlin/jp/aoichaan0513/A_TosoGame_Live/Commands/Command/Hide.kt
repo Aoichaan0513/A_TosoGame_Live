@@ -5,9 +5,8 @@ import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.ErrorMessage
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
 import org.bukkit.command.ConsoleCommandSender
@@ -17,7 +16,7 @@ class Hide(name: String) : ICommand(name) {
 
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
         if (GameManager.isGame(GameManager.GameState.GAME)) {
-            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, sp)) {
+            if (sp.isJailTeam) {
                 val isAdmin = args.isNotEmpty() && args[0].equals("admin", true)
 
                 VisibilityManager.addJailHide(sp, isAdmin)

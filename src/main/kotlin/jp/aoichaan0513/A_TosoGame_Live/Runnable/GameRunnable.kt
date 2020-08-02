@@ -18,6 +18,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.onInteract
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
+import jp.aoichaan0513.A_TosoGame_Live.Utils.*
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -82,7 +83,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
             BossBarManager.showBar(gameTime, settingGameTime)
 
             val respawnDenyTime = worldConfig.gameConfig.respawnDeny
-            TosoGameAPI.isRes = gameTime > respawnDenyTime
+            TosoGameAPI.isRespawn = gameTime > respawnDenyTime
 
             if (gameTime > 0) {
                 if (gameTime < 16) {
@@ -100,20 +101,18 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                 }
 
                 if (TimeFormat.formatMin(gameTime) % 2 != 0 && gameTime % 30 == 0) {
-                    for (player in Bukkit.getOnlinePlayers()) {
-                        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, player)) {
-                            if (!TosoGameAPI.isRes) {
-                                player.sendMessage("""
-                                    ${MainAPI.getPrefix(PrefixType.WARNING)}"/hide"で周りを非表示に、"/show"で周りを表示できます。
-                                    ${MainAPI.getPrefix(PrefixType.WARNING)}また、"/spec"で観戦モードにできます。
-                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}このメッセージは確保者にのみ表示されます。
-                                """.trimIndent())
-                            } else {
-                                player.sendMessage("""
-                                    ${MainAPI.getPrefix(PrefixType.WARNING)}"/hide"で周りを非表示に、"/show"で周りを表示できます。
-                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}このメッセージは確保者にのみ表示されます。
-                                """.trimIndent())
-                            }
+                    for (player in Bukkit.getOnlinePlayers().filter { it.isJailTeam }) {
+                        if (!TosoGameAPI.isRespawn) {
+                            player.sendMessage("""
+                                ${MainAPI.getPrefix(PrefixType.WARNING)}"/hide"で周りを非表示に、"/show"で周りを表示できます。
+                                ${MainAPI.getPrefix(PrefixType.WARNING)}また、"/spec"で観戦モードにできます。
+                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}このメッセージは確保者にのみ表示されます。
+                            """.trimIndent())
+                        } else {
+                            player.sendMessage("""
+                                ${MainAPI.getPrefix(PrefixType.WARNING)}"/hide"で周りを非表示に、"/show"で周りを表示できます。
+                                ${MainAPI.getPrefix(PrefixType.SECONDARY)}このメッセージは確保者にのみ表示されます。
+                            """.trimIndent())
                         }
                     }
                 }
@@ -121,9 +120,8 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                 if (gameTime % 5 == 0) {
                     setHealths(worldConfig, gameTime % 10 == 0)
                 } else {
-                    for (player in Bukkit.getOnlinePlayers())
-                        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, player) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, player))
-                            setHealth(player)
+                    for (player in Bukkit.getOnlinePlayers().filter { it.isPlayerGroup })
+                        setHealth(player)
                 }
 
                 if (gameTime == respawnDenyTime) {
@@ -147,7 +145,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                             BossBarManager.showBar()
 
                             for (p in Bukkit.getOnlinePlayers()) {
-                                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p)) {
+                                if (p.isSuccessTeam) {
                                     val playerConfig = PlayerManager.loadConfig(p)
                                     if (!playerConfig.advancementConfig.hasAdvancement(Advancement.FIRST_GAME_CLEAR)) {
                                         playerConfig.advancementConfig.addAdvancement(Advancement.FIRST_GAME_CLEAR)
@@ -160,7 +158,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                                 } else {
                                     MoneyManager.setReward(p, 0)
 
-                                    if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, p))
+                                    if (p.isPlayerTeam || p.isHunterGroup)
                                         p.sendTitle("${ChatColor.RED}${ChatColor.BOLD}Task Failed...", "${ChatColor.BOLD}逃走者側の勝利", 10, 70, 20)
                                     else
                                         p.sendTitle("", "${ChatColor.BOLD}逃走者側の勝利", 10, 70, 20)
@@ -192,7 +190,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                             // ゲーム時間が0以外の場合、全員のレートを一時的に変更
 
                             if (!TosoGameAPI.isRunnedBonusMission) {
-                                for (player in Bukkit.getOnlinePlayers().filter { Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, it) }) {
+                                for (player in Bukkit.getOnlinePlayers().filter { it.isSuccessTeam }) {
                                     MoneyManager.addRate(player, 50)
                                     player.sendMessage("""
                                         ${MainAPI.getPrefix(PrefixType.SECONDARY)}あなたのレートが変更されました。
@@ -219,16 +217,16 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                         BossBarManager.showBar()
 
                         for (p in Bukkit.getOnlinePlayers()) {
-                            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, p)) {
+                            if (p.isHunterGroup) {
                                 val reward = worldConfig.getDifficultyConfig(p).rate * settingGameTime.toLong()
-                                MoneyManager.setReward(p, if (Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, p)) reward else reward / 2)
+                                MoneyManager.setReward(p, if (p.isHunterTeam) reward else reward / 2)
 
                                 p.playSound(p.location, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f)
                                 p.sendTitle("${ChatColor.GREEN}${ChatColor.BOLD}Task Success.", "${ChatColor.BOLD}ハンター・通報部隊側の勝利", 10, 70, 20)
                             } else {
                                 MoneyManager.setReward(p, 0)
 
-                                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p))
+                                if (p.isPlayerGroup)
                                     p.sendTitle("${ChatColor.RED}${ChatColor.BOLD}Task Failed...", "${ChatColor.BOLD}ハンター・通報部隊側の勝利", 10, 70, 20)
                                 else
                                     p.sendTitle("", "${ChatColor.BOLD}ハンター・通報部隊側の勝利", 10, 70, 20)
@@ -267,7 +265,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                     if (Teams.getOnlineCount(OnlineTeam.TOSO_PLAYER) > 0) {
                         // 逃走者チームにプレイヤーがいる場合
                         for (p in Bukkit.getOnlinePlayers()) {
-                            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p))
+                            if (p.isPlayerTeam)
                                 Teams.joinTeam(OnlineTeam.TOSO_SUCCESS, p)
 
                             val playerConfig = PlayerManager.loadConfig(p)
@@ -276,14 +274,14 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                                 Advancement.FIRST_GAME_CLEAR.sendMessage(p)
                             }
 
-                            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p)) {
+                            if (p.isSuccessTeam) {
                                 p.playSound(p.location, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f)
                                 p.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, 200000, 1, false, false))
                                 p.sendTitle("${ChatColor.GREEN}${ChatColor.BOLD}Task Success.", "${ChatColor.BOLD}逃走者側の勝利", 10, 70, 20)
                             } else {
                                 MoneyManager.setReward(p, 0)
 
-                                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, p))
+                                if (p.isPlayerTeam || p.isHunterGroup)
                                     p.sendTitle("${ChatColor.RED}${ChatColor.BOLD}Task Failed...", "${ChatColor.BOLD}逃走者側の勝利", 10, 70, 20)
                                 else
                                     p.sendTitle("", "${ChatColor.BOLD}逃走者側の勝利", 10, 70, 20)
@@ -296,16 +294,16 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                     } else {
                         // 逃走者チームにプレイヤーがいない場合
                         for (p in Bukkit.getOnlinePlayers()) {
-                            if (Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_TUHO, p)) {
+                            if (p.isHunterGroup) {
                                 val reward = worldConfig.getDifficultyConfig(p).rate * settingGameTime.toLong()
-                                MoneyManager.setReward(p, if (Teams.hasJoinedTeam(OnlineTeam.TOSO_HUNTER, p)) reward else reward / 2)
+                                MoneyManager.setReward(p, if (p.isHunterTeam) reward else reward / 2)
 
                                 p.playSound(p.location, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f)
                                 p.sendTitle("${ChatColor.GREEN}${ChatColor.BOLD}Task Success.", "${ChatColor.BOLD}ハンター・通報部隊側の勝利", 10, 70, 20)
                             } else {
                                 MoneyManager.setReward(p, 0)
 
-                                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, p))
+                                if (p.isPlayerGroup)
                                     p.sendTitle("${ChatColor.RED}${ChatColor.BOLD}Task Failed...", "${ChatColor.BOLD}ハンター・通報部隊側の勝利", 10, 70, 20)
                                 else
                                     p.sendTitle("", "${ChatColor.BOLD}ハンター・通報部隊側の勝利", 10, 70, 20)
@@ -359,7 +357,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                     p.playSound(p.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f)
                     p.sendTitle("${ChatColor.DARK_RED}${ChatColor.BOLD}逃走中", "${ChatColor.RED}${ChatColor.BOLD}Run${ChatColor.RESET}${ChatColor.GRAY} for ${ChatColor.DARK_RED}${ChatColor.BOLD}Money", 20, 50, 20)
 
-                    if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, p)) {
+                    if (p.isPlayerTeam) {
                         TosoGameAPI.setItem(GameType.START, p)
 
                         p.addPotionEffect(PotionEffect(PotionEffectType.NIGHT_VISION, 200000, 1, false, false))
@@ -389,7 +387,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
     fun setHealths(worldConfig: WorldConfig?, isTenSecond: Boolean) {
         for (player in Bukkit.getOnlinePlayers()) {
             if (GameManager.isGame(GameState.GAME)) {
-                if (Teams.hasJoinedTeam(OnlineTeam.TOSO_PLAYER, player) || Teams.hasJoinedTeam(OnlineTeam.TOSO_SUCCESS, player)) {
+                if (player.isPlayerGroup) {
                     val difficultyConfig = worldConfig!!.getDifficultyConfig(player)
                     if (difficultyConfig.health) {
                         val loc = player.location
@@ -494,31 +492,29 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
      * ゲーム終了
      */
     private fun sendResult() {
-        val rewardMap = MoneyManager.rewardMap.entries.filter { MainAPI.isOnline(it.key) }.sortedBy { it.value * -1 }.subList(0, 4)
-
-        /*
-        val rewardList = MoneyManager.rewardMap.entries.toMutableList()
-        rewardList.sortWith(Comparator { obj1, obj2 -> obj2.value.compareTo(obj1.value) })
-        */
+        val rewardEntries = MoneyManager.rewardMap.entries
+        val rewardMap = rewardEntries.filter { MainAPI.isOnline(it.key) && it.value > 0 }.sortedBy { it.value * -1 }
+        val rewardList = if (rewardMap.size > 5) rewardMap.subList(0, 5) else rewardMap
 
         var rewardCount = 1
         val rewardBuilder = StringBuilder()
 
-        for ((key, value) in rewardMap)
+        for ((key, value) in rewardList)
             rewardBuilder.append("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GOLD}${rewardCount++}位${ChatColor.GRAY}: ${ChatColor.YELLOW}${Bukkit.getPlayer(key)!!.name}${ChatColor.GRAY} (${MoneyManager.formatMoney(value)})\n")
 
         val rewardResult = rewardBuilder.toString().trim()
         Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}賞金ランキング\n${if (!rewardResult.isEmpty()) rewardResult else "${MainAPI.getPrefix(PrefixType.SECONDARY)}なし"}")
 
-        val hunterMap = onDamage.hunterMap.entries.filter { MainAPI.isOnline(it.key) }.sortedBy { it.value * -1 }.subList(0, 4)
-        /*
-        val hunterList = onDamage.hunterMap.entries.toMutableList()
-        hunterList.sortWith(Comparator { obj1, obj2 -> obj2.value.compareTo(obj1.value) })
-        */
+        val hunterEntries = onDamage.hunterMap.entries
+        val hunterMap = hunterEntries.filter { MainAPI.isOnline(it.key) && it.value > 0 }.sortedBy { it.value * -1 }
+        val hunterList = if (hunterMap.size > 5) hunterMap.subList(0, 5) else hunterMap
+
         var hunterCount = 1
         val hunterBuilder = StringBuilder()
-        for ((key, value) in hunterMap)
+
+        for ((key, value) in hunterList)
             hunterBuilder.append("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GOLD}${hunterCount++}位${ChatColor.GRAY}: ${ChatColor.YELLOW}${Bukkit.getPlayer(key)!!.name}${ChatColor.GRAY} ($value)\n")
+
         val hunterResult = hunterBuilder.toString().trim { it <= ' ' }
         Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}確保数ランキング\n${if (!hunterResult.isEmpty()) hunterResult else "${MainAPI.getPrefix(PrefixType.SECONDARY)}なし"}")
     }

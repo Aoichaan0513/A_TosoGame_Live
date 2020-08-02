@@ -8,6 +8,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
@@ -31,7 +32,7 @@ class RespawnRunnable : BukkitRunnable() {
 
         // 自動復活
         fun setAutoTime(p: Player) {
-            if (!isAllowRespawn(p) || !TosoGameAPI.isRes) return
+            if (!isAllowRespawn(p) || !TosoGameAPI.isRespawn) return
 
             val worldConfig = Main.worldConfig
             val difficultyConfig = worldConfig.getDifficultyConfig(p)
@@ -59,7 +60,7 @@ class RespawnRunnable : BukkitRunnable() {
 
         // 復活クールタイム
         fun addCoolTime(p: Player) {
-            if (!isAllowRespawn(p) || !TosoGameAPI.isRes) return
+            if (!isAllowRespawn(p) || !TosoGameAPI.isRespawn) return
             setCoolTime(p, setCount(p, if (countMap.containsKey(p.uniqueId)) countMap[p.uniqueId]!! + 1 else 1))
         }
 
@@ -115,10 +116,10 @@ class RespawnRunnable : BukkitRunnable() {
     }
 
     override fun run() {
-        if (!GameManager.isGame(GameState.GAME) || !TosoGameAPI.isRes) return
+        if (!GameManager.isGame(GameState.GAME) || !TosoGameAPI.isRespawn) return
 
-        for (player in Bukkit.getOnlinePlayers()) {
-            if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, player) || !countMap.containsKey(player.uniqueId)) continue
+        for (player in Bukkit.getOnlinePlayers().filter { it.isJailTeam && countMap.containsKey(it.uniqueId) }) {
+            // if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, player) || !countMap.containsKey(player.uniqueId)) continue
 
             val autoTime = autoTimeMap[player.uniqueId]
             val coolTime = coolTimeMap[player.uniqueId]

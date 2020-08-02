@@ -3,10 +3,9 @@ package jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Scoreboard
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -24,7 +23,7 @@ class onItem : Listener {
     fun onDropItem(e: PlayerDropItemEvent) {
         val p = e.player
 
-        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) return
+        if (p.isAdminTeam) return
         e.isCancelled = true
         p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}アイテムを投げることはできません。")
     }
@@ -33,7 +32,7 @@ class onItem : Listener {
     fun onPickupItem(e: EntityPickupItemEvent) {
         val p = e.entity as? Player ?: return
 
-        if (Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p)) return
+        if (p.isAdminTeam) return
         e.isCancelled = true
     }
 

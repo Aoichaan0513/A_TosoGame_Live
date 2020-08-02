@@ -259,7 +259,7 @@ class Mission(name: String) : ICommand(name) {
     }
 
     private fun getTabList(sender: CommandSender, args: Array<String>): List<String>? {
-        if (TosoGameAPI.isPlayer(sender) && !TosoGameAPI.isAdmin(sender as Player)) return emptyList()
+        if (MainAPI.isPlayer(sender) && !TosoGameAPI.isAdmin(sender as Player)) return emptyList()
         if (args.size == 1) {
             return getTabList(args[0], "send", "tutatu", "hint", "chest", "end")
         } else if (args.size == 2) {

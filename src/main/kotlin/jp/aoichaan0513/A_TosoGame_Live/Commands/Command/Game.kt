@@ -11,6 +11,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
+import jp.aoichaan0513.A_TosoGame_Live.Inventory.ResultInventory
 import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.onDamage
 import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.onInteract
 import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.onInventory
@@ -18,9 +19,11 @@ import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Mission.TimedDevice
+import jp.aoichaan0513.A_TosoGame_Live.OPGame.Dice
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ParseUtil
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.setSidebar
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -61,14 +64,16 @@ class Game(name: String) : ICommand(name) {
 
 
     private fun runCommand(sender: CommandSender, cmd: Command, label: String, args: Array<String>) {
-        if (!TosoGameAPI.isPlayer(sender) || TosoGameAPI.isAdmin(sender as Player)) {
+        if (!MainAPI.isPlayer(sender) || TosoGameAPI.isAdmin(sender as Player)) {
             when (label) {
                 "game" -> {
                     if (args.isNotEmpty()) {
                         when (args[0]) {
-                            "start" -> runStart(sender, if (args.size > 1) args[1] else null)
+                            "start" -> runStart(sender, args.getOrNull(1))
                             "end" -> runEnd(sender)
+                            "opgame" -> runOPGame(sender, args.getOrNull(1))
                             "reset" -> runReset(sender)
+                            "result" -> runResult(sender, label, args.getOrNull(1))
                             else -> sendHelpMessage(sender, label)
                         }
                         return
@@ -76,14 +81,21 @@ class Game(name: String) : ICommand(name) {
                     sendHelpMessage(sender, label)
                     return
                 }
-                "start" -> runStart(sender, if (args.isNotEmpty()) args[0] else null)
+                "start" -> runStart(sender, args.getOrNull(0))
                 "end", "g_end" -> runEnd(sender)
+                "opgame" -> runOPGame(sender, args.getOrNull(0))
                 "reset" -> runReset(sender)
+                "result" -> runResult(sender, label, args.getOrNull(0))
             }
             return
+        } else {
+            if (label.equals("result", true)) {
+                runResult(sender, label, args.getOrNull(0))
+                return
+            }
+            MainAPI.sendMessage(sender, MainAPI.ErrorMessage.PERMISSIONS_TEAM_ADMIN)
+            return
         }
-        MainAPI.sendMessage(sender, MainAPI.ErrorMessage.PERMISSIONS_TEAM_ADMIN)
-        return
     }
 
 
@@ -130,6 +142,40 @@ class Game(name: String) : ICommand(name) {
         MainAPI.sendMessage(sender, MainAPI.ErrorMessage.NOT_GAME)
     }
 
+    private fun runOPGame(sender: CommandSender, arg: String?) {
+        if (!GameManager.isGame()) {
+            if (GameManager.isGame(GameManager.GameState.NONE)) {
+                if (!arg.isNullOrEmpty() && ParseUtil.isInt(arg)) {
+                    when (ParseUtil.toInt(arg)) {
+                        1 -> {
+                            if (Teams.getOnlineCount(Teams.OnlineTeam.TOSO_PLAYER) > 0) {
+                                Dice.start(sender)
+                                return
+                            }
+                            sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}逃走者の人数が少ないためオープニングゲームを実行できません。")
+                            return
+                        }
+                        2 -> return
+                    }
+                } else {
+                    sender.sendMessage("""
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}引数が不正です。数字を指定してください。
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}コマンドの使い方:
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/opgame 1" - サイコロミッション
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/opgame 2" - 実装中
+                    """.trimIndent())
+                }
+                return
+            }
+            sender.sendMessage("""
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}ゲームが終了しているため実行できません。
+                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}"${ChatColor.RED}${ChatColor.UNDERLINE}/reset${ChatColor.RESET}${ChatColor.GRAY}"でゲームをリセットしてから実行してください。
+            """.trimIndent())
+            return
+        }
+        MainAPI.sendMessage(sender, MainAPI.ErrorMessage.GAME)
+    }
+
     private fun runReset(sender: CommandSender) {
         if (!GameManager.isGame()) {
             sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}データをリセットしています…")
@@ -166,7 +212,7 @@ class Game(name: String) : ICommand(name) {
             worldConfig.hunterDoorConfig.closeHunterDoors()
 
             onInventory.isAllowOpen = false
-            TosoGameAPI.isRes = true
+            TosoGameAPI.isRespawn = true
             TosoGameAPI.isRunnedBonusMission = false
             onInteract.successBlockLoc = null
             onInteract.hunterZoneBlockLoc = null
@@ -184,7 +230,7 @@ class Game(name: String) : ICommand(name) {
 
                     player.setSidebar()
 
-                    if (!Teams.hasJoinedTeam(Teams.OnlineTeam.TOSO_ADMIN, player)) {
+                    if (!player.isAdminTeam) {
                         Teams.joinTeam(Teams.OnlineTeam.TOSO_PLAYER, player)
                         player.gameMode = GameMode.ADVENTURE
 
@@ -213,35 +259,86 @@ class Game(name: String) : ICommand(name) {
         MainAPI.sendMessage(sender, MainAPI.ErrorMessage.GAME)
     }
 
+    private fun runResult(sender: CommandSender, label: String, arg: String?) {
+        if (sender is Player) {
+            if (!GameManager.isGame()) {
+                if (GameManager.isGame(GameManager.GameState.END)) {
+                    if (!arg.isNullOrEmpty()) {
+                        val resultType = ResultInventory.ResultType.getType(arg)
+                        if (resultType != null) {
+                            sender.openInventory(ResultInventory.getInventory(sender, resultType))
+                            return
+                        }
+                        sendHelpMessage(sender, label, ErrorArgType.TYPE)
+                        return
+                    }
+                    MainAPI.sendMessage(sender, MainAPI.ErrorMessage.ARGS)
+                    return
+                }
+                sender.sendMessage("""
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}ゲームが終了しているため実行できません。
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}"${ChatColor.RED}${ChatColor.UNDERLINE}/reset${ChatColor.RESET}${ChatColor.GRAY}"でゲームをリセットしてから実行してください。
+                """.trimIndent())
+                return
+            }
+            MainAPI.sendMessage(sender, MainAPI.ErrorMessage.GAME)
+            return
+        }
+        MainAPI.sendMessage(sender, MainAPI.ErrorMessage.NOT_PLAYER)
+    }
+
 
     private fun getTabList(sender: CommandSender, alias: String, args: Array<String>): List<String>? {
-        if (TosoGameAPI.isPlayer(sender) && !TosoGameAPI.isAdmin(sender as Player)) return emptyList()
-        if (args.size == 1) {
+        if (MainAPI.isPlayer(sender) && !TosoGameAPI.isAdmin(sender as Player)) {
             return when (alias.toLowerCase()) {
-                "game" -> getTabList(args[0], "start", "end", "reset")
-                "start" -> getTabList(args[0], "skip")
+                "result" -> getTabList(args[0], "reward", "ensure")
                 else -> emptyList()
             }
-        } else if (args.size == 2) {
-            return when (alias.toLowerCase()) {
-                "game" -> getTabList(args[1], when (args[0].toLowerCase()) {
+        } else {
+            if (args.size == 1) {
+                return getTabList(args[0], when (alias.toLowerCase()) {
+                    "game" -> mutableSetOf("start", "end", "reset", "result")
                     "start" -> mutableSetOf("skip")
+                    "opgame" -> mutableSetOf("1", "2")
+                    "result" -> mutableSetOf("reward", "ensure")
                     else -> emptySet()
                 })
-                else -> emptyList()
+            } else if (args.size == 2) {
+                return when (alias.toLowerCase()) {
+                    "game" -> getTabList(args[1], when (args[0].toLowerCase()) {
+                        "start" -> mutableSetOf("skip")
+                        "result" -> mutableSetOf("reward", "ensure")
+                        else -> emptySet()
+                    })
+                    else -> emptyList()
+                }
             }
         }
         return emptyList()
     }
 
 
-    private fun sendHelpMessage(sender: CommandSender, label: String) {
-        sender.sendMessage("""
-            ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}引数が不正です。
-            ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}コマンドの使い方:
-            ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label start [skip / 整数]" または "/start [skip / 秒数] - ゲームを開始
-            ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label end" または "/end" ("/g_end") - ゲームを終了
-            ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label reset" または "/reset" - ゲームをリセット
-        """.trimIndent())
+    private fun sendHelpMessage(sender: CommandSender, label: String, type: ErrorArgType = ErrorArgType.GENERAL) {
+        sender.sendMessage(when (type) {
+            ErrorArgType.GENERAL -> """
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}引数が不正です。
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}コマンドの使い方:
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label start [skip / 整数]" または "/start [skip / 秒数] - ゲームを開始
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label end" または "/end" ("/g_end") - ゲームを終了
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label reset" または "/reset" - ゲームをリセット
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label result <reward / ensure>" または "/result <reward / ensure>" - ゲーム統計の表示
+            """.trimIndent()
+            ErrorArgType.TYPE -> """
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}引数が不正です。
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}コマンドの使い方:
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label reward" - 賞金ランキングの表示
+                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}"/$label ensure" - 確保数ランキングの表示
+            """.trimIndent()
+        })
+    }
+
+    private enum class ErrorArgType {
+        GENERAL,
+        TYPE
     }
 }

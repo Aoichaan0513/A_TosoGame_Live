@@ -1,8 +1,7 @@
 package jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft
 
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams.OnlineTeam
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import org.bukkit.block.data.type.Stairs
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -27,7 +26,7 @@ class onBreak : Listener {
     fun onHangingBreak(e: HangingBreakByEntityEvent) {
         val p = e.remover as? Player ?: return
 
-        if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_ADMIN, p))
+        if (!p.isAdminTeam)
             e.isCancelled = true
     }
 }

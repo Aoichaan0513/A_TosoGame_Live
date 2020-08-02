@@ -1,13 +1,14 @@
 package jp.aoichaan0513.A_TosoGame_Live.Commands.Command
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
+import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
 
@@ -19,8 +20,9 @@ class Appear(name: String) : ICommand(name) {
                 for (name in args) {
                     val p = Bukkit.getPlayerExact(name)
                     if (p != null) {
-                        if (VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) {
-                            VisibilityManager.remove(p, VisibilityManager.VisibilityType.ADMIN)
+                        val playerConfig = PlayerManager.loadConfig(p)
+                        if (playerConfig.visibility) {
+                            playerConfig.visibility = false
                             sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}の姿を表示しました。")
                             continue
                         }
@@ -32,8 +34,9 @@ class Appear(name: String) : ICommand(name) {
                 }
                 return
             } else {
-                if (VisibilityManager.isHide(sp, VisibilityManager.VisibilityType.ADMIN)) {
-                    VisibilityManager.remove(sp, VisibilityManager.VisibilityType.ADMIN)
+                val playerConfig = PlayerManager.loadConfig(sp)
+                if (playerConfig.visibility) {
+                    playerConfig.visibility = false
                     sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}あなたの姿を表示しました。")
                     return
                 }
@@ -49,8 +52,9 @@ class Appear(name: String) : ICommand(name) {
             for (name in args) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
-                    if (VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) {
-                        VisibilityManager.remove(p, VisibilityManager.VisibilityType.ADMIN)
+                    val playerConfig = PlayerManager.loadConfig(p)
+                    if (playerConfig.visibility) {
+                        playerConfig.visibility = false
                         bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}の姿を表示しました。")
                         continue
                     }
@@ -70,8 +74,9 @@ class Appear(name: String) : ICommand(name) {
             for (name in args) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
-                    if (VisibilityManager.isHide(p, VisibilityManager.VisibilityType.ADMIN)) {
-                        VisibilityManager.remove(p, VisibilityManager.VisibilityType.ADMIN)
+                    val playerConfig = PlayerManager.loadConfig(p)
+                    if (playerConfig.visibility) {
+                        playerConfig.visibility = false
                         cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}の姿を表示しました。")
                         continue
                     }
@@ -87,21 +92,21 @@ class Appear(name: String) : ICommand(name) {
     }
 
     override fun onPlayerTabComplete(sp: Player, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        if (!TosoGameAPI.isAdmin(sp)) return emptyList()
-        val set = mutableSetOf<String>()
-        Bukkit.getOnlinePlayers().filter { VisibilityManager.isHide(it, VisibilityManager.VisibilityType.ADMIN) }.forEach { set.add(it.name) }
-        return getTabList(args[args.size - 1], set)
+        return getTabList(sp, args)
     }
 
     override fun onBlockTabComplete(bs: BlockCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
-        val set = mutableSetOf<String>()
-        Bukkit.getOnlinePlayers().filter { VisibilityManager.isHide(it, VisibilityManager.VisibilityType.ADMIN) }.forEach { set.add(it.name) }
-        return getTabList(args[args.size - 1], set)
+        return getTabList(bs, args)
     }
 
     override fun onConsoleTabComplete(cs: ConsoleCommandSender, cmd: Command, alias: String, args: Array<String>): List<String>? {
+        return getTabList(cs, args)
+    }
+
+    private fun getTabList(sender: CommandSender, args: Array<String>): List<String>? {
+        if (MainAPI.isPlayer(sender) && !TosoGameAPI.isAdmin(sender as Player)) return emptyList()
         val set = mutableSetOf<String>()
-        Bukkit.getOnlinePlayers().filter { VisibilityManager.isHide(it, VisibilityManager.VisibilityType.ADMIN) }.forEach { set.add(it.name) }
+        Bukkit.getOnlinePlayers().filter { PlayerManager.loadConfig(it).visibility }.forEach { set.add(it.name) }
         return getTabList(args[args.size - 1], set)
     }
 }

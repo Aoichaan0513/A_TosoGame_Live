@@ -1,6 +1,7 @@
 package jp.aoichaan0513.A_TosoGame_Live.API
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
@@ -27,6 +28,11 @@ class MainAPI {
             val set = mutableSetOf<Player>()
             collection.filter { Bukkit.getPlayer(it)?.isOnline ?: false }.forEach { set.add(Bukkit.getPlayer(it)!!) }
             return set
+        }
+
+
+        fun isPlayer(sender: CommandSender): Boolean {
+            return sender is Player
         }
 
         /**
@@ -151,7 +157,7 @@ class MainAPI {
         }
 
         /**
-         * プレフィックス系
+         * メッセージ系
          */
         val prefix: String
             get() = "${ChatColor.GRAY}[${ChatColor.DARK_RED}逃走中${ChatColor.GRAY}]${ChatColor.RESET}"
@@ -166,6 +172,10 @@ class MainAPI {
 
         fun getPrefix(backColor: ChatColor, forwardColor: ChatColor): String {
             return "$prefix$backColor > $forwardColor"
+        }
+
+        fun broadcastAdminMessage(str: String) {
+            Bukkit.getOnlinePlayers().filter { it.isAdminTeam }.forEach { it.sendMessage(str) }
         }
 
         fun sendMessage(sender: CommandSender, errorMessage: ErrorMessage) {
