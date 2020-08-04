@@ -30,12 +30,12 @@ class PlayerConfig(val uuid: UUID) {
         val baseFileName = "player.yml"
         val fileName = "$uuid.yml"
 
-        file = File("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}players${Main.FILE_SEPARATOR}$fileName")
+        file = File("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}players${Main.FILE_SEPARATOR}$fileName")
         if (file.exists()) {
             config = YamlConfiguration.loadConfiguration(file)
         } else {
             try {
-                Files.copy(Main.pluginInstance.getResource(baseFileName), Paths.get("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}players${Main.FILE_SEPARATOR}$fileName"))
+                Files.copy(Main.pluginInstance.getResource(baseFileName), Paths.get("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}players${Main.FILE_SEPARATOR}$fileName"))
             } catch (e: IOException) {
                 e.printStackTrace()
             }

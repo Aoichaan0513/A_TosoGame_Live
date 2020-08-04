@@ -135,7 +135,7 @@ class MapUtility {
                 })
                 val map = ItemStack(Material.FILLED_MAP)
                 val mapMeta = (map.itemMeta as MapMeta)
-                mapMeta.setMapView(mapView)
+                mapMeta.mapView = mapView
                 map.itemMeta = mapMeta
                 return map
             }

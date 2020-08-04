@@ -13,32 +13,34 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.inventory.*
+import org.bukkit.event.inventory.CraftItemEvent
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryOpenEvent
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.InventoryView
 
 class onInventory : Listener {
 
-    private val itemBlackSet = setOf(Material.BOOK, Material.BONE, Material.FEATHER, Material.EGG, Material.SNOWBALL, Material.RABBIT_FOOT, Material.SLIME_BALL, Material.ENDER_PEARL, Material.ENDER_EYE)
+    private val itemBlackSet = setOf(Material.FILLED_MAP, Material.BOOK, Material.BONE, Material.FEATHER, Material.EGG, Material.SNOWBALL, Material.RABBIT_FOOT, Material.SLIME_BALL, Material.ENDER_PEARL, Material.ENDER_EYE)
 
     @EventHandler
     fun onInventoryClick(e: InventoryClickEvent) {
         val p = e.whoClicked as Player
+        val clickedInventory = e.clickedInventory
         val inventory = e.inventory
+        val inventoryView = e.view
         val itemStack = e.currentItem
 
         if (!p.isAdminTeam) {
             if (p.isPlayerGroup || p.isJailTeam) {
-                if (inventory.type == InventoryType.PLAYER) {
-                    if (itemStack == null || itemStack.type == Material.AIR) return
-                    if (itemStack.type == Material.MAP || itemStack.type == Material.FILLED_MAP) {
-                        e.result = Event.Result.DENY
-                        e.isCancelled = true
-                    }
-                } else if (inventory.type == InventoryType.CHEST || inventory.type == InventoryType.ENDER_CHEST
+                if (clickedInventory?.type != InventoryType.PLAYER) return
+                if (inventory.type == InventoryType.CHEST || inventory.type == InventoryType.ENDER_CHEST
                         || inventory.type == InventoryType.DISPENSER || inventory.type == InventoryType.DROPPER
                         || inventory.type == InventoryType.HOPPER || inventory.type == InventoryType.ANVIL
                         || inventory.type == InventoryType.SHULKER_BOX || inventory.type == InventoryType.BARREL) {
-                    if (!MissionManager.isMission) {
+                    if (itemStack == null || itemStack.type == Material.AIR || isAllowedInventory(inventoryView)) return
+
+                    if (itemBlackSet.contains(itemStack.type)) {
                         e.result = Event.Result.DENY
                         e.isCancelled = true
                     }
@@ -83,17 +85,21 @@ class onInventory : Listener {
         }
     }
 
+    /*
     @EventHandler
     fun onInventoryMoveItem(e: InventoryMoveItemEvent) {
         val itemStack = e.item
         val source = e.source
         val destination = e.destination
 
+        Bukkit.broadcastMessage(e.toString())
+
         if (destination.type == InventoryType.PLAYER) return
 
         if (itemBlackSet.contains(itemStack.type))
             e.isCancelled = true
     }
+    */
 
     @EventHandler
     fun onCraftItem(e: CraftItemEvent) {

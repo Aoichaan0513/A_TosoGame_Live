@@ -119,10 +119,7 @@ class MissionManager {
             when (i) {
                 MissionState.SUCCESS.id -> {
                     if (onInteract.successBlockLoc != null) {
-                        sender.sendMessage("""
-                            ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}生存ミッションを開始しました。
-                            ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ミッションを開始しました。
-                        """.trimIndent())
+                        sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}生存ミッションを開始しました。")
                         sendMissionAPI(sender, i)
                     } else {
                         sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}このミッションはコマンドから実行できません。")
@@ -131,10 +128,7 @@ class MissionManager {
                 MissionState.HUNTER_ZONE.id -> {
                     if (onInteract.hunterZoneBlockLoc != null) {
                         if (HunterZone.hunterSetCount > 0) {
-                            sender.sendMessage("""
-                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッションを開始しました。
-                                ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ミッションを開始しました。
-                            """.trimIndent())
+                            sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッションを開始しました。")
                             sendMissionAPI(sender, i)
                         } else {
                             sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}応募したハンターがいないためこのミッションは実行できません。")
@@ -167,12 +161,15 @@ class MissionManager {
             TosoGameAPI.sendNotificationSound()
 
             sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${detailType.detailName}を送信しました。")
-            Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ミッションが通知されました。")
+            Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ミッションが通知されました。")
 
-            val textComponent1 = TextComponent(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY))
-            val textComponent2 = TextComponent("${ChatColor.GRAY}${ChatColor.BOLD}${ChatColor.UNDERLINE}ここ${ChatColor.RESET}")
+            for (player in Bukkit.getOnlinePlayers())
+                player.sendTitle("", "${ChatColor.GRAY}${ChatColor.BOLD}ミッションが通知されたようだ…", 10, 50, 20)
+
+            val textComponent1 = TextComponent(MainAPI.getPrefix(MainAPI.PrefixType.WARNING))
+            val textComponent2 = TextComponent("${ChatColor.BOLD}${ChatColor.UNDERLINE}ここ${ChatColor.RESET}")
             textComponent2.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/menu open ${detailType.name.toLowerCase()} $id")
-            val textComponent3 = TextComponent("${ChatColor.GRAY}をクリックして詳細を確認できます。")
+            val textComponent3 = TextComponent("${ChatColor.YELLOW}をクリックして詳細を確認できます。")
             textComponent1.addExtra(textComponent2)
             textComponent1.addExtra(textComponent3)
 
@@ -388,12 +385,15 @@ class MissionManager {
             TosoGameAPI.sendNotificationSound()
 
             sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ミッションを開始しました。")
-            Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ミッションが通知されました。")
+            Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ミッションが通知されました。")
 
-            val textComponent1 = TextComponent(MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY))
-            val textComponent2 = TextComponent("${ChatColor.GRAY}${ChatColor.BOLD}${ChatColor.UNDERLINE}ここ${ChatColor.RESET}")
+            for (player in Bukkit.getOnlinePlayers())
+                player.sendTitle("", "${ChatColor.GRAY}${ChatColor.BOLD}ミッションが通知されたようだ…", 10, 50, 20)
+
+            val textComponent1 = TextComponent(MainAPI.getPrefix(MainAPI.PrefixType.WARNING))
+            val textComponent2 = TextComponent("${ChatColor.BOLD}${ChatColor.UNDERLINE}ここ${ChatColor.RESET}")
             textComponent2.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/menu open mission $id")
-            val textComponent3 = TextComponent("${ChatColor.GRAY}をクリックして詳細を確認できます。")
+            val textComponent3 = TextComponent("${ChatColor.YELLOW}をクリックして詳細を確認できます。")
             textComponent1.addExtra(textComponent2)
             textComponent1.addExtra(textComponent3)
 

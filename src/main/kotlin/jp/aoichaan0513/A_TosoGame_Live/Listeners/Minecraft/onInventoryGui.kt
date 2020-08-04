@@ -42,7 +42,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryType
-import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -102,7 +101,8 @@ class onInventoryGui : Listener {
             MainInventory.Item.MAP_APP -> {
                 if (p.isAdminTeam || p.isPlayerGroup) {
                     p.closeInventory()
-                    if (p.inventory.itemInOffHand.type == Material.AIR) {
+
+                    if (p.inventory.none { it != null && it.type == Material.FILLED_MAP }) {
                         val baseStack = MapUtility.map
                         if (baseStack != null) {
                             val mapStack = baseStack.clone()
@@ -110,20 +110,22 @@ class onInventoryGui : Listener {
                             mapMeta.setDisplayName("${ChatColor.GREEN}地図")
                             mapMeta.lore = Arrays.asList("${ChatColor.YELLOW}なんかすごいやつ (語彙力)")
                             mapStack.itemMeta = mapMeta
-                            p.inventory.setItem(40, mapStack)
-                            ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップアプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
+
+                            val offHand = p.inventory.itemInOffHand
+                            if (offHand == null || offHand.type == Material.AIR)
+                                p.inventory.setItem(40, mapStack)
+                            else
+                                p.inventory.addItem(mapStack)
+
+                            p.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップアプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
                             return
                         }
-                        p.sendMessage(MainAPI.getPrefix(PrefixType.SECONDARY) + ChatColor.RED + ChatColor.BOLD + ChatColor.UNDERLINE + "マップアプリ" + ChatColor.RESET + ChatColor.GRAY + "を開くことができません。")
-                        return
-                    } else if (p.inventory.itemInOffHand.type == Material.FILLED_MAP) {
-                        p.inventory.setItem(40, ItemStack(Material.AIR))
-                        ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップアプリ${ChatColor.RESET}${ChatColor.YELLOW}を閉じました。")
-                        return
+                        p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップアプリ${ChatColor.RESET}${ChatColor.RED}を開くことができません。")
                     } else {
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}オフハンドを使用しているためアプリを開けません。")
-                        return
+                        p.inventory.remove(Material.FILLED_MAP)
+                        p.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップアプリ${ChatColor.RESET}${ChatColor.YELLOW}を閉じました。")
                     }
+                    return
                 }
                 p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在実行できません。")
             }
@@ -159,8 +161,7 @@ class onInventoryGui : Listener {
             MainInventory.Item.DISCORD_INTEGRATION -> {
                 val botInstance = Main.botInstance
                 if (botInstance != null) {
-                    if (botInstance.getCategoryById(Main.mainConfig.getLong("discordIntegration.categoryId"))?.guild?.getMembersByNickname(p.name, true)?.isEmpty()
-                                    ?: false) {
+                    if (botInstance.getCategoryById(Main.mainConfig.getLong("discordIntegration.categoryId"))?.guild?.getMembersByNickname(p.name, true)?.isEmpty() == true) {
                         val str = RandomStringUtils.randomNumeric(8)
                         DiscordManager.hashMap[str] = p.uniqueId
 

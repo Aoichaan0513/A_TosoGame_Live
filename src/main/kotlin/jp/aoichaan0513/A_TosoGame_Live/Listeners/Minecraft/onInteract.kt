@@ -209,7 +209,7 @@ class onInteract : Listener {
                         if (clickedBlock != null && p.gameMode != GameMode.SPECTATOR && p.inventory.itemInMainHand.type == Material.AIR
                                 && clickedBlock.blockData is Stairs && (clickedBlock.blockData as Stairs).half == Bisected.Half.BOTTOM
                                 && clickedBlock.location.clone().add(0.0, -1.0, 0.0).block.type == Material.BEDROCK) {
-                            e.setCancelled(true)
+                            e.isCancelled = true
 
                             val loc = clickedBlock.location.clone().add(0.5, 0.0, 0.5)
 
@@ -280,7 +280,6 @@ class onInteract : Listener {
                                                     }
                                                 } else {
                                                     p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}生存ミッションが有効になっていないため開始できません。")
-                                                    return
                                                 }
                                             }
                                         } else if (block.type == Material.BONE_BLOCK) {
@@ -521,8 +520,8 @@ class onInteract : Listener {
                     damager.playSound(damager.location, Sound.ENTITY_PLAYER_LEVELUP, 1F, 1F)
                     player.playSound(damager.location, Sound.ENTITY_PLAYER_LEVELUP, 1F, 1F)
 
-                    damager.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}同じ番号のカードキーを所持していたため${ChatColor.BOLD}${ChatColor.UNDERLINE}${player.name}${ChatColor.RESET}${ChatColor.GREEN}の認証に成功しました。")
-                    player.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}同じ番号のカードキーを所持していたため${ChatColor.BOLD}${ChatColor.UNDERLINE}${damager.name}${ChatColor.RESET}${ChatColor.GREEN}の認証に成功しました。")
+                    damager.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}同じ番号のカードキーを所持していたため${ChatColor.BOLD}${ChatColor.UNDERLINE}${player.name}${ChatColor.RESET}${ChatColor.GREEN}との認証に成功しました。")
+                    player.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}同じ番号のカードキーを所持していたため${ChatColor.BOLD}${ChatColor.UNDERLINE}${damager.name}${ChatColor.RESET}${ChatColor.GREEN}との認証に成功しました。")
                 } else {
                     damager.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}同じ番号のカードキーを所持していないため認証に失敗しました。")
                 }
@@ -588,9 +587,9 @@ class onInteract : Listener {
         p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
         p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, duration, 1, false, false))
 
-        for (entity in p.world.entities)
-            if (entity is Zombie && entity.target is Player && (entity.target as Player).uniqueId == p.uniqueId)
-                entity.target = null
+        Main.worldConfig.world.entities
+                .filter { it is Zombie && it.target is Player && it.target?.uniqueId == p.uniqueId }
+                .forEach { (it as Zombie).target = null }
 
         TosoGameAPI.hidePlayer(p, duration.toLong())
     }

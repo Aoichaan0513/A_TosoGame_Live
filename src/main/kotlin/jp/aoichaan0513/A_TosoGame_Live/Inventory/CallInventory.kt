@@ -67,16 +67,19 @@ class CallInventory {
                 inv.setItem(53, itemStackForward)
             }
 
-            for (player in list[page]) {
-                val itemStackPlayerInfo = ItemStack(Material.PLAYER_HEAD, 1)
-                val itemMetaPlayerInfo = (itemStackPlayerInfo.itemMeta as SkullMeta)
-                itemMetaPlayerInfo.addItemFlags(*ItemUtil.itemFlags)
-                itemMetaPlayerInfo.owningPlayer = player
-                itemMetaPlayerInfo.setDisplayName("${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}${player.name}")
-                itemMetaPlayerInfo.lore = listOf()
-                itemStackPlayerInfo.itemMeta = itemMetaPlayerInfo
-                inv.addItem(itemStackPlayerInfo)
+            if (list.isNotEmpty()) {
+                for (player in list[page]) {
+                    val itemStackPlayerInfo = ItemStack(Material.PLAYER_HEAD, 1)
+                    val itemMetaPlayerInfo = (itemStackPlayerInfo.itemMeta as SkullMeta)
+                    itemMetaPlayerInfo.addItemFlags(*ItemUtil.itemFlags)
+                    itemMetaPlayerInfo.owningPlayer = player
+                    itemMetaPlayerInfo.setDisplayName("${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}${player.name}")
+                    itemMetaPlayerInfo.lore = listOf()
+                    itemStackPlayerInfo.itemMeta = itemMetaPlayerInfo
+                    inv.addItem(itemStackPlayerInfo)
+                }
             }
+
             return inv
         }
 

@@ -261,12 +261,13 @@ class Game(name: String) : ICommand(name) {
 
     private fun runResult(sender: CommandSender, label: String, arg: String?) {
         if (sender is Player) {
-            if (!GameManager.isGame()) {
-                if (GameManager.isGame(GameManager.GameState.END)) {
+            if (!GameManager.isGame(GameManager.GameState.NONE)) {
+                if (!GameManager.isGame()) {
                     if (!arg.isNullOrEmpty()) {
                         val resultType = ResultInventory.ResultType.getType(arg)
                         if (resultType != null) {
                             sender.openInventory(ResultInventory.getInventory(sender, resultType))
+                            sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}ゲーム結果を表示しました。")
                             return
                         }
                         sendHelpMessage(sender, label, ErrorArgType.TYPE)
@@ -275,13 +276,10 @@ class Game(name: String) : ICommand(name) {
                     MainAPI.sendMessage(sender, MainAPI.ErrorMessage.ARGS)
                     return
                 }
-                sender.sendMessage("""
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}ゲームが終了しているため実行できません。
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}"${ChatColor.RED}${ChatColor.UNDERLINE}/reset${ChatColor.RESET}${ChatColor.GRAY}"でゲームをリセットしてから実行してください。
-                """.trimIndent())
+                MainAPI.sendMessage(sender, MainAPI.ErrorMessage.GAME)
                 return
             }
-            MainAPI.sendMessage(sender, MainAPI.ErrorMessage.GAME)
+            MainAPI.sendMessage(sender, MainAPI.ErrorMessage.NOT_GAME)
             return
         }
         MainAPI.sendMessage(sender, MainAPI.ErrorMessage.NOT_PLAYER)

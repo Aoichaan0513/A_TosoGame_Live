@@ -13,7 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable
 class AdvancementMessage(private val id: NamespacedKey, private val title: String, private val description: String, icon: Material) {
     private val icon: String
 
-    constructor(id: String, title: String, description: String, icon: Material) : this(NamespacedKey(Main.pluginInstance, id), title, description, icon) {}
+    constructor(id: String, title: String, description: String, icon: Material) : this(NamespacedKey(Main.pluginInstance, id), title, description, icon)
 
     fun showTo(player: Player) {
         showTo(listOf(player))

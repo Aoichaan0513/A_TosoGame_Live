@@ -70,20 +70,22 @@ class ResultInventory {
                 inv.setItem(53, itemStackForward)
             }
 
-            val itemStackPlayerInfo = ItemStack(Material.PLAYER_HEAD, 1)
-            val itemMetaPlayerInfo = itemStackPlayerInfo.itemMeta as SkullMeta
-            itemMetaPlayerInfo.addItemFlags(*ItemUtil.itemFlags)
+            if (list.isNotEmpty()) {
+                val itemStackPlayerInfo = ItemStack(Material.PLAYER_HEAD, 1)
+                val itemMetaPlayerInfo = itemStackPlayerInfo.itemMeta as SkullMeta
+                itemMetaPlayerInfo.addItemFlags(*ItemUtil.itemFlags)
 
-            for (i in list[page].indices) {
-                val (player, long) = list[page][i]
+                for (i in list[page].indices) {
+                    val (player, long) = list[page][i]
 
-                if (player.uniqueId == p.uniqueId)
-                    itemMetaPlayerInfo.addEnchant(Enchantment.DURABILITY, 1, true)
-                itemMetaPlayerInfo.owningPlayer = player
-                itemMetaPlayerInfo.setDisplayName("${ChatColor.GOLD}${ChatColor.UNDERLINE}${i + 1}位${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${player.name}")
-                itemMetaPlayerInfo.lore = listOf("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${long}${if (resultType == ResultType.REWARD) "円" else ""}")
-                itemStackPlayerInfo.itemMeta = itemMetaPlayerInfo
-                inv.addItem(itemStackPlayerInfo)
+                    if (player.uniqueId == p.uniqueId)
+                        itemMetaPlayerInfo.addEnchant(Enchantment.DURABILITY, 1, true)
+                    itemMetaPlayerInfo.owningPlayer = player
+                    itemMetaPlayerInfo.setDisplayName("${ChatColor.GOLD}${ChatColor.UNDERLINE}${i + 1}位${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${player.name}")
+                    itemMetaPlayerInfo.lore = listOf("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${long}${if (resultType == ResultType.REWARD) "円" else ""}")
+                    itemStackPlayerInfo.itemMeta = itemMetaPlayerInfo
+                    inv.addItem(itemStackPlayerInfo)
+                }
             }
 
             return inv

@@ -24,6 +24,7 @@ class onItem : Listener {
         val p = e.player
 
         if (p.isAdminTeam) return
+
         e.isCancelled = true
         p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}アイテムを投げることはできません。")
     }

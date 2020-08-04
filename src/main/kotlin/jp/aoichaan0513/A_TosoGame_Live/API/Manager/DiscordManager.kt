@@ -53,7 +53,7 @@ class DiscordManager {
             textComponent1.addExtra(textComponent4)
             textComponent1.addExtra(textComponent5)
 
-            toPlayer.spigot().sendMessage(textComponent1);
+            toPlayer.spigot().sendMessage(textComponent1)
             return
         }
     }

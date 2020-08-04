@@ -424,13 +424,16 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                                                 if (health % 2 == 0.0) {
                                                     player.walkSpeed = walkSpeed - 0.02f
                                                     player.health = health - 2
+                                                    player.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, SoundCategory.PLAYERS, 1f, 1f)
                                                 } else {
                                                     player.walkSpeed = walkSpeed - 0.01f
                                                     player.health = health - 1
+                                                    player.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, SoundCategory.PLAYERS, 1f, 1f)
                                                 }
                                             } else {
                                                 player.walkSpeed = walkSpeed - 0.01f
                                                 player.health = health - 1
+                                                player.playSound(loc, Sound.BLOCK_NOTE_BLOCK_BASEDRUM, SoundCategory.PLAYERS, 1f, 1f)
                                             }
                                         }
                                     } else {
@@ -503,7 +506,13 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
             rewardBuilder.append("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GOLD}${rewardCount++}位${ChatColor.GRAY}: ${ChatColor.YELLOW}${Bukkit.getPlayer(key)!!.name}${ChatColor.GRAY} (${MoneyManager.formatMoney(value)})\n")
 
         val rewardResult = rewardBuilder.toString().trim()
-        Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}賞金ランキング\n${if (!rewardResult.isEmpty()) rewardResult else "${MainAPI.getPrefix(PrefixType.SECONDARY)}なし"}")
+
+        val textComponent1 = TextComponent("${MainAPI.getPrefix(PrefixType.SUCCESS)}賞金ランキング\n${if (!rewardResult.isEmpty()) rewardResult else "${MainAPI.getPrefix(PrefixType.SECONDARY)}なし"}\n${MainAPI.getPrefix(PrefixType.WARNING)}")
+        val textComponent2 = TextComponent("${ChatColor.BOLD}${ChatColor.UNDERLINE}ここ${ChatColor.RESET}")
+        textComponent2.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/result reward")
+        val textComponent3 = TextComponent("${ChatColor.YELLOW}をクリックして詳細を確認できます。")
+        textComponent1.addExtra(textComponent2)
+        textComponent1.addExtra(textComponent3)
 
         val hunterEntries = onDamage.hunterMap.entries
         val hunterMap = hunterEntries.filter { MainAPI.isOnline(it.key) && it.value > 0 }.sortedBy { it.value * -1 }
@@ -515,7 +524,16 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
         for ((key, value) in hunterList)
             hunterBuilder.append("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GOLD}${hunterCount++}位${ChatColor.GRAY}: ${ChatColor.YELLOW}${Bukkit.getPlayer(key)!!.name}${ChatColor.GRAY} ($value)\n")
 
-        val hunterResult = hunterBuilder.toString().trim { it <= ' ' }
-        Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}確保数ランキング\n${if (!hunterResult.isEmpty()) hunterResult else "${MainAPI.getPrefix(PrefixType.SECONDARY)}なし"}")
+        val hunterResult = hunterBuilder.toString().trim()
+
+        val textComponent4 = TextComponent("${MainAPI.getPrefix(PrefixType.SUCCESS)}確保数ランキング\n${if (!hunterResult.isEmpty()) hunterResult else "${MainAPI.getPrefix(PrefixType.SECONDARY)}なし"}\n${MainAPI.getPrefix(PrefixType.WARNING)}")
+        val textComponent5 = TextComponent("${ChatColor.BOLD}${ChatColor.UNDERLINE}ここ${ChatColor.RESET}")
+        textComponent5.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/result ensure")
+        val textComponent6 = TextComponent("${ChatColor.YELLOW}をクリックして詳細を確認できます。")
+        textComponent4.addExtra(textComponent5)
+        textComponent4.addExtra(textComponent6)
+
+        Bukkit.spigot().broadcast(textComponent1)
+        Bukkit.spigot().broadcast(textComponent4)
     }
 }

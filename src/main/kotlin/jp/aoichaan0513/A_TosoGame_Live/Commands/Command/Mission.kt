@@ -36,7 +36,7 @@ class Mission(name: String) : ICommand(name) {
                                     return
                                 } else {
                                     val stringBuilder = StringBuilder()
-                                    val folder = File("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}missions")
+                                    val folder = File("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}missions")
                                     folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                             .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                                     sp.sendMessage("""
@@ -48,7 +48,7 @@ class Mission(name: String) : ICommand(name) {
                                 }
                             } else {
                                 val stringBuilder = StringBuilder()
-                                val folder = File("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}missions")
+                                val folder = File("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}missions")
                                 folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                         .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                                 sp.sendMessage("""
@@ -60,7 +60,7 @@ class Mission(name: String) : ICommand(name) {
                             }
                         } else {
                             val stringBuilder = StringBuilder()
-                            val folder = File("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}missions")
+                            val folder = File("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}missions")
                             folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                     .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                             sp.sendMessage("""
@@ -147,7 +147,7 @@ class Mission(name: String) : ICommand(name) {
                                 return
                             } else {
                                 val stringBuilder = StringBuilder()
-                                val folder = File("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}missions")
+                                val folder = File("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}missions")
                                 folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                         .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                                 bs.sendMessage("""
@@ -159,7 +159,7 @@ class Mission(name: String) : ICommand(name) {
                             }
                         } else {
                             val stringBuilder = StringBuilder()
-                            val folder = File("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}missions")
+                            val folder = File("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}missions")
                             folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                     .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                             bs.sendMessage("""
@@ -171,7 +171,7 @@ class Mission(name: String) : ICommand(name) {
                         }
                     } else {
                         val stringBuilder = StringBuilder()
-                        val folder = File("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}missions")
+                        val folder = File("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}missions")
                         folder.listFiles().filter { it.isFile && it.extension.equals("txt") }
                                 .forEach { stringBuilder.append("${MainAPI.getPrefix(PrefixType.ERROR)}ID${it.nameWithoutExtension}: ${it.readLines(Main.CHARSET)[0]}\n") }
                         bs.sendMessage("""

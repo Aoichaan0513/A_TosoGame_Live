@@ -27,7 +27,7 @@ class Script(name: String) : ICommand(name) {
         }
 
         fun getFile(fileName: String): File {
-            return File("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}scripts${Main.FILE_SEPARATOR}commands${Main.FILE_SEPARATOR}$fileName.js")
+            return File("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}scripts${Main.FILE_SEPARATOR}commands${Main.FILE_SEPARATOR}$fileName.js")
         }
 
         fun hasFile(fileName: String): Boolean {
@@ -79,7 +79,7 @@ class Script(name: String) : ICommand(name) {
         if (!worldConfig.gameConfig.script || args.size != 1) return emptyList()
 
         val set = mutableSetOf<String>()
-        val file = File("${Main.pluginInstance.getDataFolder()}${Main.FILE_SEPARATOR}scripts${Main.FILE_SEPARATOR}commands")
+        val file = File("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}scripts${Main.FILE_SEPARATOR}commands")
         file.listFiles().filter { it.isFile && it.extension.equals("js") }.forEach { set.add(it.nameWithoutExtension) }
         return getTabList(args[0], set)
     }
