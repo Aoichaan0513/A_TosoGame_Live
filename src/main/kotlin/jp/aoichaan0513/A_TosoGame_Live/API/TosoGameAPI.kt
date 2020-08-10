@@ -55,65 +55,69 @@ class TosoGameAPI {
                 MissionManager.setBook(p)
             } else {
                 if (GameManager.isGame(GameState.GAME)) {
-                    if (p.isHunterGroup) {
-                        setArmor(p)
-                    } else if (p.isJailTeam) {
-                        MissionManager.setBook(p)
-                        val itemStack = ItemStack(Material.ENDER_PEARL)
-                        val itemMeta = itemStack.itemMeta!!
-                        itemMeta.setDisplayName(ItemUtil.getItemName("プレイヤーを非表示"))
-                        itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックして運営以外のプレイヤーを非表示にします。")
-                        itemStack.itemMeta = itemMeta
-
-                        inv.setItem(8, itemStack)
-                    } else {
-                        val worldConfig = Main.worldConfig
-                        val difficultyConfig = worldConfig.getDifficultyConfig(p)
-
-                        if (MapUtility.map != null) {
-                            val mapStack = MapUtility.map!!.clone()
-                            val mapMeta = mapStack.itemMeta!!
-                            mapMeta.setDisplayName(ItemUtil.getItemName("地図"))
-                            mapMeta.lore = listOf("${ChatColor.YELLOW}なんかすごいやつ (語彙力)")
-                            mapStack.itemMeta = mapMeta
-
-                            inv.setItem(40, mapStack)
+                    when {
+                        p.isHunterGroup -> {
+                            setArmor(p)
                         }
+                        p.isJailTeam -> {
+                            MissionManager.setBook(p)
+                            val itemStack = ItemStack(Material.ENDER_PEARL)
+                            val itemMeta = itemStack.itemMeta!!
+                            itemMeta.setDisplayName(ItemUtil.getItemName("プレイヤーを非表示"))
+                            itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックして運営以外のプレイヤーを非表示にします。")
+                            itemStack.itemMeta = itemMeta
 
-                        val boneItem = difficultyConfig.getBone(type)
-                        val boneStack = ItemStack(Material.BONE, boneItem.count)
-                        val boneMeta = boneStack.itemMeta!!
-                        boneMeta.setDisplayName(ItemUtil.getItemName("骨 (透明化)"))
-                        boneMeta.lore = listOf(
-                                "${ChatColor.YELLOW}クリックで${TimeFormat.formatSec(boneItem.duration)}秒間透明になります。",
-                                "",
-                                "${ChatColor.GREEN}${ChatColor.UNDERLINE}クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatSec(boneItem.duration + 5)}${ChatColor.GRAY}秒"
-                        )
-                        boneStack.itemMeta = boneMeta
+                            inv.setItem(8, itemStack)
+                        }
+                        else -> {
+                            val worldConfig = Main.worldConfig
+                            val difficultyConfig = worldConfig.getDifficultyConfig(p)
 
-                        val featherItem = difficultyConfig.getFeather(type)
-                        val featherStack = ItemStack(Material.FEATHER, featherItem.count)
-                        val featherMeta = featherStack.itemMeta!!
-                        featherMeta.setDisplayName(ItemUtil.getItemName("羽 (移動速度上昇)"))
-                        featherMeta.lore = listOf(
-                                "${ChatColor.YELLOW}クリックで${TimeFormat.formatSec(featherItem.duration)}秒間移動速度が上昇します。",
-                                "",
-                                "${ChatColor.GREEN}${ChatColor.UNDERLINE}クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatSec(featherItem.duration + 5)}${ChatColor.GRAY}秒"
-                        )
-                        featherStack.itemMeta = featherMeta
+                            if (MapUtility.map != null) {
+                                val mapStack = MapUtility.map!!.clone()
+                                val mapMeta = mapStack.itemMeta!!
+                                mapMeta.setDisplayName(ItemUtil.getItemName("地図"))
+                                mapMeta.lore = listOf("${ChatColor.YELLOW}なんかすごいやつ (語彙力)")
+                                mapStack.itemMeta = mapMeta
 
-                        val eggStack = ItemStack(Material.EGG, difficultyConfig.getEgg(type).count)
-                        val eggMeta = eggStack.itemMeta!!
-                        eggMeta.setDisplayName(ItemUtil.getItemName("卵 (盲目・移動速度低下)"))
-                        eggMeta.lore = listOf("${ChatColor.YELLOW}ハンターに当てると盲目と移動速度低下を5秒間与えます。")
-                        eggStack.itemMeta = eggMeta
+                                inv.setItem(40, mapStack)
+                            }
 
-                        val items = PlayerManager.loadConfig(p).inventoryConfig.items
-                        inv.setItem(items[ItemType.BONE] ?: 0, boneStack)
-                        inv.setItem(items[ItemType.FEATHER] ?: 1, featherStack)
-                        inv.setItem(items[ItemType.EGG] ?: 2, eggStack)
+                            val boneItem = difficultyConfig.getBone(type)
+                            val boneStack = ItemStack(Material.BONE, boneItem.count)
+                            val boneMeta = boneStack.itemMeta!!
+                            boneMeta.setDisplayName(ItemUtil.getItemName("骨 (透明化)"))
+                            boneMeta.lore = listOf(
+                                    "${ChatColor.YELLOW}クリックで${TimeFormat.formatSec(boneItem.duration)}秒間透明になります。",
+                                    "",
+                                    "${ChatColor.GREEN}${ChatColor.UNDERLINE}クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatSec(boneItem.duration + 5)}${ChatColor.GRAY}秒"
+                            )
+                            boneStack.itemMeta = boneMeta
 
-                        MissionManager.setBook(p)
+                            val featherItem = difficultyConfig.getFeather(type)
+                            val featherStack = ItemStack(Material.FEATHER, featherItem.count)
+                            val featherMeta = featherStack.itemMeta!!
+                            featherMeta.setDisplayName(ItemUtil.getItemName("羽 (移動速度上昇)"))
+                            featherMeta.lore = listOf(
+                                    "${ChatColor.YELLOW}クリックで${TimeFormat.formatSec(featherItem.duration)}秒間移動速度が上昇します。",
+                                    "",
+                                    "${ChatColor.GREEN}${ChatColor.UNDERLINE}クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatSec(featherItem.duration + 5)}${ChatColor.GRAY}秒"
+                            )
+                            featherStack.itemMeta = featherMeta
+
+                            val eggStack = ItemStack(Material.EGG, difficultyConfig.getEgg(type).count)
+                            val eggMeta = eggStack.itemMeta!!
+                            eggMeta.setDisplayName(ItemUtil.getItemName("卵 (盲目・移動速度低下)"))
+                            eggMeta.lore = listOf("${ChatColor.YELLOW}ハンターに当てると盲目と移動速度低下を5秒間与えます。")
+                            eggStack.itemMeta = eggMeta
+
+                            val items = PlayerManager.loadConfig(p).inventoryConfig.items
+                            inv.setItem(items[ItemType.BONE] ?: 0, boneStack)
+                            inv.setItem(items[ItemType.FEATHER] ?: 1, featherStack)
+                            inv.setItem(items[ItemType.EGG] ?: 2, eggStack)
+
+                            MissionManager.setBook(p)
+                        }
                     }
                 } else {
                     if (p.isHunterGroup) {
@@ -126,7 +130,7 @@ class TosoGameAPI {
         }
 
         // 装備
-        fun setArmor(p: Player) {
+        private fun setArmor(p: Player) {
             if (p.isHunterTeam) {
                 p.inventory.clear()
                 p.inventory.helmet = ItemStack(Material.DIAMOND_HELMET)
@@ -135,8 +139,13 @@ class TosoGameAPI {
                 p.inventory.boots = ItemStack(Material.DIAMOND_BOOTS)
             } else if (p.isTuhoTeam) {
                 p.inventory.clear()
-                // p.getInventory().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
-                p.inventory.helmet = ItemStack(Material.HONEY_BLOCK)
+
+                val itemStack = ItemStack(Material.HONEYCOMB)
+                val itemMeta = itemStack.itemMeta!!
+                itemMeta.setCustomModelData(1002)
+                itemStack.itemMeta = itemMeta
+
+                p.inventory.helmet = itemStack
                 p.inventory.chestplate = ItemStack(Material.GOLDEN_CHESTPLATE)
                 p.inventory.leggings = ItemStack(Material.GOLDEN_LEGGINGS)
                 p.inventory.boots = ItemStack(Material.GOLDEN_BOOTS)
@@ -189,14 +198,6 @@ class TosoGameAPI {
             return PlayerManager.loadConfig(p).broadCaster
         }
 
-        fun toggleOp(p: Player) {
-            if (!isBroadCaster(p) && !hasPermission(p)) return
-            if (p.isOp)
-                removeOp(p)
-            else
-                addOp(p)
-        }
-
         fun addOp(p: Player) {
             if (p.isAdminTeam || hasPermission(p) || isBroadCaster(p))
                 p.isOp = true
@@ -241,7 +242,7 @@ class TosoGameAPI {
                 sendNotificationSound(p)
         }
 
-        fun sendNotificationSound(p: Player) {
+        private fun sendNotificationSound(p: Player) {
             /*
             new BukkitRunnable() {
                 int count = 0;
@@ -261,7 +262,7 @@ class TosoGameAPI {
                 var c = 26
 
                 override fun run() {
-                    if (c <= 26 && c >= 18 || c <= 9 && c > 0)
+                    if (c in 18..26 || c in 1..9)
                         p.playSound(p.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f)
                     if (c < 0)
                         cancel()
