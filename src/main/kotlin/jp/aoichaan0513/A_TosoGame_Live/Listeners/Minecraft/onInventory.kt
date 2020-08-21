@@ -21,6 +21,10 @@ import org.bukkit.inventory.InventoryView
 
 class onInventory : Listener {
 
+    companion object {
+        var isAllowOpen = false
+    }
+
     private val itemBlackSet = setOf(Material.FILLED_MAP, Material.BOOK, Material.BONE, Material.FEATHER, Material.EGG, Material.SNOWBALL, Material.RABBIT_FOOT, Material.SLIME_BALL, Material.ENDER_PEARL, Material.ENDER_EYE)
 
     @EventHandler
@@ -85,22 +89,6 @@ class onInventory : Listener {
         }
     }
 
-    /*
-    @EventHandler
-    fun onInventoryMoveItem(e: InventoryMoveItemEvent) {
-        val itemStack = e.item
-        val source = e.source
-        val destination = e.destination
-
-        Bukkit.broadcastMessage(e.toString())
-
-        if (destination.type == InventoryType.PLAYER) return
-
-        if (itemBlackSet.contains(itemStack.type))
-            e.isCancelled = true
-    }
-    */
-
     @EventHandler
     fun onCraftItem(e: CraftItemEvent) {
         val p = e.whoClicked as Player
@@ -117,9 +105,5 @@ class onInventory : Listener {
                 || inventoryView.title.equals(PlayerSettingsInventory.title) || inventoryView.title.equals(PlayerSettingsInventory.inventoryTitle)
                 || inventoryView.title.equals(PlayerSettingsInventory.itemSelectTitle) || inventoryView.title.startsWith(CallInventory.title)
                 || inventoryView.title.startsWith(ResultInventory.title)
-    }
-
-    companion object {
-        var isAllowOpen = false
     }
 }

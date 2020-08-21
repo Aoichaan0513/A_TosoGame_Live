@@ -10,7 +10,7 @@ import org.json.JSONObject
 
 class HttpConnection {
 
-    var result: String = ""
+    var result = ""
 
     constructor(url: String, headers: Headers = Headers.Builder().build()) {
         val client = OkHttpClient.Builder().build()
