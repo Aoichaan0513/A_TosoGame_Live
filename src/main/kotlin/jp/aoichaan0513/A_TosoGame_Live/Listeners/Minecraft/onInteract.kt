@@ -118,6 +118,7 @@ class onInteract : Listener {
         } else {
             if (p.inventory.itemInMainHand.type == Material.BOOK && (p.inventory.itemInOffHand.type == Material.AIR || p.inventory.itemInOffHand.type == Material.FILLED_MAP)
                     || p.inventory.itemInOffHand.type == Material.BOOK && (p.inventory.itemInMainHand.type == Material.AIR || p.inventory.itemInMainHand.type == Material.FILLED_MAP)) {
+                if (p.gameMode == GameMode.SPECTATOR) return
                 if (e.action == Action.LEFT_CLICK_AIR || e.action == Action.LEFT_CLICK_BLOCK) {
                     if (p.inventory.itemInMainHand.type == Material.BOOK) {
                         val itemMeta = p.inventory.itemInMainHand.itemMeta

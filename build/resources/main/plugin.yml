@@ -4,7 +4,7 @@ api-version: 1.13
 main: jp.aoichaan0513.A_TosoGame_Live.Main
 authors: [Aoichaan0513]
 website: https://aoichaan0513.jp
-description: TosoGame (Run for Money) Plugin for Minecraft Java Edition 1.15.2. (Build 20.0822.0020)
+description: TosoGame (Run for Money) Plugin for Minecraft Java Edition 1.15.2. (Build 20.0822.2045)
 
 commands:
   toso:
