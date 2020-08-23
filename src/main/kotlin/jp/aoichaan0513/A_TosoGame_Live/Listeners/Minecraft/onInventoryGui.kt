@@ -102,30 +102,27 @@ class onInventoryGui : Listener {
                 if (p.isAdminTeam || p.isPlayerGroup) {
                     p.closeInventory()
 
-                    if (p.inventory.none { it != null && it.type == Material.FILLED_MAP }) {
-                        val baseStack = MapUtility.map
-                        if (baseStack != null) {
-                            val mapStack = baseStack.clone()
-                            val mapMeta = mapStack.itemMeta!!
-                            mapMeta.setDisplayName("${ChatColor.GREEN}地図")
-                            mapMeta.lore = Arrays.asList("${ChatColor.YELLOW}なんかすごいやつ (語彙力)")
-                            mapStack.itemMeta = mapMeta
-
+                    val mapStack = MapUtility.itemStack
+                    if (mapStack != null) {
+                        if (p.inventory.none { it != null && it.type == MapUtility.material }) {
                             val offHand = p.inventory.itemInOffHand
                             if (offHand == null || offHand.type == Material.AIR)
-                                p.inventory.setItem(40, mapStack)
+                                p.inventory.setItemInOffHand(mapStack)
                             else
                                 p.inventory.addItem(mapStack)
 
                             p.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップアプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
-                            return
+                        } else {
+                            val offHand = p.inventory.itemInOffHand
+                            if (offHand != null && offHand.type == MapUtility.material)
+                                p.inventory.setItemInOffHand(null)
+                            else
+                                p.inventory.remove(mapStack)
+
+                            p.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップアプリ${ChatColor.RESET}${ChatColor.YELLOW}を閉じました。")
                         }
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップアプリ${ChatColor.RESET}${ChatColor.RED}を開くことができません。")
-                    } else {
-                        p.inventory.remove(Material.FILLED_MAP)
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップアプリ${ChatColor.RESET}${ChatColor.YELLOW}を閉じました。")
+                        return
                     }
-                    return
                 }
                 p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在実行できません。")
             }

@@ -4,6 +4,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig.BorderType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -17,6 +18,18 @@ import javax.imageio.ImageIO
 
 class MapUtility {
     companion object {
+
+        val material = Material.FILLED_MAP
+
+        val itemStack: ItemStack?
+            get() {
+                val mapStack = map?.clone() ?: return null
+                val mapMeta = mapStack.itemMeta!!
+                mapMeta.setDisplayName("${ChatColor.GREEN}地図")
+                mapMeta.lore = Arrays.asList("${ChatColor.YELLOW}なんかすごいやつ (語彙力)")
+                mapStack.itemMeta = mapMeta
+                return mapStack
+            }
 
         var map: ItemStack? = null
             private set
@@ -133,7 +146,7 @@ class MapUtility {
                         }
                     }
                 })
-                val map = ItemStack(Material.FILLED_MAP)
+                val map = ItemStack(material)
                 val mapMeta = (map.itemMeta as MapMeta)
                 mapMeta.mapView = mapView
                 map.itemMeta = mapMeta

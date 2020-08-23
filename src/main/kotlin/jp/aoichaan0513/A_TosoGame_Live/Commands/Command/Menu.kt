@@ -6,8 +6,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
 import jp.aoichaan0513.A_TosoGame_Live.Inventory.MissionInventory
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ParseUtil
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterGroup
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
 import org.bukkit.command.ConsoleCommandSender
@@ -18,7 +17,7 @@ class Menu(name: String) : ICommand(name) {
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
         if (args.isNotEmpty()) {
             if (args[0].equals("open", true)) {
-                if (sp.isAdminTeam || sp.isPlayerGroup) {
+                if (!sp.isHunterGroup) {
                     if (args.size != 1 && args.size != 2) {
                         if (!ParseUtil.isInt(args[2])) return
 
