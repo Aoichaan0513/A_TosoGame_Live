@@ -83,10 +83,10 @@ class MissionInventory {
             for (mission in MissionManager.getMissions(type)) {
                 val descriptionFirst = mission.descriptions[0]
 
-                val itemStackMissionDetail = ItemStack(mission.material, mission.id)
+                val itemStackMissionDetail = ItemStack(mission.missionState.material, mission.count)
                 val itemMetaMissionDetail = itemStackMissionDetail.itemMeta!!
                 itemMetaMissionDetail.addItemFlags(*ItemUtil.itemFlags)
-                itemMetaMissionDetail.setCustomModelData(mission.id)
+                itemMetaMissionDetail.setCustomModelData(mission.count)
 
                 itemMetaMissionDetail.setDisplayName(when (type) {
                     MissionManager.MissionType.TUTATU_HINT -> "${ChatColor.YELLOW}${ChatColor.BOLD}${ChatColor.UNDERLINE}${mission.title}"
@@ -95,6 +95,7 @@ class MissionInventory {
                 })
 
                 itemMetaMissionDetail.lore = if (descriptionFirst.length > 15) {
+                    descriptionFirst.lastIndexOf("\n")
                     listOf("${ChatColor.RESET}${descriptionFirst.substring(0, 15)}…", "${ChatColor.GRAY}${ChatColor.UNDERLINE}続きはここをクリック")
                 } else {
                     listOf("${ChatColor.RESET}${descriptionFirst.substring(0, descriptionFirst.length)}")

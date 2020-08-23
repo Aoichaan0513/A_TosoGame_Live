@@ -200,10 +200,10 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
 
                                 MissionManager.sendMission(
                                         Bukkit.getConsoleSender(),
+                                        "通達だ。\n逃走者が全員生存者となったためボーナスとして生存者のレートを50円追加する。\nただし、確保されたらその人のレートは元に戻る。気をつけたまえ。",
+                                        MissionManager.MissionState.OTHER(otherMaterial = Material.DRAGON_EGG),
                                         MissionManager.MissionType.TUTATU_HINT,
                                         MissionManager.MissionDetailType.TUTATU,
-                                        "通達だ。\n逃走者が全員生存者となったためボーナスとして生存者のレートを50円追加する。\nただし、確保されたらその人のレートは元に戻る。気をつけたまえ。",
-                                        Material.DRAGON_EGG
                                 )
 
                                 TosoGameAPI.isRunnedBonusMission = true

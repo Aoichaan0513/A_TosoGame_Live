@@ -29,8 +29,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.util.*
-import java.util.stream.Stream
-import kotlin.streams.toList
 
 class MissionManager {
     companion object {
@@ -61,7 +59,7 @@ class MissionManager {
         }
 
         val isMission
-            get() = missionStates.isNotEmpty() && !isMission(MissionState.NONE)
+            get() = !isMission(MissionState.NONE)
 
         val isInventoryAllowOpenMission
             get() = isMission(MissionState.AREA_EXTEND)
@@ -109,8 +107,8 @@ class MissionManager {
             return missionMap[type] ?: mutableListOf()
         }
 
-        fun getMission(id: Int, type: MissionType): IMission? {
-            return getMissions(type).firstOrNull { it.id == id }
+        fun getMission(count: Int, type: MissionType): IMission? {
+            return getMissions(type).firstOrNull { it.count == count }
         }
 
         fun sendMission(sender: CommandSender, i: Int) {
@@ -154,10 +152,10 @@ class MissionManager {
             sendMission(sender, state.id)
         }
 
-        fun sendMission(sender: CommandSender, missionType: MissionType = MissionType.TUTATU_HINT, detailType: MissionDetailType = MissionDetailType.TUTATU, list: List<String>, material: Material = Material.QUARTZ_BLOCK) {
+        fun sendMission(sender: CommandSender, descriptions: List<String>, missionState: MissionState, missionType: MissionType = MissionType.TUTATU_HINT, detailType: MissionDetailType = MissionDetailType.TUTATU) {
             if (!GameManager.isGame(GameManager.GameState.GAME)) return
 
-            val id = startMission(detailType.detailName, list, missionType, material)
+            val id = startMission(detailType.detailName, descriptions, missionState, missionType)
             TosoGameAPI.sendNotificationSound()
 
             sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${detailType.detailName}を送信しました。")
@@ -177,8 +175,8 @@ class MissionManager {
             return
         }
 
-        fun sendMission(sender: CommandSender, missionType: MissionType = MissionType.TUTATU_HINT, detailType: MissionDetailType = MissionDetailType.TUTATU, text: String, material: Material = Material.QUARTZ_BLOCK) {
-            sendMission(sender, missionType, detailType, listOf(text.trim()), material)
+        fun sendMission(sender: CommandSender, description: String, missionState: MissionState, missionType: MissionType = MissionType.TUTATU_HINT, detailType: MissionDetailType = MissionDetailType.TUTATU) {
+            sendMission(sender, listOf(description.trim()), missionState, missionType, detailType)
         }
 
 
@@ -287,7 +285,7 @@ class MissionManager {
                 bossBar = Bukkit.createBossBar(title, barColor, barStyle)
 
             bossBar?.setTitle(title)
-            bossBar?.progress = progress
+            bossBar?.progress = if (progress in 0.toDouble()..1.toDouble()) progress else 1.toDouble()
             bossBar?.color = barColor
             bossBar?.style = barStyle
 
@@ -317,11 +315,11 @@ class MissionManager {
                 MissionState.TIMED_DEVICE -> TimedDevice.startMission()
             }
 
-            return sendFileMissionAPI(id, missionState.material)
+            return sendFileMissionAPI(id, missionState)
         }
 
         private fun startMission(missionState: MissionState): Int {
-            if (missionState == MissionState.OTHER || missionState == MissionState.NONE
+            if (missionState == MissionState.OTHER() || missionState == MissionState.NONE
                     || !hasFile(missionState.id)) return -1
 
             when (missionState) {
@@ -329,18 +327,18 @@ class MissionManager {
                 MissionState.TIMED_DEVICE -> TimedDevice.startMission()
             }
 
-            return sendFileMissionAPI(missionState.id, missionState.material)
+            return sendFileMissionAPI(missionState.id, missionState)
         }
 
-        private fun startMission(title: String, descriptions: List<String>, type: MissionType, material: Material): Int {
-            val id = if (type == MissionType.MISSION) getMissions(MissionType.MISSION).size + getMissions(MissionType.END).size else getMissions(type).size
+        private fun startMission(title: String, descriptions: List<String>, missionState: MissionState, type: MissionType): Int {
+            val count = if (type == MissionType.MISSION) getMissions(MissionType.MISSION).size + getMissions(MissionType.END).size else getMissions(type).size
 
             val list = getMissions(type)
 
-            val mission = IMission(id + 1, title, descriptions, type, material)
+            val mission = IMission(count + 1, title, descriptions, missionState, type)
             list.add(mission)
             missionMap[type] = list
-            return mission.id
+            return mission.count
         }
 
         private fun endMission(id: Int) {
@@ -350,8 +348,12 @@ class MissionManager {
 
             val listMission = getMissions(MissionType.MISSION)
             val listEnd = getMissions(MissionType.END)
-            missionMap[MissionType.MISSION] = mutableListOf()
-            missionMap[MissionType.END] = Stream.concat(listEnd.stream(), listMission.stream()).toList().toMutableList()
+
+            val mission = listMission.firstOrNull { it.missionState.id == id } ?: return
+            listEnd.add(mission)
+
+            missionMap[MissionType.MISSION] = listMission.filter { it.missionState.id != id }.toMutableList()
+            missionMap[MissionType.END] = listEnd
 
             HunterZone.endMission()
             TimedDevice.endMission()
@@ -366,7 +368,7 @@ class MissionManager {
 
         fun endMissions() {
             val missionStates = missionStates
-            for (id in missionStates)
+            for (id in missionStates.filter { it != MissionState.NONE.id })
                 endMission(id)
         }
 
@@ -400,7 +402,7 @@ class MissionManager {
             Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { it.spigot().sendMessage(textComponent1) }
         }
 
-        private fun sendFileMissionAPI(id: Int, material: Material): Int {
+        private fun sendFileMissionAPI(id: Int, missionState: MissionState): Int {
             val file = File("${Main.pluginInstance.dataFolder}${Main.FILE_SEPARATOR}missions${Main.FILE_SEPARATOR}$id.txt")
 
             var title = ""
@@ -431,10 +433,11 @@ class MissionManager {
             if (worldConfig.gameConfig.script)
                 Bukkit.getPluginManager().callEvent(MissionStartEvent(id))
 
-            return startMission(title, descriptions, MissionType.MISSION, material)
+            return startMission(title, descriptions, missionState, MissionType.MISSION)
         }
     }
 
+    /*
     enum class MissionState(val id: Int, val material: Material, val barColor: BarColor) {
         // プラグインで登録されているミッション
         SUCCESS(1, Material.EMERALD_BLOCK, BarColor.GREEN),
@@ -449,6 +452,27 @@ class MissionManager {
 
             fun getMission(id: Int): MissionState {
                 return values().firstOrNull { it.id == id } ?: NONE
+            }
+        }
+    }
+    */
+
+    sealed class MissionState(val id: Int, val material: Material = Material.QUARTZ_BLOCK, val barColor: BarColor = BarColor.WHITE) {
+        object SUCCESS : MissionState(1, Material.EMERALD_BLOCK, BarColor.GREEN)
+        object AREA_EXTEND : MissionState(2, Material.GOLD_BLOCK, BarColor.YELLOW)
+        object HUNTER_ZONE : MissionState(3, Material.BONE_BLOCK, BarColor.BLUE)
+        object TIMED_DEVICE : MissionState(4, Material.PAPER, BarColor.PURPLE)
+
+        object NONE : MissionState(-1)
+
+        data class OTHER(val otherId: Int = 0, val otherMaterial: Material = Material.QUARTZ_BLOCK, val otherBarColor: BarColor = BarColor.WHITE) : MissionState(otherId, otherMaterial, otherBarColor)
+
+        companion object {
+
+            val values = arrayOf(SUCCESS, AREA_EXTEND, HUNTER_ZONE, TIMED_DEVICE, OTHER(), NONE)
+
+            fun getMission(id: Int): MissionState {
+                return values.firstOrNull { it.id == id } ?: NONE
             }
         }
     }

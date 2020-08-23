@@ -277,7 +277,7 @@ class onInteract : Listener {
                                                         MissionManager.sendMission(p, missionState)
                                                     } else {
                                                         p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}生存ミッションで使用するブロックの位置を変更しました。")
-                                                        MissionManager.sendMission(p, MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU, "生存ミッションで使用されるブロックの位置が変更された。", Material.EMERALD_BLOCK)
+                                                        MissionManager.sendMission(p, "生存ミッションで使用されるブロックの位置が変更された。", MissionManager.MissionState.OTHER(otherMaterial = Material.EMERALD_BLOCK), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU)
                                                     }
                                                 } else {
                                                     p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}生存ミッションが有効になっていないため開始できません。")
@@ -293,7 +293,7 @@ class onInteract : Listener {
                                                     MissionManager.sendMission(p, missionState)
                                                 } else {
                                                     p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッションで使用するブロックの位置を変更しました。")
-                                                    MissionManager.sendMission(p, MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU, "ハンターゾーンミッションで使用されるブロックの位置が変更された。", Material.BONE_BLOCK)
+                                                    MissionManager.sendMission(p, "ハンターゾーンミッションで使用されるブロックの位置が変更された。", MissionManager.MissionState.OTHER(otherMaterial = Material.BONE_BLOCK), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU)
                                                 }
                                             }
                                         }

@@ -1,9 +1,8 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Interfaces
 
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
-import org.bukkit.Material
 
-class IMission(val id: Int, private val rawTitle: String, val descriptions: List<String>, val type: MissionManager.MissionType, val material: Material = Material.QUARTZ_BLOCK) {
+class IMission(val count: Int, private val rawTitle: String, val descriptions: List<String>, val missionState: MissionManager.MissionState, val type: MissionManager.MissionType) {
 
     val title: String
         get() {
