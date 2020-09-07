@@ -277,7 +277,7 @@ class onInteract : Listener {
                                                         MissionManager.sendMission(p, missionState)
                                                     } else {
                                                         p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}生存ミッションで使用するブロックの位置を変更しました。")
-                                                        MissionManager.sendMission(p, "生存ミッションで使用されるブロックの位置が変更された。", MissionManager.MissionState.OTHER(otherMaterial = Material.EMERALD_BLOCK), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU)
+                                                        MissionManager.sendMission(p, -1, "生存ミッションで使用されるブロックの位置が変更された。", MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU, Material.EMERALD_BLOCK)
                                                     }
                                                 } else {
                                                     p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}生存ミッションが有効になっていないため開始できません。")
@@ -293,13 +293,12 @@ class onInteract : Listener {
                                                     MissionManager.sendMission(p, missionState)
                                                 } else {
                                                     p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッションで使用するブロックの位置を変更しました。")
-                                                    MissionManager.sendMission(p, "ハンターゾーンミッションで使用されるブロックの位置が変更された。", MissionManager.MissionState.OTHER(otherMaterial = Material.BONE_BLOCK), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU)
+                                                    MissionManager.sendMission(p, -1, "ハンターゾーンミッションで使用されるブロックの位置が変更された。", MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU, Material.BONE_BLOCK)
                                                 }
                                             }
                                         }
                                     }
                                 }
-                                return
                             } else if (p.isPlayerGroup) {
                                 if (p.inventory.itemInMainHand.type == Material.BONE) {
                                     bone(p, true, difficultyConfig, itemGameType)
@@ -311,119 +310,73 @@ class onInteract : Listener {
                                     feather(p, false, difficultyConfig, itemGameType)
                                 } else {
                                     if (p.inventory.itemInMainHand.type != Material.AIR || clickedBlock == null) return
-                                    if (p.isPlayerTeam) {
-                                        if (clickedBlock.type == Material.OAK_SIGN || clickedBlock.type == Material.SPRUCE_SIGN
-                                                || clickedBlock.type == Material.BIRCH_SIGN || clickedBlock.type == Material.JUNGLE_SIGN
-                                                || clickedBlock.type == Material.ACACIA_SIGN || clickedBlock.type == Material.DARK_OAK_SIGN
-                                                || clickedBlock.type == Material.OAK_WALL_SIGN || clickedBlock.type == Material.SPRUCE_WALL_SIGN
-                                                || clickedBlock.type == Material.BIRCH_WALL_SIGN || clickedBlock.type == Material.JUNGLE_WALL_SIGN
-                                                || clickedBlock.type == Material.ACACIA_WALL_SIGN || clickedBlock.type == Material.DARK_OAK_WALL_SIGN) {
-                                            val sign = clickedBlock.state as Sign
-                                            if (sign.getLine(0).equals(MainAPI.prefix, true) && ChatColor.stripColor(sign.getLine(1)).equals("自首", true)
-                                                    && ChatColor.stripColor(sign.getLine(3)).equals("クリック", true)) {
-                                                TosoGameAPI.teleport(p, worldConfig.respawnLocationConfig.locations.values)
 
+                                    if (clickedBlock.type == Material.OAK_SIGN || clickedBlock.type == Material.SPRUCE_SIGN
+                                            || clickedBlock.type == Material.BIRCH_SIGN || clickedBlock.type == Material.JUNGLE_SIGN
+                                            || clickedBlock.type == Material.ACACIA_SIGN || clickedBlock.type == Material.DARK_OAK_SIGN
+                                            || clickedBlock.type == Material.OAK_WALL_SIGN || clickedBlock.type == Material.SPRUCE_WALL_SIGN
+                                            || clickedBlock.type == Material.BIRCH_WALL_SIGN || clickedBlock.type == Material.JUNGLE_WALL_SIGN
+                                            || clickedBlock.type == Material.ACACIA_WALL_SIGN || clickedBlock.type == Material.DARK_OAK_WALL_SIGN) {
+                                        val sign = clickedBlock.state as Sign
+
+                                        if (sign.getLine(0).equals(MainAPI.prefix, true) && ChatColor.stripColor(sign.getLine(1)).equals("自首", true)
+                                                && ChatColor.stripColor(sign.getLine(3)).equals("クリック", true)) {
+                                            if (!p.isPlayerTeam) return
+
+                                            TosoGameAPI.teleport(p, worldConfig.respawnLocationConfig.locations.values)
+
+                                            Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)
+                                            p.gameMode = GameMode.SPECTATOR
+
+                                            p.inventory.clear()
+
+                                            p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを生存者 (自首)に追加しました。")
+                                            Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}が自首しました。")
+                                            return
+                                        }
+                                    } else if (clickedBlock.type == Material.OAK_BUTTON || clickedBlock.type == Material.SPRUCE_BUTTON
+                                            || clickedBlock.type == Material.BIRCH_BUTTON || clickedBlock.type == Material.JUNGLE_BUTTON
+                                            || clickedBlock.type == Material.ACACIA_BUTTON || clickedBlock.type == Material.DARK_OAK_BUTTON
+                                            || clickedBlock.type == Material.STONE_BUTTON) {
+                                        if (!GameManager.isGame(GameManager.GameState.GAME)) return
+
+                                        val directional = clickedBlock.blockData as Directional
+                                        val block = clickedBlock.getRelative(getAttachmentFace(directional))
+
+                                        if (block.type == Material.EMERALD_BLOCK) {
+                                            if (!p.isPlayerTeam || !MissionManager.isMission(MissionManager.MissionState.SUCCESS) || successBlockLoc == null) return
+                                            if (block.location.blockX == successBlockLoc!!.blockX && block.location.blockY == successBlockLoc!!.blockY && block.location.blockZ == successBlockLoc!!.blockZ) {
                                                 Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)
-                                                p.gameMode = GameMode.SPECTATOR
-
-                                                p.inventory.clear()
-
-                                                p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを生存者 (自首)に追加しました。")
-                                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}が自首しました。")
-                                                return
+                                                p.sendMessage("""
+                                                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを生存者に追加しました。
+                                                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}サーバーから退出した場合は逃走者になります。
+                                                """.trimIndent())
                                             }
-                                        } else {
-                                            if (MissionManager.isMission(MissionManager.MissionState.SUCCESS)) {
-                                                if (clickedBlock.type == Material.OAK_BUTTON || clickedBlock.type == Material.SPRUCE_BUTTON
-                                                        || clickedBlock.type == Material.BIRCH_BUTTON || clickedBlock.type == Material.JUNGLE_BUTTON
-                                                        || clickedBlock.type == Material.ACACIA_BUTTON || clickedBlock.type == Material.DARK_OAK_BUTTON
-                                                        || clickedBlock.type == Material.STONE_BUTTON) {
-                                                    if (!GameManager.isGame(GameManager.GameState.GAME)) return
+                                        } else if (block.type == Material.BONE_BLOCK) {
+                                            if (!MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE) || hunterZoneBlockLoc == null) return
+                                            if (block.location.blockX == hunterZoneBlockLoc!!.blockX && block.location.blockY == hunterZoneBlockLoc!!.blockY && block.location.blockZ == hunterZoneBlockLoc!!.blockZ) {
 
-                                                    val directional = clickedBlock.blockData as Directional
-                                                    val block = clickedBlock.getRelative(getAttachmentFace(directional))
-
-                                                    if (block.type == Material.EMERALD_BLOCK) {
-                                                        if (block.location.blockX == successBlockLoc!!.blockX && block.location.blockY == successBlockLoc!!.blockY && block.location.blockZ == successBlockLoc!!.blockZ) {
-                                                            Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)
-                                                            p.sendMessage("""
-                                                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを生存者に追加しました。
-                                                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}サーバーから退出した場合は逃走者になります。
-                                                            """.trimIndent())
-                                                        }
-                                                    }
-                                                }
-                                            } else if (MissionManager.isMission(MissionManager.MissionState.AREA_EXTEND)) {
-                                                if (clickedBlock.type == Material.GOLD_BLOCK) {
-                                                    if (p.inventory.itemInMainHand.type == Material.STONE_PRESSURE_PLATE || p.inventory.itemInOffHand.type == Material.STONE_PRESSURE_PLATE) {
-                                                        val loc = clickedBlock.location.clone()
-                                                        loc.add(0.0, 1.0, 0.0)
-                                                        loc.block.type = Material.STONE_PRESSURE_PLATE
-
-                                                        val inv = p.inventory
-                                                        inv.removeItem(ItemStack(Material.STONE_PRESSURE_PLATE, 1))
-                                                        return
-                                                    }
-                                                }
-                                            } else if (MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE)) {
-                                                if (clickedBlock.type == Material.OAK_BUTTON || clickedBlock.type == Material.SPRUCE_BUTTON
-                                                        || clickedBlock.type == Material.BIRCH_BUTTON || clickedBlock.type == Material.JUNGLE_BUTTON
-                                                        || clickedBlock.type == Material.ACACIA_BUTTON || clickedBlock.type == Material.DARK_OAK_BUTTON
-                                                        || clickedBlock.type == Material.STONE_BUTTON) {
-                                                    if (!GameManager.isGame(GameManager.GameState.GAME)) return
-
-                                                    val directional = clickedBlock.blockData as Directional
-                                                    val block = clickedBlock.getRelative(getAttachmentFace(directional))
-
-                                                    if (block.type == Material.BONE_BLOCK) {
-                                                        if (block.location.blockX == hunterZoneBlockLoc!!.blockX && block.location.blockY == hunterZoneBlockLoc!!.blockY && block.location.blockZ == hunterZoneBlockLoc!!.blockZ) {
-                                                            p.sendMessage("""
-                                                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ハンターゾーンミッションのコード: ${HunterZone.code}
-                                                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}"/code ${HunterZone.code}"と入力してミッションを完了してください。
-                                                                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}このコードを他の逃走者に教えるかどうかはあなた次第です。
-                                                            """.trimIndent())
-                                                        }
-                                                    }
-                                                }
+                                                p.sendMessage("""
+                                                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ハンターゾーンミッションのコード: ${HunterZone.code}
+                                                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}"/code ${HunterZone.code}"と入力してミッションを完了してください。
+                                                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}このコードを他の逃走者に教えるかどうかはあなた次第です。
+                                                """.trimIndent())
                                             }
                                         }
-                                    } else if (p.isSuccessTeam) {
-                                        if (MissionManager.isMission(MissionManager.MissionState.AREA_EXTEND)) {
-                                            if (clickedBlock.type == Material.GOLD_BLOCK) {
-                                                if (p.inventory.itemInMainHand.type == Material.STONE_PRESSURE_PLATE || p.inventory.itemInOffHand.type == Material.STONE_PRESSURE_PLATE) {
-                                                    val loc = clickedBlock.location.clone()
-                                                    loc.add(0.0, 1.0, 0.0)
-                                                    loc.block.type = Material.STONE_PRESSURE_PLATE
+                                    } else if (clickedBlock.type == Material.GOLD_BLOCK) {
+                                        if (p.inventory.itemInMainHand.type == Material.STONE_PRESSURE_PLATE || p.inventory.itemInOffHand.type == Material.STONE_PRESSURE_PLATE) {
+                                            if (!MissionManager.isMission(MissionManager.MissionState.AREA_EXTEND)) return
 
-                                                    val inv = p.inventory
-                                                    inv.removeItem(ItemStack(Material.STONE_PRESSURE_PLATE, 1))
-                                                    return
-                                                }
-                                            }
-                                        } else if (MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE)) {
-                                            if (clickedBlock.type == Material.OAK_BUTTON || clickedBlock.type == Material.SPRUCE_BUTTON
-                                                    || clickedBlock.type == Material.BIRCH_BUTTON || clickedBlock.type == Material.JUNGLE_BUTTON
-                                                    || clickedBlock.type == Material.ACACIA_BUTTON || clickedBlock.type == Material.DARK_OAK_BUTTON
-                                                    || clickedBlock.type == Material.STONE_BUTTON) {
-                                                if (!GameManager.isGame(GameManager.GameState.GAME)) return
+                                            val loc = clickedBlock.location.clone()
+                                            loc.add(0.0, 1.0, 0.0)
+                                            loc.block.type = Material.STONE_PRESSURE_PLATE
 
-                                                val directional = clickedBlock.blockData as Directional
-                                                val block = clickedBlock.getRelative(getAttachmentFace(directional))
-
-                                                if (block.type == Material.BONE_BLOCK) {
-                                                    if (block.location.blockX == hunterZoneBlockLoc!!.blockX && block.location.blockY == hunterZoneBlockLoc!!.blockY && block.location.blockZ == hunterZoneBlockLoc!!.blockZ) {
-                                                        p.sendMessage("""
-                                                            ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}ハンターゾーンミッションのコード: ${HunterZone.code}
-                                                            ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}"/code ${HunterZone.code}"と入力してミッションを完了してください。
-                                                            ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}このコードを他の逃走者に教えるかどうかはあなた次第です。
-                                                        """.trimIndent())
-                                                    }
-                                                }
-                                            }
+                                            val inv = p.inventory
+                                            inv.removeItem(ItemStack(Material.STONE_PRESSURE_PLATE, 1))
+                                            return
                                         }
                                     }
                                 }
-                                return
                             } else if (p.isJailTeam) {
                                 if (p.inventory.itemInMainHand.type == Material.ENDER_PEARL) {
                                     enderPearl(p, e, true)
@@ -434,8 +387,8 @@ class onInteract : Listener {
                                 } else if (p.inventory.itemInOffHand.type == Material.ENDER_EYE) {
                                     enderEye(p, e, false)
                                 }
-                                return
                             }
+                            return
                         }
                     }
                     Action.LEFT_CLICK_AIR, Action.RIGHT_CLICK_AIR -> {
@@ -504,6 +457,7 @@ class onInteract : Listener {
 
                 val itemStackDamager = if (damager.inventory.itemInMainHand.type == itemType) damager.inventory.itemInMainHand
                 else damager.inventory.itemInOffHand
+
                 val itemStackPlayer = player.inventory.contents.firstOrNull { it != null && it.type == itemType }
                         ?: return
 

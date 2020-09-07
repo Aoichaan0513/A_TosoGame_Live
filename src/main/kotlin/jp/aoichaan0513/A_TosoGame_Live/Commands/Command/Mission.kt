@@ -76,7 +76,7 @@ class Mission(name: String) : ICommand(name) {
                             for (i in 1 until args.size)
                                 stringBuilder.append("${args[i].replace("&n", "\n")} ")
 
-                            MissionManager.sendMission(sp, stringBuilder.toString().trim(), MissionManager.MissionState.OTHER(), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU)
+                            MissionManager.sendMission(sp, -1, stringBuilder.toString().trim(), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU)
                             return
                         }
                         sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。説明を指定してください。")
@@ -87,7 +87,7 @@ class Mission(name: String) : ICommand(name) {
                             for (i in 1 until args.size)
                                 stringBuilder.append("${args[i].replace("&n", "\n")} ")
 
-                            MissionManager.sendMission(sp, stringBuilder.toString().trim(), MissionManager.MissionState.OTHER(), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.HINT)
+                            MissionManager.sendMission(sp, -1, stringBuilder.toString().trim(), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.HINT)
                             return
                         }
                         sp.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。説明を指定してください。")
@@ -97,7 +97,7 @@ class Mission(name: String) : ICommand(name) {
                         sp.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}チェストの開放を${if (onInventory.isAllowOpen) "${ChatColor.GREEN}${ChatColor.UNDERLINE}有効" else "${ChatColor.RED}${ChatColor.UNDERLINE}無効"}${ChatColor.RESET}${ChatColor.GRAY}にしました。")
                         return
                     } else if (args[0].equals("end", true)) {
-                        if (MissionManager.isMission) {
+                        if (MissionManager.isMissions) {
                             MissionManager.endMissions()
                             sp.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ミッションを終了しました。")
                             Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ミッションが終了しました。")
@@ -187,7 +187,7 @@ class Mission(name: String) : ICommand(name) {
                         for (i in 1 until args.size)
                             stringBuilder.append("${args[i].replace("&n", "\n")} ")
 
-                        MissionManager.sendMission(bs, stringBuilder.toString().trim(), MissionManager.MissionState.OTHER(), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU)
+                        MissionManager.sendMission(bs, -1, stringBuilder.toString().trim(), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.TUTATU)
                         return
                     }
                     bs.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。説明を指定してください。")
@@ -198,7 +198,7 @@ class Mission(name: String) : ICommand(name) {
                         for (i in 1 until args.size)
                             stringBuilder.append("${args[i].replace("&n", "\n")} ")
 
-                        MissionManager.sendMission(bs, stringBuilder.toString().trim(), MissionManager.MissionState.OTHER(), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.HINT)
+                        MissionManager.sendMission(bs, -1, stringBuilder.toString().trim(), MissionManager.MissionType.TUTATU_HINT, MissionManager.MissionDetailType.HINT)
                         return
                     }
                     bs.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。説明を指定してください。")
@@ -208,7 +208,7 @@ class Mission(name: String) : ICommand(name) {
                     bs.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}チェストの開放を${if (onInventory.isAllowOpen) "${ChatColor.GREEN}${ChatColor.UNDERLINE}有効" else "${ChatColor.RED}${ChatColor.UNDERLINE}無効"}${ChatColor.RESET}${ChatColor.GRAY}にしました。")
                     return
                 } else if (args[0].equals("end", true)) {
-                    if (MissionManager.isMission) {
+                    if (MissionManager.isMissions) {
                         MissionManager.endMissions()
                         bs.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ミッションを終了しました。")
                         Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ミッションが終了しました。")

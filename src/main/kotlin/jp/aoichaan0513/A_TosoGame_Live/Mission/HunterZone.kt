@@ -22,6 +22,9 @@ class HunterZone {
         private var hunterZoneRunnable: HunterZoneRunnable? = null
         private var timer: BukkitTask? = null
 
+        var internalMissionState = MissionManager.InternalMissionState.NONE
+            private set
+
         var isStart = false
             private set
 
@@ -67,6 +70,7 @@ class HunterZone {
             hunterZoneRunnable = HunterZoneRunnable(getInitialMissionTime().toInt() / 20)
             timer = hunterZoneRunnable?.runTaskTimer(Main.pluginInstance, 0L, 20L)
 
+            internalMissionState = MissionManager.InternalMissionState.START
             isStart = true
         }
 
@@ -100,6 +104,8 @@ class HunterZone {
             }
 
             joinedPlayerSet.clear()
+
+            internalMissionState = MissionManager.InternalMissionState.END
         }
 
         fun resetMission() {
@@ -110,6 +116,8 @@ class HunterZone {
             codeSet.clear()
             joinedPlayerSet.clear()
             leavedPlayerSet.clear()
+
+            internalMissionState = MissionManager.InternalMissionState.NONE
             isStart = false
         }
 
@@ -199,6 +207,7 @@ class HunterZone {
                         }
                     }
                     MissionManager.endMission(MissionManager.MissionState.HUNTER_ZONE)
+                    endMission()
                 } else if (missionTime == 60) {
                     Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッション終了まで残り${TimeFormat.formatMin(missionTime)}分")
                 }

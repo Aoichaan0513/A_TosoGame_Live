@@ -102,7 +102,6 @@ class onDamage : Listener {
                     player.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたの位置情報が通知されました。")
 
                     player.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, 20 * 15, 1, false, false))
-                    player.world.strikeLightningEffect(player.location)
 
                     val loc = player.location
                     for (str in Teams.OnlineTeam.TOSO_HUNTER.team.entries) {

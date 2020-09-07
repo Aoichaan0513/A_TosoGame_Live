@@ -29,14 +29,18 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.util.*
+import java.util.stream.Stream
+import kotlin.streams.toList
 
 class MissionManager {
-    companion object {
 
+    companion object {
+        // ボスバーに表示する内容
         var bossBarList = mutableListOf(-1)
             private set
 
-        var missionStates = mutableSetOf(MissionState.NONE.id)
+        // 実行中のミッション
+        var missionStates = mutableSetOf<Int>()
             private set
 
         val missionTitleMap = mutableMapOf<Int, String>()
@@ -50,6 +54,8 @@ class MissionManager {
         var bossBar: BossBar? = null
             private set
 
+        var bossBarCount = 10
+
         fun isMission(id: Int): Boolean {
             return missionStates.isNotEmpty() && missionStates.contains(id)
         }
@@ -58,8 +64,8 @@ class MissionManager {
             return isMission(missionState.id)
         }
 
-        val isMission
-            get() = !isMission(MissionState.NONE)
+        val isMissions
+            get() = missionStates.isNotEmpty()
 
         val isInventoryAllowOpenMission
             get() = isMission(MissionState.AREA_EXTEND)
@@ -152,10 +158,10 @@ class MissionManager {
             sendMission(sender, state.id)
         }
 
-        fun sendMission(sender: CommandSender, descriptions: List<String>, missionState: MissionState, missionType: MissionType = MissionType.TUTATU_HINT, detailType: MissionDetailType = MissionDetailType.TUTATU) {
+        fun sendMission(sender: CommandSender, id: Int, descriptions: List<String>, missionType: MissionType = MissionType.TUTATU_HINT, detailType: MissionDetailType = MissionDetailType.TUTATU, material: Material = Material.QUARTZ_BLOCK) {
             if (!GameManager.isGame(GameManager.GameState.GAME)) return
 
-            val id = startMission(detailType.detailName, descriptions, missionState, missionType)
+            val id = startMission(id, detailType.detailName, descriptions, missionType, material)
             TosoGameAPI.sendNotificationSound()
 
             sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${detailType.detailName}を送信しました。")
@@ -175,109 +181,113 @@ class MissionManager {
             return
         }
 
-        fun sendMission(sender: CommandSender, description: String, missionState: MissionState, missionType: MissionType = MissionType.TUTATU_HINT, detailType: MissionDetailType = MissionDetailType.TUTATU) {
-            sendMission(sender, listOf(description.trim()), missionState, missionType, detailType)
+        fun sendMission(sender: CommandSender, id: Int, description: String, missionType: MissionType = MissionType.TUTATU_HINT, detailType: MissionDetailType = MissionDetailType.TUTATU, material: Material = Material.QUARTZ_BLOCK) {
+            sendMission(sender, id, listOf(description.trim()), missionType, detailType, material)
         }
 
 
         fun setBossBar() {
-            if (bossBarList.filter { it == -1 || isMission(it) }.isEmpty()) return
+            if (GameManager.isGame()) {
+                if (bossBarList.filter { it == -1 || isMission(it) }.isEmpty()) return
 
-            val result = bossBarList.filter { it == -1 || isMission(it) }[0]
+                val result = bossBarList.filter { it == -1 || isMission(it) }[0]
 
-            bossBarList.removeAt(0)
-            bossBarList.add(result)
+                bossBarList.removeAt(0)
+                bossBarList.add(result)
 
-            when (result) {
-                -1 -> {
-                    object : BukkitRunnable() {
-                        var i = 10
+                when (result) {
+                    -1 -> {
+                        object : BukkitRunnable() {
+                            var i = 10
 
-                        override fun run() {
-                            if (i < 0) cancel()
+                            override fun run() {
+                                if (i < 0) cancel()
 
-                            if (isMission) {
-                                val stringBuilder = StringBuilder()
-                                for (id in missionStates)
-                                    stringBuilder.append("${ChatColor.GOLD}${ChatColor.BOLD}${missionTitleMap[id] ?: "Unknown"}${ChatColor.RESET}${ChatColor.GRAY}, ")
+                                if (isMissions) {
+                                    val stringBuilder = StringBuilder()
+                                    for (id in missionStates)
+                                        stringBuilder.append("${ChatColor.GOLD}${ChatColor.BOLD}${missionTitleMap[id] ?: "Unknown"}${ChatColor.RESET}${ChatColor.GRAY}, ")
 
-                                bossBar = createBossBar(stringBuilder.toString().trim().substring(0, stringBuilder.toString().trim().length - 5), 1.toDouble(), BarColor.YELLOW, BarStyle.SOLID)
+                                    bossBar = createBossBar(stringBuilder.toString().trim().substring(0, stringBuilder.toString().trim().length - 5), 1.toDouble(), BarColor.YELLOW, BarStyle.SOLID)
+
+                                    Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
+                                } else {
+                                    bossBar?.removeAll()
+                                    bossBar = null
+                                }
+
+                                i--
+                            }
+                        }.runTaskTimer(Main.pluginInstance, 0, 20)
+                    }
+                    MissionState.HUNTER_ZONE.id -> {
+                        object : BukkitRunnable() {
+                            var i = 10
+
+                            override fun run() {
+                                if (i < 0 || !isMission(MissionState.HUNTER_ZONE) || HunterZone.internalMissionState != InternalMissionState.START) cancel()
+
+                                val bossBar = createBossBar(
+                                        "${ChatColor.YELLOW}${ChatColor.BOLD}ハンターゾーンミッション終了まで${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.RESET}${TimeFormat.formatJapan(HunterZone.getMissionTime().toInt())}",
+                                        if (isMission(MissionState.HUNTER_ZONE)) HunterZone.getMissionTime() / (HunterZone.getInitialMissionTime() / 20) else 1.toDouble(),
+                                        MissionState.HUNTER_ZONE.barColor,
+                                        BarStyle.SOLID
+                                )
 
                                 Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
-                            } else {
-                                bossBar?.removeAll()
-                                bossBar = null
+
+                                i--
                             }
+                        }.runTaskTimer(Main.pluginInstance, 0, 20)
+                    }
+                    MissionState.TIMED_DEVICE.id -> {
+                        object : BukkitRunnable() {
+                            var i = 10
 
-                            i--
-                        }
-                    }.runTaskTimer(Main.pluginInstance, 0, 20)
+                            override fun run() {
+                                if (i < 0 || !isMission(MissionState.TIMED_DEVICE) || TimedDevice.internalMissionState != InternalMissionState.START) cancel()
+
+                                val bossBar = createBossBar(
+                                        "${ChatColor.YELLOW}${ChatColor.BOLD}時限装置解除ミッション終了まで${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.RESET}${TimeFormat.formatJapan(TimedDevice.getMissionTime().toInt())}",
+                                        if (isMission(MissionState.TIMED_DEVICE)) TimedDevice.getMissionTime() / (TimedDevice.getInitialMissionTime() / 20) else 1.toDouble(),
+                                        MissionState.TIMED_DEVICE.barColor,
+                                        BarStyle.SOLID
+                                )
+
+                                Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
+
+                                i--
+                            }
+                        }.runTaskTimer(Main.pluginInstance, 0, 20)
+                    }
+                    else -> {
+                        object : BukkitRunnable() {
+                            var i = 10
+
+                            override fun run() {
+                                if (i < 0) cancel()
+
+                                val bossBar = createBossBar("${ChatColor.BOLD}${missionTitleMap[result]}", 1.toDouble(), MissionState.getMission(result).barColor, BarStyle.SOLID)
+
+                                Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
+
+                                i--
+                            }
+                        }.runTaskTimer(Main.pluginInstance, 0, 20)
+                    }
                 }
-                MissionState.HUNTER_ZONE.id -> {
-                    object : BukkitRunnable() {
-                        var i = 10
 
-                        override fun run() {
-                            if (i < 0) cancel()
-
-                            val bossBar = createBossBar(
-                                    "${ChatColor.YELLOW}${ChatColor.BOLD}ハンターゾーンミッション終了まで${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.RESET}${TimeFormat.formatJapan(HunterZone.getMissionTime().toInt())}",
-                                    if (isMission(MissionState.HUNTER_ZONE)) HunterZone.getMissionTime() / (HunterZone.getInitialMissionTime() / 20) else 1.toDouble(),
-                                    MissionState.HUNTER_ZONE.barColor,
-                                    BarStyle.SOLID
-                            )
-
-                            Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
-
-                            i--
-                        }
-                    }.runTaskTimer(Main.pluginInstance, 0, 20)
-                }
-                MissionState.TIMED_DEVICE.id -> {
-                    object : BukkitRunnable() {
-                        var i = 10
-
-                        override fun run() {
-                            if (i < 0) cancel()
-
-                            val bossBar = createBossBar(
-                                    "${ChatColor.YELLOW}${ChatColor.BOLD}時限装置解除ミッション終了まで${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.RESET}${TimeFormat.formatJapan(TimedDevice.getMissionTime().toInt())}",
-                                    if (isMission(MissionState.TIMED_DEVICE)) TimedDevice.getMissionTime() / (TimedDevice.getInitialMissionTime() / 20) else 1.toDouble(),
-                                    MissionState.TIMED_DEVICE.barColor,
-                                    BarStyle.SOLID
-                            )
-
-                            Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
-
-                            i--
-                        }
-                    }.runTaskTimer(Main.pluginInstance, 0, 20)
-                }
-                else -> {
-                    object : BukkitRunnable() {
-                        var i = 10
-
-                        override fun run() {
-                            if (i < 0) cancel()
-
-                            val bossBar = createBossBar("${ChatColor.BOLD}${missionTitleMap[result]}", 1.toDouble(), MissionState.getMission(result).barColor, BarStyle.SOLID)
-
-                            Bukkit.getOnlinePlayers().filter { !it.isHunterGroup }.forEach { bossBar?.addPlayer(it) }
-
-                            i--
-                        }
-                    }.runTaskTimer(Main.pluginInstance, 0, 20)
-                }
-            }
-
-            if (GameManager.isGame())
                 Bukkit.getScheduler().runTaskLater(Main.pluginInstance, Runnable { setBossBar() }, 20 * 10)
+            } else {
+                bossBar?.removeAll()
+                bossBar = null
+            }
         }
 
         fun resetBossBar() {
             bossBar?.removeAll()
             bossBar = null
-            bossBarList = mutableListOf(MissionState.NONE.id)
+            bossBarList = mutableListOf(-1)
         }
 
         private fun createBossBar(title: String?, progress: Double = 1.toDouble(), barColor: BarColor = BarColor.WHITE, barStyle: BarStyle = BarStyle.SOLID): BossBar? {
@@ -319,7 +329,7 @@ class MissionManager {
         }
 
         private fun startMission(missionState: MissionState): Int {
-            if (missionState == MissionState.OTHER() || missionState == MissionState.NONE
+            if (missionState == MissionState.OTHER || missionState == MissionState.NONE
                     || !hasFile(missionState.id)) return -1
 
             when (missionState) {
@@ -330,33 +340,30 @@ class MissionManager {
             return sendFileMissionAPI(missionState.id, missionState)
         }
 
-        private fun startMission(title: String, descriptions: List<String>, missionState: MissionState, type: MissionType): Int {
+        private fun startMission(id: Int, title: String, descriptions: List<String>, type: MissionType, material: Material): Int {
             val count = if (type == MissionType.MISSION) getMissions(MissionType.MISSION).size + getMissions(MissionType.END).size else getMissions(type).size
 
             val list = getMissions(type)
 
-            val mission = IMission(count + 1, title, descriptions, missionState, type)
+            val mission = IMission(id, count + 1, title, descriptions, type, material)
             list.add(mission)
             missionMap[type] = list
             return mission.count
         }
 
         private fun endMission(id: Int) {
-            if (!isMission) return
+            if (!isMissions) return
 
             Bukkit.getPluginManager().callEvent(MissionEndEvent(id))
 
             val listMission = getMissions(MissionType.MISSION)
             val listEnd = getMissions(MissionType.END)
 
-            val mission = listMission.firstOrNull { it.missionState.id == id } ?: return
+            val mission = listMission.firstOrNull { it.id == id } ?: return
             listEnd.add(mission)
 
-            missionMap[MissionType.MISSION] = listMission.filter { it.missionState.id != id }.toMutableList()
+            missionMap[MissionType.MISSION] = listMission.filter { it.id != id }.toMutableList()
             missionMap[MissionType.END] = listEnd
-
-            HunterZone.endMission()
-            TimedDevice.endMission()
 
             bossBarList.remove(id)
             missionStates.remove(id)
@@ -367,14 +374,13 @@ class MissionManager {
         }
 
         fun endMissions() {
-            val missionStates = missionStates
-            for (id in missionStates.filter { it != MissionState.NONE.id })
+            for (id in missionStates)
                 endMission(id)
         }
 
         fun resetMission() {
             resetBossBar()
-            missionStates = mutableSetOf(MissionState.NONE.id)
+            missionStates.clear()
 
             for (key in missionMap.keys)
                 missionMap[key] = mutableListOf()
@@ -425,19 +431,18 @@ class MissionManager {
 
             descriptions.add(descriptionBuilder.toString().trim { it <= ' ' })
 
-            missionStates.remove(MissionState.NONE.id)
             missionStates.add(id)
-            bossBarList.add(id)
+            bossBarList = Stream.concat(mutableSetOf(-1).stream(), missionStates.stream()).toList().toMutableList()
 
             val worldConfig = Main.worldConfig
             if (worldConfig.gameConfig.script)
                 Bukkit.getPluginManager().callEvent(MissionStartEvent(id))
 
-            return startMission(title, descriptions, missionState, MissionType.MISSION)
+            return startMission(missionState.id, title, descriptions, MissionType.MISSION, missionState.material)
         }
     }
 
-    /*
+    // ミッションの列挙値
     enum class MissionState(val id: Int, val material: Material, val barColor: BarColor) {
         // プラグインで登録されているミッション
         SUCCESS(1, Material.EMERALD_BLOCK, BarColor.GREEN),
@@ -455,28 +460,8 @@ class MissionManager {
             }
         }
     }
-    */
 
-    sealed class MissionState(val id: Int, val material: Material = Material.QUARTZ_BLOCK, val barColor: BarColor = BarColor.WHITE) {
-        object SUCCESS : MissionState(1, Material.EMERALD_BLOCK, BarColor.GREEN)
-        object AREA_EXTEND : MissionState(2, Material.GOLD_BLOCK, BarColor.YELLOW)
-        object HUNTER_ZONE : MissionState(3, Material.BONE_BLOCK, BarColor.BLUE)
-        object TIMED_DEVICE : MissionState(4, Material.PAPER, BarColor.PURPLE)
-
-        object NONE : MissionState(-1)
-
-        data class OTHER(val otherId: Int = 0, val otherMaterial: Material = Material.QUARTZ_BLOCK, val otherBarColor: BarColor = BarColor.WHITE) : MissionState(otherId, otherMaterial, otherBarColor)
-
-        companion object {
-
-            val values = arrayOf(SUCCESS, AREA_EXTEND, HUNTER_ZONE, TIMED_DEVICE, OTHER(), NONE)
-
-            fun getMission(id: Int): MissionState {
-                return values.firstOrNull { it.id == id } ?: NONE
-            }
-        }
-    }
-
+    // ミッションの大まかな種類
     enum class MissionType(val id: Int, val detailType: MutableSet<MissionDetailType>) {
         MISSION(1, mutableSetOf(MissionDetailType.MISSION)),
         TUTATU_HINT(2, mutableSetOf(MissionDetailType.TUTATU, MissionDetailType.HINT)),
@@ -485,9 +470,17 @@ class MissionManager {
         NONE(-1, mutableSetOf());
     }
 
+    // ミッションの細かな種類
     enum class MissionDetailType(val id: Int, val detailName: String) {
         MISSION(1, "ミッション"),
         TUTATU(2, "通達"),
         HINT(3, "ヒント")
+    }
+
+    // 各ミッション内部の開始状態
+    enum class InternalMissionState {
+        START,
+        END,
+        NONE
     }
 }

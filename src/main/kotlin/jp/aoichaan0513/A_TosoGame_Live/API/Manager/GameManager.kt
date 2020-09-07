@@ -9,8 +9,8 @@ import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitTask
 
 class GameManager {
-    companion object {
 
+    companion object {
         var gameState = GameState.NONE
         private var timer: BukkitTask? = null
 

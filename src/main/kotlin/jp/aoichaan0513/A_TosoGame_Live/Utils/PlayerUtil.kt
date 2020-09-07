@@ -60,7 +60,7 @@ fun Player.setTeam(team: Teams.OnlineTeam, isTeleport: Boolean = true, isSendTea
     if (isAdminTeam) TosoGameAPI.addOp(this) else TosoGameAPI.removeOp(this)
     setSidebar()
 
-    if (isAdminTeam || isJailTeam || isPlayerGroup)
+    if (!isHunterGroup)
         MissionManager.bossBar?.addPlayer(this)
     else
         MissionManager.bossBar?.removePlayer(this)

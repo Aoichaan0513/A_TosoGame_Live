@@ -76,7 +76,7 @@ class BossBarManager {
                     }
                 }
                 GameState.GAME -> {
-                    bossBar.setTitle("${ChatColor.BOLD}${ChatColor.RED}ゲーム終了まで残り${ChatColor.GRAY}: ${ChatColor.DARK_RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(time)}${if (MissionManager.isMission) "${ChatColor.RESET}${ChatColor.GRAY} / ${ChatColor.YELLOW}${ChatColor.BOLD}ミッション中" else ""}")
+                    bossBar.setTitle("${ChatColor.BOLD}${ChatColor.RED}ゲーム終了まで残り${ChatColor.GRAY}: ${ChatColor.DARK_RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(time)}${if (MissionManager.isMissions) "${ChatColor.RESET}${ChatColor.GRAY} / ${ChatColor.YELLOW}${ChatColor.BOLD}ミッション中" else ""}")
                     bossBar.progress = time.toDouble() / maxTime
                     bossBar.color = BarColor.RED
                     bossBar.addPlayer(p)

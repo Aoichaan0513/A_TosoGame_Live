@@ -22,6 +22,9 @@ class TimedDevice {
 
         private var taskRunnable: BukkitTask? = null
 
+        var internalMissionState = MissionManager.InternalMissionState.NONE
+            private set
+
         var isStart = false
             private set
 
@@ -63,6 +66,7 @@ class TimedDevice {
             timedDeviceRunnable = TimedDeviceRunnable(getInitialMissionTime().toInt() / 20)
             timer = timedDeviceRunnable?.runTaskTimer(Main.pluginInstance, 0L, 20L)
 
+            internalMissionState = MissionManager.InternalMissionState.START
             isStart = true
         }
 
@@ -73,6 +77,8 @@ class TimedDevice {
 
             timer = null
             timedDeviceRunnable = null
+
+            internalMissionState = MissionManager.InternalMissionState.END
         }
 
         fun resetMission() {
@@ -85,6 +91,7 @@ class TimedDevice {
             clearedNumberSet.clear()
             failedNumberSet.clear()
 
+            internalMissionState = MissionManager.InternalMissionState.NONE
             isStart = false
         }
 

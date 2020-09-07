@@ -7,6 +7,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager.GameState
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterGroup
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import org.bukkit.ChatColor
 import org.bukkit.command.BlockCommandSender
@@ -17,7 +18,7 @@ import org.bukkit.entity.Player
 class H(name: String) : ICommand(name) {
 
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
-        if (Team.isHunterRandom) {
+        if (Team.isHunterRandom || !sp.isHunterGroup) {
             if (GameManager.isGame(GameState.GAME)) {
                 if (sp.isJailTeam) {
                     if (!Main.hunterShuffleSet.contains(sp.uniqueId)) Main.hunterShuffleSet.add(sp.uniqueId) else Main.hunterShuffleSet.remove(sp.uniqueId)

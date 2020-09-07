@@ -37,7 +37,7 @@ class onMove : Listener {
         }
 
         if (isBorderAttack(to, worldConfig.hunterZoneBorderConfig)) {
-            if (MissionManager.isMission) {
+            if (MissionManager.isMissions) {
                 if (MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE)) {
                     if (p.isPlayerGroup) {
                         if (HunterZone.containsJoinedSet(p)) {
@@ -55,7 +55,7 @@ class onMove : Listener {
                         p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在入ることはできません。3")
                     }
                 } else {
-                    if (isJoinedArea(to, worldConfig.hunterZoneBorderConfig) || HunterZone.containsJoinedSet(p)) {
+                    if (HunterZone.containsJoinedSet(p)) {
                         HunterZone.removeJoinedSet(p)
                     } else {
                         e.setTo(from)
@@ -63,7 +63,7 @@ class onMove : Listener {
                     }
                 }
             } else {
-                if (isJoinedArea(to, worldConfig.hunterZoneBorderConfig) || HunterZone.containsJoinedSet(p)) {
+                if (HunterZone.containsJoinedSet(p)) {
                     HunterZone.removeJoinedSet(p)
                 } else {
                     e.setTo(from)

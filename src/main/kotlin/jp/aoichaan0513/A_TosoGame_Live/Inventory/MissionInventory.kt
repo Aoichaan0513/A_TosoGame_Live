@@ -83,7 +83,7 @@ class MissionInventory {
             for (mission in MissionManager.getMissions(type)) {
                 val descriptionFirst = mission.descriptions[0]
 
-                val itemStackMissionDetail = ItemStack(mission.missionState.material, mission.count)
+                val itemStackMissionDetail = ItemStack(mission.material, mission.count)
                 val itemMetaMissionDetail = itemStackMissionDetail.itemMeta!!
                 itemMetaMissionDetail.addItemFlags(*ItemUtil.itemFlags)
                 itemMetaMissionDetail.setCustomModelData(mission.count)
