@@ -11,8 +11,10 @@ import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterGroup
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -30,6 +32,8 @@ class onMove : Listener {
         if (p.isAdminTeam) return
 
         val worldConfig = Main.worldConfig
+        val mapBorder = worldConfig.mapBorderConfig
+        val hunterZoneBorder = worldConfig.hunterZoneBorderConfig
 
         if (isBorderAttack(to, worldConfig.mapBorderConfig)) {
             e.setTo(from)
@@ -37,38 +41,42 @@ class onMove : Listener {
         }
 
         if (isBorderAttack(to, worldConfig.hunterZoneBorderConfig)) {
-            if (MissionManager.isMissions) {
-                if (MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE)) {
-                    if (p.isPlayerGroup) {
-                        if (HunterZone.containsJoinedSet(p)) {
-                            HunterZone.removeJoinedSet(p)
-                        } else {
-                            if (HunterZone.joinedSetCount < 4) {
+            if (p.isPlayerGroup) {
+                if (MissionManager.isMissions) {
+                    if (MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE)) {
+                        if (!isJoinedArea(from, hunterZoneBorder) && isJoinedArea(to, hunterZoneBorder)) {
+                            // エリアに入ったとき
+                            Bukkit.broadcastMessage("[デバッグ] » 人数: ${HunterZone.joinedSetCount}")
+                            if (HunterZone.joinedSetCount < 3) {
                                 HunterZone.addJoinedSet(p)
                             } else {
                                 e.setTo(from)
                                 p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}3人以上は入れません。")
                             }
+                        } else if (isJoinedArea(from, hunterZoneBorder) && !isJoinedArea(to, hunterZoneBorder)) {
+                            // エリアから出たとき
+                            HunterZone.removeJoinedSet(p)
                         }
                     } else {
-                        e.setTo(from)
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在入ることはできません。3")
+                        if (isJoinedArea(from, hunterZoneBorder) && !isJoinedArea(to, hunterZoneBorder)) {
+                            HunterZone.removeJoinedSet(p)
+                        } else {
+                            e.setTo(from)
+                            p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在入ることはできません。2")
+                        }
                     }
                 } else {
-                    if (HunterZone.containsJoinedSet(p)) {
+                    if (isJoinedArea(from, hunterZoneBorder) && !isJoinedArea(to, hunterZoneBorder)) {
                         HunterZone.removeJoinedSet(p)
                     } else {
                         e.setTo(from)
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在入ることはできません。2")
+                        p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在入ることはできません。1")
                     }
                 }
-            } else {
-                if (HunterZone.containsJoinedSet(p)) {
-                    HunterZone.removeJoinedSet(p)
-                } else {
-                    e.setTo(from)
-                    p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在入ることはできません。1")
-                }
+            } else if (p.isHunterGroup) {
+                HunterZone.removeJoinedSet(p)
+                e.setTo(from)
+                p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ハンター、通報部隊は入ることができません。")
             }
         }
 

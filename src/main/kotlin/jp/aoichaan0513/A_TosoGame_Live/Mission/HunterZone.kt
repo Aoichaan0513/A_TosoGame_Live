@@ -103,8 +103,6 @@ class HunterZone {
                 TosoGameAPI.hidePlayer(it)
             }
 
-            joinedPlayerSet.clear()
-
             internalMissionState = MissionManager.InternalMissionState.END
         }
 
@@ -163,7 +161,7 @@ class HunterZone {
             return joinedPlayerSet.contains(p.uniqueId)
         }
 
-        val joinedSetCount: Int
+        val joinedSetCount
             get() = joinedPlayerSet.size
 
         fun removeLeavedSet(p: Player) {
@@ -197,7 +195,7 @@ class HunterZone {
 
                 if (missionTime == 0) {
                     Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッションが終了しました。")
-                    for (player in Bukkit.getOnlinePlayers().filter { it.isPlayerGroup }) {
+                    for (player in Bukkit.getOnlinePlayers().filter { it.isPlayerGroup && !codeSet.contains(it.uniqueId) }) {
                         if (!codeSet.contains(player.uniqueId)) {
                             player.sendMessage("""
                                 ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}あなたはコードを入力していないため発光しました。

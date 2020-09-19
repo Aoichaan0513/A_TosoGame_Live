@@ -13,10 +13,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.inventory.CraftItemEvent
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryOpenEvent
-import org.bukkit.event.inventory.InventoryType
+import org.bukkit.event.inventory.*
 import org.bukkit.inventory.InventoryView
 
 class onInventory : Listener {
@@ -38,6 +35,7 @@ class onInventory : Listener {
 
         if (!p.isAdminTeam) {
             if (p.isPlayerGroup || p.isJailTeam) {
+                // p.sendMessage("スロット番号: ${e.rawSlot}, ${e.slot}")
                 if (slotType == InventoryType.SlotType.CRAFTING) {
                     e.result = Event.Result.DENY
                     e.isCancelled = true
@@ -48,7 +46,8 @@ class onInventory : Listener {
                             || inventory.type == InventoryType.DISPENSER || inventory.type == InventoryType.DROPPER
                             || inventory.type == InventoryType.HOPPER || inventory.type == InventoryType.ANVIL
                             || inventory.type == InventoryType.SHULKER_BOX || inventory.type == InventoryType.BARREL
-                            || inventory.type == InventoryType.BREWING || inventory.type == InventoryType.FURNACE) {
+                            || inventory.type == InventoryType.BREWING || inventory.type == InventoryType.FURNACE
+                            || inventory.type == InventoryType.SMOKER || inventory.type == InventoryType.BLAST_FURNACE) {
                         if (itemStack == null || itemStack.type == Material.AIR || isAllowedInventory(inventoryView)) return
 
                         if (itemBlackSet.contains(itemStack.type)) {
@@ -76,7 +75,8 @@ class onInventory : Listener {
                         || inventory.type == InventoryType.DISPENSER || inventory.type == InventoryType.DROPPER
                         || inventory.type == InventoryType.HOPPER || inventory.type == InventoryType.ANVIL
                         || inventory.type == InventoryType.SHULKER_BOX || inventory.type == InventoryType.BARREL
-                        || inventory.type == InventoryType.BREWING || inventory.type == InventoryType.FURNACE) {
+                        || inventory.type == InventoryType.BREWING || inventory.type == InventoryType.FURNACE
+                        || inventory.type == InventoryType.SMOKER || inventory.type == InventoryType.BLAST_FURNACE) {
                     if (isAllowedInventory(inventoryView) || MissionManager.isInventoryAllowOpenMission || isAllowOpen) return
 
                     e.isCancelled = true
@@ -87,13 +87,24 @@ class onInventory : Listener {
                         || inventory.type == InventoryType.DISPENSER || inventory.type == InventoryType.DROPPER
                         || inventory.type == InventoryType.HOPPER || inventory.type == InventoryType.ANVIL
                         || inventory.type == InventoryType.SHULKER_BOX || inventory.type == InventoryType.BARREL
-                        || inventory.type == InventoryType.BREWING || inventory.type == InventoryType.FURNACE) {
+                        || inventory.type == InventoryType.BREWING || inventory.type == InventoryType.FURNACE
+                        || inventory.type == InventoryType.SMOKER || inventory.type == InventoryType.BLAST_FURNACE) {
                     if (isAllowedInventory(inventoryView)) return
 
                     e.isCancelled = true
                     p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在開くことができません。")
                 }
             }
+        }
+    }
+
+    @EventHandler
+    fun onInventoryDrag(e: InventoryDragEvent) {
+        val slots = e.rawSlots
+
+        if (slots.any { it in 1..4 }) {
+            e.result = Event.Result.DENY
+            e.isCancelled = true
         }
     }
 

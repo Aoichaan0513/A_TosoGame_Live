@@ -17,6 +17,8 @@ import jp.aoichaan0513.A_TosoGame_Live.Mission.TimedDevice
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.*
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+import net.minecraft.server.v1_15_R1.BlockPosition
+import net.minecraft.server.v1_15_R1.TileEntityChest
 import net.wesjd.anvilgui.AnvilGUI
 import org.bukkit.*
 import org.bukkit.block.BlockFace
@@ -26,6 +28,7 @@ import org.bukkit.block.data.Directional
 import org.bukkit.block.data.FaceAttachable
 import org.bukkit.block.data.type.Door
 import org.bukkit.block.data.type.Stairs
+import org.bukkit.craftbukkit.v1_15_R1.CraftWorld
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftArrow
 import org.bukkit.entity.ItemFrame
 import org.bukkit.entity.Player
@@ -262,7 +265,10 @@ class onInteract : Listener {
                                     """.trimIndent())
                                     return
                                 } else {
-                                    if (clickedBlock.type == Material.OAK_BUTTON || clickedBlock.type == Material.SPRUCE_BUTTON || clickedBlock.type == Material.BIRCH_BUTTON || clickedBlock.type == Material.JUNGLE_BUTTON || clickedBlock.type == Material.ACACIA_BUTTON || clickedBlock.type == Material.DARK_OAK_BUTTON || clickedBlock.type == Material.STONE_BUTTON) {
+                                    if (clickedBlock.type == Material.OAK_BUTTON || clickedBlock.type == Material.SPRUCE_BUTTON
+                                            || clickedBlock.type == Material.BIRCH_BUTTON || clickedBlock.type == Material.JUNGLE_BUTTON
+                                            || clickedBlock.type == Material.ACACIA_BUTTON || clickedBlock.type == Material.DARK_OAK_BUTTON
+                                            || clickedBlock.type == Material.STONE_BUTTON) {
                                         val directional = clickedBlock.blockData as Directional
                                         val block = clickedBlock.getRelative(getAttachmentFace(directional))
 
@@ -297,6 +303,15 @@ class onInteract : Listener {
                                                 }
                                             }
                                         }
+                                    } else if (clickedBlock.type == Material.CHEST) {
+                                        e.isCancelled = true
+
+                                        val loc = clickedBlock.location
+                                        val world = (loc.world as CraftWorld).handle
+                                        val position = BlockPosition(loc.x, loc.y, loc.z)
+                                        val tileChest = world.getTileEntity(position) as TileEntityChest
+
+                                        world.playBlockAction(position, world.getType(position).block, 1, 1)
                                     }
                                 }
                             } else if (p.isPlayerGroup) {

@@ -21,6 +21,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
+import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.setSidebar
 import org.bukkit.Bukkit
@@ -29,6 +30,8 @@ import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 class onJoin : Listener {
 
@@ -77,6 +80,15 @@ class onJoin : Listener {
         MissionManager.setBook(p)
         if (MissionManager.isBossBar)
             MissionManager.bossBar!!.addPlayer(p)
+
+        if (HunterZone.internalMissionState == MissionManager.InternalMissionState.END
+                && p.isPlayerGroup && !HunterZone.containsCodeSet(p)) {
+            p.sendMessage("""
+                ${MainAPI.getPrefix(PrefixType.WARNING)}あなたはコードを入力していないため発光しました。
+                ${MainAPI.getPrefix(PrefixType.SECONDARY)}解除するには"${ChatColor.UNDERLINE}/code 入手したコード${ChatColor.RESET}${ChatColor.GRAY}"と入力して装置を解除してください。
+            """.trimIndent())
+            p.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, 200000, 1, false, false))
+        }
 
         if (p.isPlayerTeam) {
             Teams.joinTeam(OnlineTeam.TOSO_PLAYER, p)

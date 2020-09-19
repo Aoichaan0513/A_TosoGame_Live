@@ -237,6 +237,7 @@ class Game(name: String) : ICommand(name) {
                         player.teleport(worldConfig.respawnLocationConfig.getLocation(1))
                     }
 
+                    player.closeInventory()
                     TosoGameAPI.setItem(WorldManager.GameType.START, player)
                     TosoGameAPI.setPotionEffect(player)
 
