@@ -205,6 +205,8 @@ class MissionManager {
                                 if (i < 0) cancel()
 
                                 if (isMissions) {
+                                    bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
+
                                     val stringBuilder = StringBuilder()
                                     for (id in missionStates)
                                         stringBuilder.append("${ChatColor.GOLD}${ChatColor.BOLD}${missionTitleMap[id] ?: "Unknown"}${ChatColor.RESET}${ChatColor.GRAY}, ")
@@ -228,6 +230,8 @@ class MissionManager {
                             override fun run() {
                                 if (i < 0 || !isMission(MissionState.HUNTER_ZONE) || HunterZone.internalMissionState != InternalMissionState.START) cancel()
 
+                                bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
+
                                 val bossBar = createBossBar(
                                         "${ChatColor.YELLOW}${ChatColor.BOLD}ハンターゾーンミッション終了まで${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.RESET}${TimeFormat.formatJapan(HunterZone.getMissionTime().toInt())}",
                                         if (isMission(MissionState.HUNTER_ZONE)) HunterZone.getMissionTime() / (HunterZone.getInitialMissionTime() / 20) else 1.toDouble(),
@@ -248,6 +252,8 @@ class MissionManager {
                             override fun run() {
                                 if (i < 0 || !isMission(MissionState.TIMED_DEVICE) || TimedDevice.internalMissionState != InternalMissionState.START) cancel()
 
+                                bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
+
                                 val bossBar = createBossBar(
                                         "${ChatColor.YELLOW}${ChatColor.BOLD}時限装置解除ミッション終了まで${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.RESET}${TimeFormat.formatJapan(TimedDevice.getMissionTime().toInt())}",
                                         if (isMission(MissionState.TIMED_DEVICE)) TimedDevice.getMissionTime() / (TimedDevice.getInitialMissionTime() / 20) else 1.toDouble(),
@@ -267,6 +273,8 @@ class MissionManager {
 
                             override fun run() {
                                 if (i < 0) cancel()
+
+                                bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
 
                                 val bossBar = createBossBar("${ChatColor.BOLD}${missionTitleMap[result]}", 1.toDouble(), MissionState.getMission(result).barColor, BarStyle.SOLID)
 

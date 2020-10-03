@@ -11,7 +11,6 @@ import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterGroup
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.Bukkit
@@ -20,6 +19,7 @@ import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
+
 
 class onMove : Listener {
 
@@ -40,64 +40,46 @@ class onMove : Listener {
             p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}マップから出ることはできません。")
         }
 
-        if (isBorderAttack(to, worldConfig.hunterZoneBorderConfig)) {
+
+        val fromIsIn = isJoinedArea(from, hunterZoneBorder)
+        val toIsIn = isJoinedArea(to, hunterZoneBorder)
+
+        if (fromIsIn && !toIsIn) {
+            // エリアから出たとき
             if (p.isPlayerGroup) {
-                if (MissionManager.isMissions) {
-                    if (MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE)) {
-                        Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > エリア外から中へ from: ${isJoinedArea(from, hunterZoneBorder, true)}, to: ${isJoinedArea(to, hunterZoneBorder)}")
-                        Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > エリア内から外へ from: ${isJoinedArea(from, hunterZoneBorder)}, to: ${isJoinedArea(to, hunterZoneBorder, true)}")
+                HunterZone.removeJoinedSet(p)
+                Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, エリア退出")
+            } else {
+                e.setTo(from)
+                Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, ハンターアタック")
+            }
+        } else if (!fromIsIn && toIsIn) {
+            if (p.isPlayerGroup) {
+                if (MissionManager.isMissions && MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE)) {
+                    if (HunterZone.joinedSetCount < 3) {
+                        HunterZone.addJoinedSet(p)
 
-                        if (isJoinedArea(from, hunterZoneBorder) && !isJoinedArea(to, hunterZoneBorder, true)) {
-                            // エリアから出たとき
-                            HunterZone.removeJoinedSet(p)
-
-                            Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, エリア退出")
-                        } else if (!isJoinedArea(from, hunterZoneBorder, true) && isJoinedArea(to, hunterZoneBorder)) {
-                            // エリアに入ったとき
-                            if (HunterZone.joinedSetCount < 3) {
-                                HunterZone.addJoinedSet(p)
-
-                                Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, エリア参加")
-                            } else {
-                                e.setTo(from)
-                                p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}3人以上は入れません。")
-
-                                Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, エリア参加 -> ブロック")
-                            }
-
-                        }
-                    } else {
-                        if (isJoinedArea(from, hunterZoneBorder) && !isJoinedArea(to, hunterZoneBorder, true)) {
-                            HunterZone.removeJoinedSet(p)
-
-                            Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, ボーダーアタック 2")
-                        } else {
-                            e.setTo(from)
-                            p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在入ることはできません。2")
-
-                            Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, 参加禁止 2")
-                        }
-                    }
-                } else {
-                    if (isJoinedArea(from, hunterZoneBorder) && !isJoinedArea(to, hunterZoneBorder, true)) {
-                        HunterZone.removeJoinedSet(p)
-
-                        Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, ボーダーアタック 1")
+                        Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, エリア参加")
                     } else {
                         e.setTo(from)
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在入ることはできません。1")
+                        p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}4人以上は入れません。")
 
-                        Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, 参加禁止 1")
+                        Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, エリア参加 -> 満員")
                     }
+                } else {
+                    e.setTo(from)
+                    p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在入ることはできません。")
+
+                    Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, 参加禁止")
                 }
-            } else if (p.isHunterGroup) {
-                HunterZone.removeJoinedSet(p)
+            } else {
                 e.setTo(from)
                 p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ハンター、通報部隊は入ることができません。")
 
                 Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, ハンターアタック")
             }
         }
+
 
         if (OPGameManager.opGameState != OPGameManager.OPGameState.NONE) {
             val player = OPGameManager.player
