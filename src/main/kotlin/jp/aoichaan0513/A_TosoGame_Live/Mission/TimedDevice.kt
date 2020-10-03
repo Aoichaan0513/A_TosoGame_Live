@@ -95,6 +95,11 @@ class TimedDevice {
             isStart = false
         }
 
+        fun endAndResetMission() {
+            HunterZone.endMission()
+            HunterZone.resetMission()
+        }
+
 
         fun addClearedNumberSet(i: Int) {
             clearedNumberSet.add(i)

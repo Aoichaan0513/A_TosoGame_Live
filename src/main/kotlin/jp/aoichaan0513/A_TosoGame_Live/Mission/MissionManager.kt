@@ -11,6 +11,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.onInteract
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+import jp.aoichaan0513.A_TosoGame_Live.Utils.color
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterGroup
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
@@ -182,7 +183,7 @@ class MissionManager {
         }
 
         fun sendMission(sender: CommandSender, id: Int, description: String, missionType: MissionType = MissionType.TUTATU_HINT, detailType: MissionDetailType = MissionDetailType.TUTATU, material: Material = Material.QUARTZ_BLOCK) {
-            sendMission(sender, id, listOf(description.trim()), missionType, detailType, material)
+            sendMission(sender, id, listOf(description.trim().color()), missionType, detailType, material)
         }
 
 
@@ -374,6 +375,9 @@ class MissionManager {
         }
 
         fun endMissions() {
+            HunterZone.endMission()
+            TimedDevice.endMission()
+
             for (id in missionStates)
                 endMission(id)
         }

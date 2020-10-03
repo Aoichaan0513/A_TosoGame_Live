@@ -28,6 +28,12 @@ class BaseMission {
             isStart = false
         }
 
+        fun endAndResetMission() {
+            HunterZone.endMission()
+            HunterZone.resetMission()
+        }
+
+
         private class BaseMissionRunnable(private val initialMissionTime: Int) : BukkitRunnable() {
             private var missionTime: Int
 

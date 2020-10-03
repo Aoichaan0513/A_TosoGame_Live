@@ -119,6 +119,11 @@ class HunterZone {
             isStart = false
         }
 
+        fun endAndResetMission() {
+            endMission()
+            resetMission()
+        }
+
 
         val hunterSetCount: Int
             get() = hunterSet.size

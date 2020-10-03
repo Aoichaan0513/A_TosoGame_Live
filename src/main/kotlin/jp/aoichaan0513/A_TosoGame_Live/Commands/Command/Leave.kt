@@ -4,6 +4,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
+import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.setTeam
 import org.bukkit.Bukkit
@@ -19,11 +20,12 @@ class Leave(name: String) : ICommand(name) {
         if (TosoGameAPI.isBroadCaster(sp) || TosoGameAPI.hasPermission(sp)) {
             if (args.isNotEmpty()) {
                 if (TosoGameAPI.isBroadCaster(sp) || TosoGameAPI.isAdmin(sp)) {
-                    for (name in args) {
+                    for (name in args.filter { it.isNotEmpty() }) {
                         val p = Bukkit.getPlayerExact(name)
                         if (p != null) {
                             if (!p.isAdminTeam) {
                                 p.setTeam(Teams.OnlineTeam.TOSO_ADMIN, false)
+                                HunterZone.removeJoinedSet(p)
 
                                 sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を運営に追加しました。")
                                 MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームから抜けました。")
@@ -41,6 +43,7 @@ class Leave(name: String) : ICommand(name) {
             } else {
                 if (!sp.isAdminTeam) {
                     sp.setTeam(Teams.OnlineTeam.TOSO_ADMIN, false)
+                    HunterZone.removeJoinedSet(sp)
 
                     MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${sp.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームから抜けました。")
                     return
@@ -54,11 +57,12 @@ class Leave(name: String) : ICommand(name) {
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
         if (args.isNotEmpty()) {
-            for (name in args) {
+            for (name in args.filter { it.isNotEmpty() }) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
                     if (!p.isAdminTeam) {
                         p.setTeam(Teams.OnlineTeam.TOSO_ADMIN, false)
+                        HunterZone.removeJoinedSet(p)
 
                         bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を運営に追加しました。")
                         MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームから抜けました。")
@@ -77,11 +81,12 @@ class Leave(name: String) : ICommand(name) {
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         if (args.isNotEmpty()) {
-            for (name in args) {
+            for (name in args.filter { it.isNotEmpty() }) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
                     if (!p.isAdminTeam) {
                         p.setTeam(Teams.OnlineTeam.TOSO_ADMIN, false)
+                        HunterZone.removeJoinedSet(p)
 
                         cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を運営に追加しました。")
                         MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームから抜けました。")

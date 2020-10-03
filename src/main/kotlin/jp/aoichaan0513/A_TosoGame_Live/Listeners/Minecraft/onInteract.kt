@@ -394,12 +394,16 @@ class onInteract : Listener {
                                 }
                             } else if (p.isJailTeam) {
                                 if (p.inventory.itemInMainHand.type == Material.ENDER_PEARL) {
+                                    e.isCancelled = true
                                     enderPearl(p, e, true)
                                 } else if (p.inventory.itemInOffHand.type == Material.ENDER_PEARL) {
+                                    e.isCancelled = true
                                     enderPearl(p, e, false)
                                 } else if (p.inventory.itemInMainHand.type == Material.ENDER_EYE) {
+                                    e.isCancelled = true
                                     enderEye(p, e, true)
                                 } else if (p.inventory.itemInOffHand.type == Material.ENDER_EYE) {
+                                    e.isCancelled = true
                                     enderEye(p, e, false)
                                 }
                             }
@@ -593,8 +597,6 @@ class onInteract : Listener {
 
     private fun enderPearl(p: Player, e: PlayerInteractEvent, isMainHand: Boolean) {
         if (!GameManager.isGame(GameManager.GameState.GAME) || p.hasCooldown(Material.ENDER_PEARL) || p.hasCooldown(Material.ENDER_EYE)) return
-
-        e.isCancelled = true
 
         VisibilityManager.addJailHide(p)
 

@@ -19,7 +19,7 @@ class Join(name: String) : ICommand(name) {
         if (TosoGameAPI.isBroadCaster(sp) || TosoGameAPI.hasPermission(sp)) {
             if (args.isNotEmpty()) {
                 if (TosoGameAPI.isBroadCaster(sp) || TosoGameAPI.isAdmin(sp)) {
-                    for (name in args) {
+                    for (name in args.filter { it.isNotEmpty() }) {
                         val p = Bukkit.getPlayerExact(name)
                         if (p != null) {
                             if (!p.isPlayerTeam) {
@@ -54,7 +54,7 @@ class Join(name: String) : ICommand(name) {
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
         if (args.isNotEmpty()) {
-            for (name in args) {
+            for (name in args.filter { it.isNotEmpty() }) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
                     if (!p.isPlayerTeam) {
@@ -77,7 +77,7 @@ class Join(name: String) : ICommand(name) {
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         if (args.isNotEmpty()) {
-            for (name in args) {
+            for (name in args.filter { it.isNotEmpty() }) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
                     if (!p.isPlayerTeam) {

@@ -17,7 +17,7 @@ class Appear(name: String) : ICommand(name) {
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
         if (TosoGameAPI.isAdmin(sp)) {
             if (args.isNotEmpty()) {
-                for (name in args) {
+                for (name in args.filter { it.isNotEmpty() }) {
                     val p = Bukkit.getPlayerExact(name)
                     if (p != null) {
                         val playerConfig = PlayerManager.loadConfig(p)
@@ -49,7 +49,7 @@ class Appear(name: String) : ICommand(name) {
 
     override fun onBlockCommand(bs: BlockCommandSender, cmd: Command, label: String, args: Array<String>) {
         if (args.isNotEmpty()) {
-            for (name in args) {
+            for (name in args.filter { it.isNotEmpty() }) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
                     val playerConfig = PlayerManager.loadConfig(p)
@@ -71,7 +71,7 @@ class Appear(name: String) : ICommand(name) {
 
     override fun onConsoleCommand(cs: ConsoleCommandSender, cmd: Command, label: String, args: Array<String>) {
         if (args.isNotEmpty()) {
-            for (name in args) {
+            for (name in args.filter { it.isNotEmpty() }) {
                 val p = Bukkit.getPlayerExact(name)
                 if (p != null) {
                     val playerConfig = PlayerManager.loadConfig(p)

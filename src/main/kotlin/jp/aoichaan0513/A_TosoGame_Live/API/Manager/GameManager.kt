@@ -27,6 +27,7 @@ class GameManager {
             gameState = GameState.END
 
             MissionManager.endMissions()
+
             Dice.end()
             OPGameManager.endOPGame(Bukkit.getConsoleSender())
         }
