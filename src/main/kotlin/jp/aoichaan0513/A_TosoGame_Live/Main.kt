@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent
 import org.bukkit.*
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Arrow
+import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.PotionEffectType
@@ -487,10 +488,13 @@ class Main : JavaPlugin(), Listener {
         }, 0, 0)
     }
 
-    private fun getActionbarMessage(p: org.bukkit.entity.Player, decimalFormat: DecimalFormat): String {
+    private fun getActionbarMessage(p: Player, decimalFormat: DecimalFormat): String {
         val separator = "${ChatColor.RESET}${ChatColor.GRAY} / ${ChatColor.RESET}"
 
         val isHiddenMessage = if (PlayerManager.loadConfig(p).visibility) "${ChatColor.RED}姿を非表示中" else ""
+
+        val target = p.spectatorTarget
+        val spectatorMessage = if (p.gameMode == org.bukkit.GameMode.SPECTATOR && target != null && target is Player) "${ChatColor.GRAY}${target.name} に憑依中" else ""
 
         val invisibleMessage = if (p.isPlayerGroup) {
             if (p.hasPotionEffect(PotionEffectType.INVISIBILITY))
@@ -527,6 +531,6 @@ class Main : JavaPlugin(), Listener {
             ""
         }
 
-        return "${if (isHiddenMessage.isNotEmpty()) "$isHiddenMessage${if (invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}$invisibleMessage${if (invisibleMessage.isNotEmpty() && speedMessage.isNotEmpty()) separator else ""}$speedMessage${if (respawnMessage.isNotEmpty()) "$respawnMessage${if (invisibleMessage.isNotEmpty() || invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}"
+        return "${if (isHiddenMessage.isNotEmpty()) "$isHiddenMessage${if (spectatorMessage.isNotEmpty() || invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}${if (spectatorMessage.isNotEmpty()) "$spectatorMessage${if (invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}$invisibleMessage${if (invisibleMessage.isNotEmpty() && speedMessage.isNotEmpty()) separator else ""}$speedMessage${if (respawnMessage.isNotEmpty()) "$respawnMessage${if (invisibleMessage.isNotEmpty() || invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}"
     }
 }

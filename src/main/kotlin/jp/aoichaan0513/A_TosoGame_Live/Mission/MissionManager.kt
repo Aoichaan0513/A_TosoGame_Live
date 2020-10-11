@@ -386,7 +386,8 @@ class MissionManager {
             HunterZone.endMission()
             TimedDevice.endMission()
 
-            for (id in missionStates)
+            val states = missionStates.toSet()
+            for (id in states)
                 endMission(id)
         }
 

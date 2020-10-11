@@ -13,7 +13,6 @@ import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -48,35 +47,25 @@ class onMove : Listener {
             // エリアから出たとき
             if (p.isPlayerGroup) {
                 HunterZone.removeJoinedSet(p)
-                Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, エリア退出")
             } else {
                 e.setTo(from)
-                Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, ハンターアタック")
             }
         } else if (!fromIsIn && toIsIn) {
             if (p.isPlayerGroup) {
                 if (MissionManager.isMissions && MissionManager.isMission(MissionManager.MissionState.HUNTER_ZONE)) {
                     if (HunterZone.joinedSetCount < 3) {
                         HunterZone.addJoinedSet(p)
-
-                        Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, エリア参加")
                     } else {
                         e.setTo(from)
                         p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}4人以上は入れません。")
-
-                        Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, エリア参加 -> 満員")
                     }
                 } else {
                     e.setTo(from)
                     p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}現在入ることはできません。")
-
-                    Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, 参加禁止")
                 }
             } else {
                 e.setTo(from)
                 p.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ハンター、通報部隊は入ることができません。")
-
-                Bukkit.broadcastMessage("[デバッグ] -> ${p.name} > 人数: ${HunterZone.joinedSetCount}, ハンターアタック")
             }
         }
 

@@ -63,13 +63,13 @@ class BossBarManager {
                             val maxCount = worldConfig.opGameConfig.diceCount
 
                             bossBar.setTitle("${ChatColor.YELLOW}${ChatColor.BOLD}オープニングゲーム${ChatColor.RESET}${ChatColor.GRAY} / ${ChatColor.YELLOW}サイコロ${ChatColor.GRAY}: ${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}$count${ChatColor.RESET}${ChatColor.YELLOW} / ${ChatColor.YELLOW}${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}$maxCount")
-                            bossBar.progress = count.toDouble() / maxCount
+                            bossBar.progress = (count.toDouble() / maxCount).coerceAtMost(1.0)
                             bossBar.color = BarColor.YELLOW
                             bossBar.addPlayer(p)
                         }
                         else -> {
                             bossBar.setTitle("${ChatColor.YELLOW}ゲーム開始まで残り${ChatColor.GRAY}: ${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(time)}")
-                            bossBar.progress = time.toDouble() / maxTime
+                            bossBar.progress = (time.toDouble() / maxTime).coerceAtMost(1.0)
                             bossBar.color = BarColor.YELLOW
                             bossBar.addPlayer(p)
                         }
@@ -77,7 +77,7 @@ class BossBarManager {
                 }
                 GameState.GAME -> {
                     bossBar.setTitle("${ChatColor.BOLD}${ChatColor.RED}ゲーム終了まで残り${ChatColor.GRAY}: ${ChatColor.DARK_RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(time)}${if (MissionManager.isMissions) "${ChatColor.RESET}${ChatColor.GRAY} / ${ChatColor.YELLOW}${ChatColor.BOLD}ミッション中" else ""}")
-                    bossBar.progress = time.toDouble() / maxTime
+                    bossBar.progress = (time.toDouble() / maxTime).coerceAtMost(1.0)
                     bossBar.color = BarColor.RED
                     bossBar.addPlayer(p)
                 }
