@@ -29,6 +29,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
+import net.dv8tion.jda.api.requests.GatewayIntent
 import org.bukkit.*
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Arrow
@@ -352,8 +353,7 @@ class Main : JavaPlugin(), Listener {
 
     private fun loadBot() {
         if (!mainConfig.getBoolean("discordIntegration.enabled")) return
-        botInstance = JDABuilder()
-                .setToken(mainConfig.getString("discordIntegration.token"))
+        botInstance = JDABuilder.createDefault(mainConfig.getString("discordIntegration.token"), GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.DIRECT_MESSAGE_REACTIONS)
                 .setStatus(OnlineStatus.ONLINE)
                 .addEventListeners(onMessage())
                 .build()

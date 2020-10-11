@@ -62,7 +62,7 @@ repositories {
 dependencies {
     // Kotlin
     implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: kotlinVersion
-    implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.3.2'
+    implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.3.9'
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-script-util'
 
     // Minecraft
@@ -72,7 +72,7 @@ dependencies {
     compile group: 'com.github.WesJD', name: 'AnvilGUI', version: '-SNAPSHOT'
 
     // Discord
-    compile group: 'net.dv8tion', name: 'JDA', version: '4.2.0_194'
+    compile group: 'net.dv8tion', name: 'JDA', version: '4.2.0_208'
 
     // データ管理用ライブラリ
     compile group: 'org.json', name: 'json', version: '20190722'
