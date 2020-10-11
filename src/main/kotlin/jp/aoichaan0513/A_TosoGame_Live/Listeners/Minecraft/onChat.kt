@@ -5,7 +5,6 @@ import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
-import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Utils.*
@@ -96,7 +95,7 @@ class onChat : Listener {
     }
 
     private fun sendMessage(chatType: ChatType, sp: Player, p: Player, msg: String) {
-        val basePrefix = "${(if (TosoGameAPI.isBroadCaster(sp)) "${ChatColor.GOLD}${ChatColor.BOLD} * ${ChatColor.RESET}" else "")}${Teams.getTeamLabel(Teams.DisplaySlot.CHAT, sp)}${ChatColor.RESET}${(if (!PlayerManager.loadConfig(p).visibility) " ${sp.displayName}" else "")}${ChatColor.GREEN}: ${ChatColor.RESET}"
+        val basePrefix = "${Teams.getTeamLabel(Teams.DisplaySlot.CHAT, sp)}${ChatColor.RESET}${(if (!PlayerManager.loadConfig(p).visibility) " ${sp.displayName}" else "")}${ChatColor.GREEN}: ${ChatColor.RESET}"
         val globalMessagePrefix = "${ChatType.GLOBAL.prefix}$basePrefix"
         val rangeMessagePrefix = "${ChatType.RANGE.prefix}$basePrefix"
         val teamMessagePrefix = "${ChatType.TEAM.prefix}$basePrefix"

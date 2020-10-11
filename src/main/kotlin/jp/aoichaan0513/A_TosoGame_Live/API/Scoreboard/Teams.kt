@@ -289,12 +289,12 @@ class Teams {
 
         fun getTeamLabel(slot: DisplaySlot, p: Player): String {
             return if (slot == DisplaySlot.CHAT) {
-                if (teamAdmin.hasEntry(p.name)) "${OnlineTeam.TOSO_ADMIN.color}[${OnlineTeam.TOSO_ADMIN.displayName}]${ChatColor.RESET}"
-                else if (teamPlayer.hasEntry(p.name)) "${OnlineTeam.TOSO_PLAYER.color}[${OnlineTeam.TOSO_PLAYER.displayName}]${ChatColor.RESET}"
-                else if (teamHunter.hasEntry(p.name)) "${OnlineTeam.TOSO_HUNTER.color}[${OnlineTeam.TOSO_HUNTER.displayName}]${ChatColor.RESET}"
-                else if (teamJail.hasEntry(p.name)) "${OnlineTeam.TOSO_JAIL.color}[${OnlineTeam.TOSO_JAIL.displayName}]${ChatColor.RESET}"
-                else if (teamSuccess.hasEntry(p.name)) "${OnlineTeam.TOSO_SUCCESS.color}[${OnlineTeam.TOSO_SUCCESS.displayName}]${ChatColor.RESET}"
-                else if (teamTuho.hasEntry(p.name)) "${OnlineTeam.TOSO_TUHO.color}[${OnlineTeam.TOSO_TUHO.displayName}]${ChatColor.RESET}"
+                if (teamAdmin.hasEntry(p.name)) "${OnlineTeam.TOSO_ADMIN.color}[${if (TosoGameAPI.isBroadCaster(p)) "配信者" else OnlineTeam.TOSO_ADMIN.displayName}]${ChatColor.RESET}"
+                else if (teamPlayer.hasEntry(p.name)) "${OnlineTeam.TOSO_PLAYER.color}[${if (TosoGameAPI.isBroadCaster(p)) "配信者" else OnlineTeam.TOSO_PLAYER.displayName}]${ChatColor.RESET}"
+                else if (teamHunter.hasEntry(p.name)) "${OnlineTeam.TOSO_HUNTER.color}[${if (TosoGameAPI.isBroadCaster(p)) "配信者" else OnlineTeam.TOSO_HUNTER.displayName}]${ChatColor.RESET}"
+                else if (teamJail.hasEntry(p.name)) "${OnlineTeam.TOSO_JAIL.color}[${if (TosoGameAPI.isBroadCaster(p)) "配信者" else OnlineTeam.TOSO_JAIL.displayName}]${ChatColor.RESET}"
+                else if (teamSuccess.hasEntry(p.name)) "${OnlineTeam.TOSO_SUCCESS.color}[${if (TosoGameAPI.isBroadCaster(p)) "配信者" else OnlineTeam.TOSO_SUCCESS.displayName}]${ChatColor.RESET}"
+                else if (teamTuho.hasEntry(p.name)) "${OnlineTeam.TOSO_TUHO.color}[${if (TosoGameAPI.isBroadCaster(p)) "配信者" else OnlineTeam.TOSO_TUHO.displayName}]${ChatColor.RESET}"
                 else ""
             } else if (slot == DisplaySlot.SIDEBAR) {
                 if (teamAdmin.hasEntry(p.name)) "${OnlineTeam.TOSO_ADMIN.displayName}${ChatColor.RESET}"
