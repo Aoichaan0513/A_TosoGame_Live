@@ -396,16 +396,16 @@ class onInteract : Listener {
                             } else if (p.isJailTeam) {
                                 if (p.inventory.itemInMainHand.type == Material.ENDER_PEARL) {
                                     e.isCancelled = true
-                                    enderPearl(p, e, true)
+                                    enderPearl(p, true)
                                 } else if (p.inventory.itemInOffHand.type == Material.ENDER_PEARL) {
                                     e.isCancelled = true
-                                    enderPearl(p, e, false)
+                                    enderPearl(p, false)
                                 } else if (p.inventory.itemInMainHand.type == Material.ENDER_EYE) {
                                     e.isCancelled = true
-                                    enderEye(p, e, true)
+                                    enderEye(p, true)
                                 } else if (p.inventory.itemInOffHand.type == Material.ENDER_EYE) {
                                     e.isCancelled = true
-                                    enderEye(p, e, false)
+                                    enderEye(p, false)
                                 }
                             }
                             return
@@ -425,13 +425,17 @@ class onInteract : Listener {
                             return
                         } else if (p.isJailTeam) {
                             if (p.inventory.itemInMainHand.type == Material.ENDER_PEARL) {
-                                enderPearl(p, e, true)
+                                e.isCancelled = true
+                                enderPearl(p, true)
                             } else if (p.inventory.itemInOffHand.type == Material.ENDER_PEARL) {
-                                enderPearl(p, e, false)
+                                e.isCancelled = true
+                                enderPearl(p, false)
                             } else if (p.inventory.itemInMainHand.type == Material.ENDER_EYE) {
-                                enderEye(p, e, true)
+                                e.isCancelled = true
+                                enderEye(p, true)
                             } else if (p.inventory.itemInOffHand.type == Material.ENDER_EYE) {
-                                enderEye(p, e, false)
+                                e.isCancelled = true
+                                enderEye(p, false)
                             }
                             return
                         }
@@ -508,23 +512,35 @@ class onInteract : Listener {
     fun onAnimation(e: PlayerAnimationEvent) {
         val p = e.player
 
-        if (!p.isPlayerTeam || p.eyeLocation.block.type.toString().contains("AIR")) return
+        val blocks = p.getLineOfSight(Material.values().toSet(), 5).filterNotNull()
+        val block = blocks.firstOrNull { !it.type.toString().contains("AIR", true) } ?: return
 
         val worldConfig = Main.worldConfig
         val difficultyConfig = worldConfig.getDifficultyConfig(p)
 
         val itemGameType = RespawnRunnable.getGameType(p)
 
-        if (p.inventory.itemInMainHand.type == Material.BONE) {
-            bone(p, true, difficultyConfig, itemGameType)
-        } else if (p.inventory.itemInOffHand.type == Material.BONE) {
-            bone(p, false, difficultyConfig, itemGameType)
-        } else if (p.inventory.itemInMainHand.type == Material.FEATHER) {
-            feather(p, true, difficultyConfig, itemGameType)
-        } else if (p.inventory.itemInOffHand.type == Material.FEATHER) {
-            feather(p, false, difficultyConfig, itemGameType)
+        if (p.isPlayerGroup) {
+            if (p.inventory.itemInMainHand.type == Material.BONE) {
+                bone(p, true, difficultyConfig, itemGameType)
+            } else if (p.inventory.itemInOffHand.type == Material.BONE) {
+                bone(p, false, difficultyConfig, itemGameType)
+            } else if (p.inventory.itemInMainHand.type == Material.FEATHER) {
+                feather(p, true, difficultyConfig, itemGameType)
+            } else if (p.inventory.itemInOffHand.type == Material.FEATHER) {
+                feather(p, false, difficultyConfig, itemGameType)
+            }
+        } else if (p.isJailTeam) {
+            if (p.inventory.itemInMainHand.type == Material.ENDER_PEARL) {
+                enderPearl(p, true)
+            } else if (p.inventory.itemInOffHand.type == Material.ENDER_PEARL) {
+                enderPearl(p, false)
+            } else if (p.inventory.itemInMainHand.type == Material.ENDER_EYE) {
+                enderEye(p, true)
+            } else if (p.inventory.itemInOffHand.type == Material.ENDER_EYE) {
+                enderEye(p, false)
+            }
         }
-        return
     }
 
 
@@ -596,25 +612,25 @@ class onInteract : Listener {
         p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, duration, 1, false, false))
     }
 
-    private fun enderPearl(p: Player, e: PlayerInteractEvent, isMainHand: Boolean) {
+    private fun enderPearl(p: Player, isMainHand: Boolean) {
         if (!GameManager.isGame(GameManager.GameState.GAME) || p.hasCooldown(Material.ENDER_PEARL) || p.hasCooldown(Material.ENDER_EYE)) return
 
         VisibilityManager.addJailHide(p)
 
-        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}周りを非表示にしました。")
+        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}周りのプレイヤーを非表示にしました。")
 
         if (isMainHand) {
             val itemStack = p.inventory.itemInMainHand
             val itemMeta = itemStack.itemMeta!!
             itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを表示")
-            itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを表示します。")
+            itemMeta.lore = listOf("${ChatColor.YELLOW}クリックして運営以外のプレイヤーを非表示にします。")
             itemStack.type = Material.ENDER_EYE
             itemStack.itemMeta = itemMeta
         } else {
             val itemStack = p.inventory.itemInOffHand
             val itemMeta = itemStack.itemMeta!!
             itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを表示")
-            itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを表示します。")
+            itemMeta.lore = listOf("${ChatColor.YELLOW}クリックして運営以外のプレイヤーを非表示にします。")
             itemStack.type = Material.ENDER_EYE
             itemStack.itemMeta = itemMeta
         }
@@ -622,27 +638,25 @@ class onInteract : Listener {
         setJailItemCoolTime(p)
     }
 
-    private fun enderEye(p: Player, e: PlayerInteractEvent, isMainHand: Boolean) {
+    private fun enderEye(p: Player, isMainHand: Boolean) {
         if (!GameManager.isGame(GameManager.GameState.GAME) || p.hasCooldown(Material.ENDER_PEARL) || p.hasCooldown(Material.ENDER_EYE)) return
-
-        e.isCancelled = true
 
         VisibilityManager.removeJailHide(p)
 
-        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}周りを表示しました。")
+        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}周りのプレイヤーを表示しました。")
 
         if (isMainHand) {
             val itemStack = p.inventory.itemInMainHand
             val itemMeta = itemStack.itemMeta!!
             itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを非表示")
-            itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを非表示にします。")
+            itemMeta.lore = listOf("${ChatColor.YELLOW}クリックして周りのプレイヤーを非表示にします。")
             itemStack.type = Material.ENDER_PEARL
             itemStack.itemMeta = itemMeta
         } else {
             val itemStack = p.inventory.itemInOffHand
             val itemMeta = itemStack.itemMeta!!
             itemMeta.setDisplayName("${ChatColor.GREEN}プレイヤーを非表示")
-            itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックしてプレイヤーを非表示にします。")
+            itemMeta.lore = listOf("${ChatColor.YELLOW}クリックして周りのプレイヤーを非表示にします。")
             itemStack.type = Material.ENDER_PEARL
             itemStack.itemMeta = itemMeta
         }

@@ -33,7 +33,6 @@ class Join(name: String) : ICommand(name) {
                             continue
                         }
                         MainAPI.sendOfflineMessage(sp, name)
-                        continue
                     }
                     return
                 }
@@ -68,7 +67,6 @@ class Join(name: String) : ICommand(name) {
                     continue
                 }
                 MainAPI.sendOfflineMessage(bs, name)
-                continue
             }
             return
         }
@@ -91,7 +89,6 @@ class Join(name: String) : ICommand(name) {
                     continue
                 }
                 MainAPI.sendOfflineMessage(cs, name)
-                continue
             }
             return
         }

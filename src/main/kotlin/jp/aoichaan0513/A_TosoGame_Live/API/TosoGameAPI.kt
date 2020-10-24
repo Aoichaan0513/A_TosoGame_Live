@@ -64,7 +64,7 @@ class TosoGameAPI {
                             val itemStack = ItemStack(Material.ENDER_PEARL)
                             val itemMeta = itemStack.itemMeta!!
                             itemMeta.setDisplayName(ItemUtil.getItemName("プレイヤーを非表示"))
-                            itemMeta.lore = listOf("${ChatColor.YELLOW}右クリックして運営以外のプレイヤーを非表示にします。")
+                            itemMeta.lore = listOf("${ChatColor.YELLOW}クリックして運営以外のプレイヤーを非表示にします。")
                             itemStack.itemMeta = itemMeta
 
                             inv.setItem(8, itemStack)

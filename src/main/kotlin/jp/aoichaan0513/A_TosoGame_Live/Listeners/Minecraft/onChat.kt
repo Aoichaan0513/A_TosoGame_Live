@@ -105,7 +105,6 @@ class onChat : Listener {
             ChatType.GLOBAL -> Bukkit.broadcastMessage(globalMessagePrefix + msg)
             ChatType.RANGE -> {
                 if (sp.isPlayerGroup || sp.isHunterGroup) {
-
                     val loc = sp.location
                     Bukkit.getConsoleSender().sendMessage(rangeMessagePrefix + msg)
                     for (player in Bukkit.getOnlinePlayers().filter { it.isAdminTeam || it.location.distance(loc) <= range })

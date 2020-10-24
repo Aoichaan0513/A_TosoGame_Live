@@ -69,7 +69,6 @@ class Team(name: String) : ICommand(name) {
                             }
                         }
                         sendHelpMessage(sender, label, ErrorArgType.RANDOM)
-                        return
                     }
                     else -> {
                         if (args.size > 1) {
@@ -105,7 +104,6 @@ class Team(name: String) : ICommand(name) {
                                                 return
                                             }
                                             sendHelpMessage(sender, label, ErrorArgType.SELECTOR, team)
-                                            return
                                         }
                                     }
                                 } else {
@@ -132,7 +130,6 @@ class Team(name: String) : ICommand(name) {
                             }
                         }
                         sendHelpMessage(sender, label, ErrorArgType.TEAM)
-                        return
                     }
                 }
                 return

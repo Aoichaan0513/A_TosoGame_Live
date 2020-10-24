@@ -232,7 +232,7 @@ class Main : JavaPlugin(), Listener {
                 // プレイヤー用コマンド
                 "join" to Join("join"), // コマンドブロック対応
                 "leave" to Leave("leave"), // コマンドブロック対応
-                "broadcaster" to BroadCaster("broadcaster"), // コマンドブロック対応
+                "broadcaster" to Broadcaster("broadcaster"), // コマンドブロック対応
                 "disappear" to Disappear("disappear"), // コマンドブロック対応
                 "appear" to Appear("appear"), // コマンドブロック対応
                 "gamemode" to GameMode("gamemode"), // コマンドブロック対応
@@ -240,6 +240,7 @@ class Main : JavaPlugin(), Listener {
                 "show" to Show("show"),
                 "spec" to Spec("spec"),
                 "sidebar" to Sidebar("sidebar"),
+                "ping" to Ping("ping"),
 
                 // スクリプトコマンド
                 "script" to Script("script"),

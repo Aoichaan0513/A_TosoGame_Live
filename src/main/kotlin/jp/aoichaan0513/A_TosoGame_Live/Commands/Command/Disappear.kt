@@ -30,7 +30,6 @@ class Disappear(name: String) : ICommand(name) {
                         continue
                     }
                     MainAPI.sendOfflineMessage(sp, name)
-                    continue
                 }
                 return
             } else {
@@ -62,7 +61,6 @@ class Disappear(name: String) : ICommand(name) {
                     continue
                 }
                 MainAPI.sendOfflineMessage(bs, name)
-                continue
             }
             return
         }
@@ -84,7 +82,6 @@ class Disappear(name: String) : ICommand(name) {
                     continue
                 }
                 MainAPI.sendOfflineMessage(cs, name)
-                continue
             }
             return
         }
@@ -103,10 +100,9 @@ class Disappear(name: String) : ICommand(name) {
         return getTabList(cs, args)
     }
 
+
     private fun getTabList(sender: CommandSender, args: Array<String>): List<String>? {
         if (MainAPI.isPlayer(sender) && !TosoGameAPI.isAdmin(sender as Player)) return emptyList()
-        val set = mutableSetOf<String>()
-        Bukkit.getOnlinePlayers().filter { !PlayerManager.loadConfig(it).visibility }.forEach { set.add(it.name) }
-        return getTabList(args[args.size - 1], set)
+        return getTabList(args[args.size - 1], Bukkit.getOnlinePlayers().filter { !PlayerManager.loadConfig(it).visibility }.map { it.name })
     }
 }

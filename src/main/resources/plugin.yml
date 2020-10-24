@@ -84,6 +84,8 @@ commands:
   spec:
     description: Toggle Spectator Mode Command.
   sidebar:
+  ping:
+    description: Pong!
 
   script:
 
