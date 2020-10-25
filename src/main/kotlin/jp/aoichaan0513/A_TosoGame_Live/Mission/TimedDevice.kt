@@ -141,9 +141,14 @@ class TimedDevice {
 
                     override fun run() {
                         if (!GameManager.isGame(GameManager.GameState.GAME)) cancel()
-                        for (set in hashMap.filter { !clearedNumberSet.contains(it.key) && failedNumberSet.contains(it.key) }.values)
-                            for (player in getPlayers(set))
-                                player.world.playSound(player.location, Sound.BLOCK_ANVIL_LAND, SoundCategory.RECORDS, 1f, 1f)
+                        for (set in hashMap.filter { !clearedNumberSet.contains(it.key) && failedNumberSet.contains(it.key) }.values) {
+                            for (player in MainAPI.getOnlinePlayers(set)) {
+                                if (player.isPlayerGroup && !player.hasPotionEffect(PotionEffectType.INVISIBILITY))
+                                    player.world.playSound(player.location, Sound.BLOCK_ANVIL_LAND, SoundCategory.RECORDS, 1f, 1f)
+                                else
+                                    player.stopSound(Sound.BLOCK_ANVIL_LAND, SoundCategory.RECORDS)
+                            }
+                        }
                     }
                 }.runTaskTimer(Main.pluginInstance, 0, 20)
             }
@@ -155,9 +160,10 @@ class TimedDevice {
                     Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}時限装置解除ミッションが終了しました。")
                     for (set in hashMap.filter { !clearedNumberSet.contains(it.key) }.values) {
                         for (player in getPlayers(set)) {
+                            // ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}時限装置を解除するには同じ番号のカードキーを利用して装置を解除してください。
                             player.sendMessage("""
                                 ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}あなたは時限装置を解除していないため位置情報がハンターに通知されました。
-                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}時限装置を解除するには同じ番号のカードキーを利用して装置を解除してください。
+                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ミッション終了後、1分間は鳴り続けます。
                             """.trimIndent())
                         }
                     }
@@ -170,9 +176,14 @@ class TimedDevice {
                         override fun run() {
                             if (c < 1) cancel()
                             if (!GameManager.isGame(GameManager.GameState.GAME)) cancel()
-                            for (set in hashMap.filter { !clearedNumberSet.contains(it.key) }.values)
-                                for (player in getPlayers(set))
-                                    player.world.playSound(player.location, Sound.BLOCK_ANVIL_LAND, SoundCategory.RECORDS, 1f, 1f)
+                            for (set in hashMap.filter { !clearedNumberSet.contains(it.key) }.values) {
+                                for (player in MainAPI.getOnlinePlayers(set)) {
+                                    if (player.isPlayerGroup && !player.hasPotionEffect(PotionEffectType.INVISIBILITY))
+                                        player.world.playSound(player.location, Sound.BLOCK_ANVIL_LAND, SoundCategory.RECORDS, 1f, 1f)
+                                    else
+                                        player.stopSound(Sound.BLOCK_ANVIL_LAND, SoundCategory.RECORDS)
+                                }
+                            }
                             c--
                         }
                     }.runTaskTimer(Main.pluginInstance, 0, 20)
