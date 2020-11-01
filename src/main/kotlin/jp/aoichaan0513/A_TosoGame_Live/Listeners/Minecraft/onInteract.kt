@@ -390,9 +390,9 @@ class onInteract : Listener {
 
                                         val inv = p.inventory
                                         inv.removeItem(ItemStack(Material.STONE_PRESSURE_PLATE, 1))
-                                        return
                                     }
                                 }
+                                return
                             } else if (p.isJailTeam) {
                                 if (p.inventory.itemInMainHand.type == Material.ENDER_PEARL) {
                                     e.isCancelled = true

@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        kotlinVersion = '1.4.0'
+        kotlinVersion = '1.4.10'
         kotlinLanguageVersion = '1.4'
         kotlinApiVersion = '1.4'
         spigotVersion = '1.15.2-R0.1-SNAPSHOT'

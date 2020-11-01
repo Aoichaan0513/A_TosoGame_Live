@@ -272,7 +272,7 @@ class MissionManager {
                             var i = 10
 
                             override fun run() {
-                                if (i < 0) cancel()
+                                if (i < 0 || !isMission(result)) cancel()
 
                                 bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
 
