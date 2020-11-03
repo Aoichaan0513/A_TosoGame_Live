@@ -44,7 +44,7 @@ class TimedDevice {
             val lastResult = mutableSetOf<Int>()
 
             for (list in divideList) {
-                val result = (1..30).filter { !lastResult.contains(it) }.shuffled().first()
+                val result = "%02d".format((1..30).filter { !lastResult.contains(it) }.shuffled().first()).toInt()
                 hashMap[result] = list.toSet()
                 lastResult.add(result)
 
