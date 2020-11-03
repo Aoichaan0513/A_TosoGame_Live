@@ -36,7 +36,6 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerAnimationEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
@@ -380,8 +379,12 @@ class onInteract : Listener {
                                                 }
                                             }
                                         }
-                                    } else if (p.inventory.itemInMainHand.type == Material.STONE_PRESSURE_PLATE || p.inventory.itemInOffHand.type == Material.STONE_PRESSURE_PLATE
+                                    }
+                                    /*
+                                    else if (p.inventory.itemInMainHand.type == Material.STONE_PRESSURE_PLATE || p.inventory.itemInOffHand.type == Material.STONE_PRESSURE_PLATE
                                             && clickedBlock.type == Material.GOLD_BLOCK) {
+                                        p.sendMessage(clickedBlock.type.toString())
+
                                         if (!MissionManager.isMission(MissionManager.MissionState.AREA_EXTEND)) return
 
                                         val loc = clickedBlock.location.clone()
@@ -391,6 +394,7 @@ class onInteract : Listener {
                                         val inv = p.inventory
                                         inv.removeItem(ItemStack(Material.STONE_PRESSURE_PLATE, 1))
                                     }
+                                    */
                                 }
                                 return
                             } else if (p.isJailTeam) {
