@@ -9,8 +9,7 @@ buildscript {
 
         charSet = 'UTF-8'
 
-        projectChannel = 'Dev'
-        projectVersion = '2.0.0'
+        projectVersion = '2.1.0'
         projectBuildDate = new Date().format('yy.MMdd.HHmm')
     }
 
@@ -31,7 +30,7 @@ plugins {
 apply plugin: 'kotlin'
 
 group = 'jp.aoichaan0513'
-version = "$projectChannel-${projectVersion}_$projectBuildDate"
+version = "${projectVersion}_$projectBuildDate"
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
@@ -98,7 +97,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 processResources {
     from(sourceSets.main.resources.srcDirs) {
-        filter ReplaceTokens, tokens: ['version': new String("$projectChannel-$projectVersion"), 'projectChannel': projectChannel, 'projectVersion': projectVersion, 'projectBuildDate': projectBuildDate]
+        filter ReplaceTokens, tokens: ['version': projectVersion, 'projectVersion': projectVersion, 'projectBuildDate': projectBuildDate]
     }
 }
 

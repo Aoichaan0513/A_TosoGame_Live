@@ -23,7 +23,6 @@ import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.*
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
-import jp.aoichaan0513.A_TosoGame_Live.Utils.HttpConnection
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import net.dv8tion.jda.api.JDA
@@ -37,13 +36,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.PotionEffectType
-import org.json.JSONObject
-import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
+import java.io.File
 import java.nio.file.FileSystems
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.text.DecimalFormat
 import java.util.*
 
@@ -75,7 +69,6 @@ class Main : JavaPlugin(), Listener {
         // プレイヤーが座るときの矢のリスト
         val arrowSet = mutableSetOf<Arrow>()
 
-        val projectChannel = ResourceBundle.getBundle("settings").getString("projectChannel")
         val projectVersion = ResourceBundle.getBundle("settings").getString("projectVersion")
         val projectBuildDate = ResourceBundle.getBundle("settings").getString("projectBuildDate")
 
@@ -359,103 +352,6 @@ class Main : JavaPlugin(), Listener {
                 .setStatus(OnlineStatus.ONLINE)
                 .addEventListeners(onMessage())
                 .build()
-    }
-
-
-    private fun download() {
-        val urlStr = "https://incha.work/services/files/plugins/org/aoichaan0513/a_tosogame_live/"
-        val strPostUrl = "${urlStr}api"
-        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}更新を確認しています…")
-        val jsonObject = JSONObject(HttpConnection(strPostUrl, "{\"channel\":\"$projectChannel\", \"current\":\"$projectVersion\"}").result)
-
-        if (jsonObject.getBoolean("result")) {
-            Bukkit.getConsoleSender().sendMessage("""
-                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}更新が見つかりました。
-                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}プラグインチャンネル: $projectChannel
-                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}現在のバージョン: $projectVersion
-                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}最新のバージョン: ${jsonObject.getString("latest")}
-                ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}最新のバージョンをダウンロードしています…
-            """.trimIndent())
-            try {
-                val url = URL("$urlStr${jsonObject.getString("file")}")
-                val conn = url.openConnection() as HttpURLConnection
-                conn.allowUserInteraction = false
-                conn.instanceFollowRedirects = true
-                conn.requestMethod = "GET"
-                conn.connect()
-
-                val httpStatusCode = conn.responseCode
-                if (httpStatusCode == HttpURLConnection.HTTP_OK) {
-                    // Input Stream
-                    val dataInStream = DataInputStream(conn.inputStream)
-
-                    // Output Stream
-                    val dataOutStream = DataOutputStream(BufferedOutputStream(FileOutputStream("$dataFolder${FILE_SEPARATOR}updates${FILE_SEPARATOR}${jsonObject.getString("file")}")))
-
-                    // Read Data
-                    val b = ByteArray(4096)
-                    var readByte: Int
-                    while (-1 != dataInStream.read(b).also { readByte = it })
-                        dataOutStream.write(b, 0, readByte)
-
-                    // Close Stream
-                    dataInStream.close()
-                    dataOutStream.close()
-
-                    Bukkit.getConsoleSender().sendMessage("""
-                        ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}最新のバージョンをダウンロードしました。
-                        ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}プラグインを最新のバージョンに置き換えています…
-                    """.trimIndent())
-
-                    try {
-                        val sourcePath = Paths.get("$dataFolder${FILE_SEPARATOR}updates${FILE_SEPARATOR}${jsonObject.getString("file")}")
-                        val targetPath = Paths.get("${server.worldContainer.absolutePath}${FILE_SEPARATOR}plugins${FILE_SEPARATOR}${jsonObject.getString("file")}")
-                        Files.move(sourcePath, targetPath)
-                        Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}最新のバージョンを移動しました。")
-                        try {
-                            val targetPath2 = Paths.get("${server.worldContainer.absolutePath}${FILE_SEPARATOR}plugins${FILE_SEPARATOR}A_TosoGame_Live-${description.version}.jar")
-                            if (Files.deleteIfExists(targetPath2)) {
-                                Bukkit.getConsoleSender().sendMessage("""
-                                    ${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}現在のバージョンを削除しました。
-                                    ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}サーバーを再起動しています…
-                                """.trimIndent())
-                                server.reload()
-                            } else {
-                                Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}サーバーを再起動しています…")
-                                server.reload()
-                            }
-                        } catch (e: IOException) {
-                            Bukkit.getConsoleSender().sendMessage("""
-                                ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}更新に失敗しました。以前のバージョンのプラグインを削除できませんでした。
-                                ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}詳細は下記のエラーログを確認してください。
-                            """.trimIndent())
-                            e.printStackTrace()
-                            return
-                        }
-                    } catch (e: IOException) {
-                        Bukkit.getConsoleSender().sendMessage("""
-                            ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}更新に失敗しました。プラグインの移動に失敗しました。
-                            ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}詳細は下記のエラーログを確認してください。
-                        """.trimIndent())
-                        e.printStackTrace()
-                        return
-                    }
-                } else {
-                    Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}更新に失敗しました。サーバーへのアクセスに失敗しました。")
-                    return
-                }
-            } catch (e: Exception) {
-                Bukkit.getConsoleSender().sendMessage("""
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}更新に失敗しました。予期しないエラーが発生しました。
-                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}詳細は下記のエラーログを確認してください。
-                """.trimIndent())
-                e.printStackTrace()
-                return
-            }
-        } else {
-            Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}更新はありませんでした。")
-            return
-        }
     }
 
 
