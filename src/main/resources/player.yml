@@ -1,11 +1,32 @@
+# 前回変更した難易度
+difficulty: 1
+
+# Discord ID (連携用)
+discordId: 0
+
 # 所持金
 money: 0
 
 # 「/leave」で運営チームに参加できるか
 hasPermission: false
-
 # 配信者モードか
 isBroadCaster: false
+# 「/disappear」で姿を非表示にしたか
+isVisibility: false
+
+# 本のベース文字色
+bookForegroundColor: "black"
+
+# アイテム配置
+inventory:
+  map: 40
+  book: 3
+  bone: 0
+  feather: 1
+  egg: 2
+  snowball: 4
+  rabbit_foot: 5
+  slime_ball: 6
 
 # 付与されている進捗
 advancements: []

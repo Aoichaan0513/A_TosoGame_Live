@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/A_TosoGame_Live.iml" filepath="$PROJECT_DIR$/.idea/A_TosoGame_Live.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/A_TosoGame_Live.main.iml" filepath="$PROJECT_DIR$/.idea/modules/A_TosoGame_Live.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/A_TosoGame_Live.test.iml" filepath="$PROJECT_DIR$/.idea/modules/A_TosoGame_Live.test.iml" />
+    </modules>
+  </component>
+</project>

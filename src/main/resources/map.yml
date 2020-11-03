@@ -43,8 +43,8 @@ difficulty:
     health: false
     rate: 100
     respawn:
-      auto: 90
       count: 10
+      autoTime: 90
       coolTime: 0
     item:
       start:
@@ -69,9 +69,9 @@ difficulty:
     health: true
     rate: 200
     respawn:
-      auto: 120
       count: 7
-      coolTime: 60
+      autoTime: 120
+      coolTime: 0
     item:
       start:
         bone:
@@ -95,9 +95,9 @@ difficulty:
     health: true
     rate: 300
     respawn:
-      auto: -1
       count: 3
-      coolTime: 90
+      autoTime: -1
+      coolTime: 60
     item:
       start:
         bone:
@@ -121,9 +121,9 @@ difficulty:
     health: true
     rate: 400
     respawn:
-      auto: -1
       count: 1
-      coolTime: 300
+      autoTime: -1
+      coolTime: 90
     item:
       start:
         bone:
