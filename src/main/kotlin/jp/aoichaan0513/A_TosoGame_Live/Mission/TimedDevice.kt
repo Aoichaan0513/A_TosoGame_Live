@@ -44,14 +44,14 @@ class TimedDevice {
             val lastResult = mutableSetOf<Int>()
 
             for (list in divideList) {
-                val result = "%02d".format((1..30).filter { !lastResult.contains(it) }.shuffled().first()).toInt()
+                val result = (1..30).filter { !lastResult.contains(it) }.shuffled().first()
                 hashMap[result] = list.toSet()
                 lastResult.add(result)
 
                 val itemStack = ItemStack(Material.PAPER, 1)
                 val itemMeta = itemStack.itemMeta!!
                 itemMeta.addItemFlags(*ItemUtil.itemFlags)
-                itemMeta.setCustomModelData("10$result".toInt())
+                itemMeta.setCustomModelData("10${if (result < 10) "0$result" else result}".toInt())
                 itemMeta.setDisplayName(ItemUtil.getItemName("【$result】 カードキー"))
                 itemMeta.lore = listOf(
                         "${ChatColor.YELLOW}${result}番のカードキーだ。",
