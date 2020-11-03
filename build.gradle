@@ -1,11 +1,13 @@
 buildscript {
     ext {
         kotlinVersion = '1.4.10'
-        kotlinLanguageVersion = '1.4'
-        kotlinApiVersion = '1.4'
         spigotVersion = '1.15.2-R0.1-SNAPSHOT'
 
         javaVersion = JavaVersion.VERSION_1_8
+        kotlinLanguageVersion = '1.4'
+        kotlinApiVersion = '1.4'
+
+        charSet = 'UTF-8'
 
         projectChannel = 'Dev'
         projectVersion = '2.0.0'
@@ -69,10 +71,10 @@ dependencies {
     compileOnly group: 'org.spigotmc', name: 'spigot-api', version: spigotVersion
     compileOnly files('libs/Spigot-1.15.2.jar')
 
-    implementation group: 'com.github.WesJD', name: 'AnvilGUI', version: '-SNAPSHOT'
+    implementation group: 'com.github.WesJD.AnvilGUI', name: 'anvilgui', version: 'master-SNAPSHOT'
 
     // Discord
-    implementation group: 'net.dv8tion', name: 'JDA', version: '4.2.0_208'
+    implementation group: 'net.dv8tion', name: 'JDA', version: '4.2.0_214'
 
     // データ管理用ライブラリ
     implementation group: 'org.json', name: 'json', version: '20190722'
@@ -100,10 +102,10 @@ processResources {
     }
 }
 
-compileJava.options.encoding = 'UTF-8'
-compileTestJava.options.encoding = 'UTF-8'
+compileJava.options.encoding = charSet
+compileTestJava.options.encoding = charSet
 tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+    options.encoding = charSet
 }
 
 sourceSets {
