@@ -35,7 +35,6 @@ class onInventory : Listener {
 
         if (!p.isAdminTeam) {
             if (p.isPlayerGroup || p.isJailTeam) {
-                // p.sendMessage("スロット番号: ${e.rawSlot}, ${e.slot}")
                 if (slotType == InventoryType.SlotType.CRAFTING) {
                     e.result = Event.Result.DENY
                     e.isCancelled = true
