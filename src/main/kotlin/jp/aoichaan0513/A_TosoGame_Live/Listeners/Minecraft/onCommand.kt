@@ -27,9 +27,6 @@ class onCommand : Listener {
 
         val cmdName = if (msg.split(" ")[0].split(":").size > 1) msg.split(" ")[0].split(":")[1] else msg.split(" ")[0].substring(1)
 
-        if (!TosoGameAPI.isAdmin(p))
-            p.sendMessage("${ChatColor.GRAY}> ${p.name}: ${msg}")
-
         val textComponent1 = TextComponent("${ChatColor.GRAY}> ${p.name}: ")
         val textComponent2 = TextComponent(msg)
         textComponent2.color = net.md_5.bungee.api.ChatColor.GRAY
@@ -37,9 +34,9 @@ class onCommand : Listener {
         textComponent2.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, ComponentBuilder("${ChatColor.GRAY}${ChatColor.BOLD}クリックでコマンドをチャット欄に入力します。").create())
         textComponent1.addExtra(textComponent2)
 
-        for (player in Bukkit.getOnlinePlayers())
-            if (TosoGameAPI.isAdmin(player))
-                player.spigot().sendMessage(textComponent1)
+        Bukkit.getOnlinePlayers().filter { TosoGameAPI.isAdmin(it) }.forEach {
+            it.spigot().sendMessage(textComponent1)
+        }
 
         if (set.contains("/$cmdName")) {
             if (TosoGameAPI.isAdmin(p)) return
