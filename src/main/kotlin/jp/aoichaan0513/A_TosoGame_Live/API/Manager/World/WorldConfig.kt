@@ -9,6 +9,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.DifficultyManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ParseUtil
+import jp.aoichaan0513.A_TosoGame_Live.Utils.toString
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -142,7 +143,7 @@ class WorldConfig(val world: World) {
         val authors: String
             get() {
                 val path = "$PATH.authors"
-                return if (c.contains(path) && c.getStringList(path).isNotEmpty()) c.getStringList(path).toString() else "未設定"
+                return c.getStringList(path).toString({ it }, "未設定")
             }
 
         val icon: Material

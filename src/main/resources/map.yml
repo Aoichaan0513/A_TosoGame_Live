@@ -3,7 +3,7 @@ map:
   name: Untitled
   description: No description.
   version: 1.0
-  author: []
+  authors: [ ]
 
 # ゲームの基本設定
 game:
