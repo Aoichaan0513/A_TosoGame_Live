@@ -18,7 +18,7 @@ import org.bukkit.entity.Player
 class H(name: String) : ICommand(name) {
 
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
-        if (Team.isHunterRandom || !sp.isHunterGroup) {
+        if (Team.isHunterRandom && !sp.isHunterGroup) {
             if (GameManager.isGame(GameState.GAME)) {
                 if (sp.isJailTeam) {
                     if (!Main.hunterShuffleSet.contains(sp.uniqueId)) Main.hunterShuffleSet.add(sp.uniqueId) else Main.hunterShuffleSet.remove(sp.uniqueId)
