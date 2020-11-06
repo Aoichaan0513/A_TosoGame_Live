@@ -16,18 +16,32 @@ import org.bukkit.GameMode
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
 import org.bukkit.command.ConsoleCommandSender
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.MagmaCube
 import org.bukkit.entity.Player
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 class Btp(name: String) : ICommand(name) {
     override fun onPlayerCommand(sp: Player, cmd: Command, label: String, args: Array<String>) {
         if (TosoGameAPI.isAdmin(sp)) {
             if (!GameManager.isGame()) {
-                val loc = onInteract.successBlockLoc
+                val loc = onInteract.successBlockLoc?.clone()?.add(0.5, 0.0, 0.5)
                 if (loc != null) {
-                    val l = loc.add(0.5, 0.0, 0.5)
+                    val world = loc.world
+                    loc.yaw = 0f
+                    loc.pitch = 0f
+                    val magmaCube = world?.spawnEntity(loc, EntityType.MAGMA_CUBE) as? MagmaCube
+                    magmaCube?.setAI(false)
+                    magmaCube?.setGravity(false)
+                    magmaCube?.isInvulnerable = true
+                    magmaCube?.isGlowing = true
+                    magmaCube?.size = 2
+                    magmaCube?.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 9999, 255, false, false))
+
                     for (p in Bukkit.getOnlinePlayers().filter { !it.isAdminTeam }) {
                         p.gameMode = GameMode.SPECTATOR
-                        TosoGameAPI.teleport(p, l)
+                        TosoGameAPI.teleport(p, loc)
                     }
                     sp.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${Bukkit.getOnlinePlayers().size - Teams.getOnlineCount(OnlineTeam.TOSO_ADMIN)}人${ChatColor.RESET}${ChatColor.GRAY}を生存ブロックの位置にテレポートしました。")
                     return

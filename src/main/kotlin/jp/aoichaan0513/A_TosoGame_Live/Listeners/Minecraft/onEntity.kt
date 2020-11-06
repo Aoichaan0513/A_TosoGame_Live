@@ -16,6 +16,8 @@ import org.bukkit.potion.PotionEffectType
 
 class onEntity : Listener {
 
+    val entities = setOf(EntityType.ZOMBIE, EntityType.ARMOR_STAND, EntityType.VILLAGER, EntityType.MAGMA_CUBE)
+
     @EventHandler
     fun onEntityBreakDoor(e: EntityBreakDoorEvent) {
         if (e.entityType != EntityType.PLAYER)
@@ -49,7 +51,7 @@ class onEntity : Listener {
 
     @EventHandler
     fun onEntitySpawn(e: CreatureSpawnEvent) {
-        if (e.location.world !== WorldManager.world || e.entityType == EntityType.ZOMBIE || e.entityType == EntityType.ARMOR_STAND || e.entityType == EntityType.VILLAGER) return
+        if (e.location.world !== WorldManager.world || entities.contains(e.entityType)) return
         e.isCancelled = true
     }
 
