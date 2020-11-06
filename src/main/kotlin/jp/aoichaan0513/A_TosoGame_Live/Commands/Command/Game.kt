@@ -208,7 +208,7 @@ class Game(name: String) : ICommand(name) {
             MoneyManager.resetReward()
             MoneyManager.resetRate()
 
-            WorldManager.world.entities.filter { it.type == EntityType.ZOMBIE }.forEach { it.remove() }
+            WorldManager.world.entities.filter { it.type == EntityType.ZOMBIE || it.type == EntityType.MAGMA_CUBE }.forEach { it.remove() }
             worldConfig.hunterDoorConfig.closeHunterDoors()
 
             onInventory.isAllowOpen = false
@@ -235,11 +235,11 @@ class Game(name: String) : ICommand(name) {
                         player.gameMode = GameMode.ADVENTURE
 
                         player.teleport(worldConfig.respawnLocationConfig.getLocation(1))
-                    }
 
-                    player.closeInventory()
-                    TosoGameAPI.setItem(WorldManager.GameType.START, player)
-                    TosoGameAPI.setPotionEffect(player)
+                        player.closeInventory()
+                        TosoGameAPI.setItem(WorldManager.GameType.START, player)
+                        TosoGameAPI.setPotionEffect(player)
+                    }
 
                     player.walkSpeed = 0.2f
                     player.health = 20.0
