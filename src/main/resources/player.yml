@@ -29,4 +29,4 @@ inventory:
   slime_ball: 6
 
 # 付与されている進捗
-advancements: []
+advancements: [ ]

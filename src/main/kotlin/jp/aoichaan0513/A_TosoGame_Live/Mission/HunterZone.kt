@@ -3,7 +3,8 @@ package jp.aoichaan0513.A_TosoGame_Live.Mission
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTimeUtil
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.apache.commons.lang.RandomStringUtils
@@ -212,7 +213,7 @@ class HunterZone {
                     MissionManager.endMission(MissionManager.MissionState.HUNTER_ZONE)
                     endMission()
                 } else if (missionTime == 60) {
-                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッション終了まで残り${TimeFormat.formatMin(missionTime)}分")
+                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターゾーンミッション終了まで残り${DateTimeUtil.formatTimestamp(missionTime).rawMinutes}分")
                 }
             }
         }

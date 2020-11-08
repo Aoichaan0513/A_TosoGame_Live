@@ -16,7 +16,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Mission.TimedDevice
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.*
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+
 import net.wesjd.anvilgui.AnvilGUI
 import org.bukkit.*
 import org.bukkit.block.BlockFace
@@ -109,7 +109,7 @@ class onInteract : Listener {
                     } else {
                         // TosoGameAPI.teleport(p, worldConfig.jailLocationConfig.locations.values)
                         p.gameMode = GameMode.ADVENTURE
-                        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ゲーム終了まで残り${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(worldConfig.gameConfig.respawnDeny)}以下${ChatColor.RESET}${ChatColor.GRAY}になったため復活できません。")
+                        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ゲーム終了まで残り${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(worldConfig.gameConfig.respawnDeny).toJapan}以下${ChatColor.RESET}${ChatColor.GRAY}になったため復活できません。")
                         return
                     }
                 }

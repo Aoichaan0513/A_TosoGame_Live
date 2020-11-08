@@ -95,7 +95,7 @@ object RomajiConverter {
         }
     }
 
-    private class HiraganaConverter internal constructor(source: String) {
+    private class HiraganaConverter(source: String) {
 
         private val buffer = StringBuilder()
         private val dest = StringBuilder()

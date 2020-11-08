@@ -22,21 +22,21 @@ opgame:
 
 # 位置設定
 location:
-  opgame: {}
-  gopgame: {}
-  respawn: {}
-  hunter: {}
-  jail: {}
+  opgame: { }
+  gopgame: { }
+  respawn: { }
+  hunter: { }
+  jail: { }
 
 # ドア設定
 door:
-  hunter: {}
+  hunter: { }
 
 # ボーダー設定
 border:
-  map: {}
-  opgame: {}
-  hunterzone: {}
+  map: { }
+  opgame: { }
+  hunterzone: { }
 
 difficulty:
   easy:

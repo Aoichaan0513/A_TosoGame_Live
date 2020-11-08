@@ -25,11 +25,8 @@ import jp.aoichaan0513.A_TosoGame_Live.Inventory.MapInventory.ActionType
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
-import jp.aoichaan0513.A_TosoGame_Live.Utils.ParseUtil
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
+import jp.aoichaan0513.A_TosoGame_Live.Utils.*
+
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -554,7 +551,7 @@ class onInventoryGui : Listener {
                             if (ParseUtil.isInt(reply)) {
                                 val i = reply.toInt()
                                 worldConfig.gameConfig.countDown = i
-                                player.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}カウントダウン" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(i) + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。")
+                                player.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}カウントダウン" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + DateTimeUtil.formatTimestamp(i).toJapan + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。")
                                 player.openInventory(MapInventory.editInventory)
                             } else {
                                 MainAPI.sendMessage(player, ErrorMessage.ARGS_INTEGER)
@@ -567,7 +564,7 @@ class onInventoryGui : Listener {
                             if (ParseUtil.isInt(reply)) {
                                 val i = reply.toInt()
                                 worldConfig.gameConfig.game = i
-                                player.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}ゲーム時間" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(i) + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。")
+                                player.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}ゲーム時間" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + DateTimeUtil.formatTimestamp(i).toJapan + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。")
                                 player.openInventory(MapInventory.editInventory)
                             } else {
                                 MainAPI.sendMessage(player, ErrorMessage.ARGS_INTEGER)
@@ -580,7 +577,7 @@ class onInventoryGui : Listener {
                             if (ParseUtil.isInt(reply)) {
                                 val i = reply.toInt()
                                 worldConfig.gameConfig.respawnDeny = i
-                                player.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}復活禁止時間" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(i) + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。")
+                                player.sendMessage("${MainAPI.getPrefix(PrefixType.WARNING)}復活禁止時間" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + DateTimeUtil.formatTimestamp(i).toJapan + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。")
                                 player.openInventory(MapInventory.editInventory)
                             } else {
                                 MainAPI.sendMessage(player, ErrorMessage.ARGS_INTEGER)
@@ -659,7 +656,7 @@ class onInventoryGui : Listener {
                                 val i = reply.toInt()
                                 if (i > 0) {
                                     worldConfig.opGameLocationConfig.setGOPLocation(i, p.location)
-                                    player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}オープニングゲーム集合地点の位置" + i + "を設定しました。")
+                                    player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}オープニングゲーム集合地点の位置${i}を設定しました。")
                                     player.openInventory(MapInventory.editInventory)
                                 } else {
                                     player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。1以上で数字を指定してください。")
@@ -677,7 +674,7 @@ class onInventoryGui : Listener {
                                 val i = reply.toInt()
                                 if (i > 0) {
                                     worldConfig.hunterLocationConfig.setLocation(i, p.location)
-                                    player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンター集合地点の位置" + i + "を設定しました。")
+                                    player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンター集合地点の位置${i}を設定しました。")
                                     player.openInventory(MapInventory.editInventory)
                                 } else {
                                     player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。1以上で数字を指定してください。")
@@ -695,7 +692,7 @@ class onInventoryGui : Listener {
                                 val i = reply.toInt()
                                 if (i > 0) {
                                     worldConfig.jailLocationConfig.setLocation(i, p.location)
-                                    player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}牢獄地点の位置" + i + "を設定しました。")
+                                    player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}牢獄地点の位置${i}を設定しました。")
                                     player.openInventory(MapInventory.editInventory)
                                 } else {
                                     player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。1以上で数字を指定してください。")
@@ -713,7 +710,7 @@ class onInventoryGui : Listener {
                                 val i = reply.toInt()
                                 if (i > 0) {
                                     worldConfig.respawnLocationConfig.setLocation(i, p.location)
-                                    player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}復活地点の位置" + i + "を設定しました。")
+                                    player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}復活地点の位置${i}を設定しました。")
                                     player.openInventory(MapInventory.editInventory)
                                 } else {
                                     player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}引数が不正です。1以上で数字を指定してください。")
@@ -742,25 +739,25 @@ class onInventoryGui : Listener {
                     } else if (slot == 6 && itemStack!!.type == Material.PAPER) {
                         val i = 30
                         worldConfig.opGameConfig.diceCount = i
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}サイコロの最大数を" + i + "に設定しました。")
+                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}サイコロの最大数を${i}に設定しました。")
                         p.openInventory(MapInventory.editInventory)
                         return
                     } else if (slot == 19 && itemStack!!.type == Material.PAPER) {
                         val i = 15
                         worldConfig.gameConfig.countDown = i
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}カウントダウン秒数を" + TimeFormat.formatJapan(i) + "に設定しました。")
+                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}カウントダウン秒数を${DateTimeUtil.formatTimestamp(i).toJapan}に設定しました。")
                         p.openInventory(MapInventory.editInventory)
                         return
                     } else if (slot == 20 && itemStack!!.type == Material.PAPER) {
                         val i = 1200
                         worldConfig.gameConfig.game = i
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ゲーム時間を" + TimeFormat.formatJapan(i) + "に設定しました。")
+                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ゲーム時間を${DateTimeUtil.formatTimestamp(i).toJapan}に設定しました。")
                         p.openInventory(MapInventory.editInventory)
                         return
                     } else if (slot == 21 && itemStack!!.type == Material.PAPER) {
                         val i = 240
                         worldConfig.gameConfig.respawnDeny = i
-                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}復活禁止時間を" + TimeFormat.formatJapan(i) + "に設定しました。")
+                        p.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}復活禁止時間を${DateTimeUtil.formatTimestamp(i).toJapan}に設定しました。")
                         p.openInventory(MapInventory.editInventory)
                         return
                     } else if (slot == 23 && (itemStack!!.type == Material.RED_CONCRETE || itemStack.type == Material.LIME_CONCRETE)) {
@@ -814,10 +811,10 @@ class onInventoryGui : Listener {
                                 if (i > 0) {
                                     if (worldConfig.config.contains(WorldManager.PathType.LOCATION_GOPGAME.path + ".p" + i)) {
                                         player.teleport(worldConfig.opGameLocationConfig.getGOPLocation(i))
-                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}オープニングゲーム集合地点の位置" + i + "にテレポートしました。")
+                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}オープニングゲーム集合地点の位置${i}にテレポートしました。")
                                         player.openInventory(MapInventory.editInventory)
                                     } else {
-                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}オープニングゲーム集合地点の位置" + i + "は設定されていないためテレポートすることができません。")
+                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}オープニングゲーム集合地点の位置${i}は設定されていないためテレポートすることができません。")
                                         player.openInventory(MapInventory.editInventory)
                                     }
                                 } else {
@@ -837,10 +834,10 @@ class onInventoryGui : Listener {
                                 if (i > 0) {
                                     if (worldConfig.config.contains(WorldManager.PathType.LOCATION_HUNTER.path + ".p" + i)) {
                                         player.teleport(worldConfig.hunterLocationConfig.getLocation(i))
-                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンター集合地点の位置" + i + "にテレポートしました。")
+                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンター集合地点の位置${i}にテレポートしました。")
                                         player.openInventory(MapInventory.editInventory)
                                     } else {
-                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ハンター集合地点の位置" + i + "は設定されていないためテレポートすることができません。")
+                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ハンター集合地点の位置${i}は設定されていないためテレポートすることができません。")
                                         player.openInventory(MapInventory.editInventory)
                                     }
                                 } else {
@@ -860,10 +857,10 @@ class onInventoryGui : Listener {
                                 if (i > 0) {
                                     if (worldConfig.config.contains(WorldManager.PathType.DOOR_HUNTER.path + ".p" + i)) {
                                         worldConfig.hunterDoorConfig.openHunterDoor(i)
-                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンターボックスのドア" + i + "を開きました。")
+                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}ハンターボックスのドア${i}を開きました。")
                                         player.openInventory(MapInventory.editInventory)
                                     } else {
-                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ハンターボックスのドア" + i + "は設定されていないため開くことができません。")
+                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}ハンターボックスのドア${i}は設定されていないため開くことができません。")
                                         player.openInventory(MapInventory.editInventory)
                                     }
                                 } else {
@@ -883,10 +880,10 @@ class onInventoryGui : Listener {
                                 if (i > 0) {
                                     if (worldConfig.config.contains(WorldManager.PathType.LOCATION_JAIL.path + ".p" + i)) {
                                         player.teleport(worldConfig.jailLocationConfig.getLocation(i))
-                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}牢獄地点の位置" + i + "にテレポートしました。")
+                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}牢獄地点の位置${i}にテレポートしました。")
                                         player.openInventory(MapInventory.editInventory)
                                     } else {
-                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}牢獄地点の位置" + i + "は設定されていないためテレポートすることができません。")
+                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}牢獄地点の位置${i}は設定されていないためテレポートすることができません。")
                                         player.openInventory(MapInventory.editInventory)
                                     }
                                 } else {
@@ -906,10 +903,10 @@ class onInventoryGui : Listener {
                                 if (i > 0) {
                                     if (worldConfig.config.contains(WorldManager.PathType.LOCATION_RESPAWN.path + ".p" + i)) {
                                         player.teleport(worldConfig.respawnLocationConfig.getLocation(i))
-                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}復活地点の位置" + i + "にテレポートしました。")
+                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.SUCCESS)}復活地点の位置${i}にテレポートしました。")
                                         player.openInventory(MapInventory.editInventory)
                                     } else {
-                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}復活地点の位置" + i + "は設定されていないためテレポートすることができません。")
+                                        player.sendMessage("${MainAPI.getPrefix(PrefixType.ERROR)}復活地点の位置${i}は設定されていないためテレポートすることができません。")
                                         player.openInventory(MapInventory.editInventory)
                                     }
                                 } else {
@@ -1038,7 +1035,7 @@ class onInventoryGui : Listener {
                 if (ParseUtil.isInt(reply)) {
                     val i = reply.toInt()
                     difficultyConfig.respawnCoolTime = i
-                    player.sendMessage(MainAPI.getPrefix(PrefixType.WARNING) + difficultyName + ChatColor.YELLOW + "の" + ChatColor.GOLD + "復活クールタイム" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + TimeFormat.formatJapan(i) + "/回" + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。")
+                    player.sendMessage(MainAPI.getPrefix(PrefixType.WARNING) + difficultyName + ChatColor.YELLOW + "の" + ChatColor.GOLD + "復活クールタイム" + ChatColor.RESET + ChatColor.YELLOW + "を" + ChatColor.GOLD + ChatColor.BOLD + ChatColor.UNDERLINE + DateTimeUtil.formatTimestamp(i).toJapan + "/回" + ChatColor.RESET + ChatColor.YELLOW + "に設定しました。")
                     player.openInventory(MapInventory.editInventory)
                 } else {
                     MainAPI.sendMessage(player, ErrorMessage.ARGS_INTEGER)

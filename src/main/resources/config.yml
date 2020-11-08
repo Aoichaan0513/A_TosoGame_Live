@@ -2,6 +2,12 @@
 # 逃走中で使用するワールド名を指定しないと、プラグインが正常に動作しません。
 worldName: "world"
 
+# リソースパック用
+resourcePack: "https://aoichaan0513.jp/private/TosoGame-DebugRP.zip"
+
+# デバッグモード
+isDebug: false
+
 # Discord連携用
 discordIntegration:
   enabled: false
@@ -9,8 +15,5 @@ discordIntegration:
   categoryId: 716563983959719968
   voiceChannelId: 716623948665716847
 
-# リソースパック用
-resourcePack: "https://aoichaan0513.jp/private/TosoGame-DebugRP.zip"
-
 # 設定ファイルのバージョンです。変更しないでください。
-version: 1.4
+version: 1.5

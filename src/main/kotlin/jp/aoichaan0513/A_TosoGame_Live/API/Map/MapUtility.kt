@@ -3,6 +3,7 @@ package jp.aoichaan0513.A_TosoGame_Live.API.Map
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig.BorderType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
 import jp.aoichaan0513.A_TosoGame_Live.Main
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DataClass
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Location

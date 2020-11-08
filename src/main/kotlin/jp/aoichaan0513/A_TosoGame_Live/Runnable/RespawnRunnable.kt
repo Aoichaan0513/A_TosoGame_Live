@@ -119,8 +119,6 @@ class RespawnRunnable : BukkitRunnable() {
         if (!GameManager.isGame(GameState.GAME) || !TosoGameAPI.isRespawn) return
 
         for (player in Bukkit.getOnlinePlayers().filter { it.isJailTeam && countMap.containsKey(it.uniqueId) }) {
-            // if (!Teams.hasJoinedTeam(OnlineTeam.TOSO_JAIL, player) || !countMap.containsKey(player.uniqueId)) continue
-
             val autoTime = autoTimeMap[player.uniqueId]
             val coolTime = coolTimeMap[player.uniqueId]
 
@@ -156,6 +154,7 @@ class RespawnRunnable : BukkitRunnable() {
                     autoTimeMap[player.uniqueId] = autoTime - 1
                 }
             }
+
             if (coolTime != null) {
                 if (coolTime < 1)
                     coolTimeMap.remove(player.uniqueId)

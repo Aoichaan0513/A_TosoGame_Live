@@ -3,7 +3,8 @@ package jp.aoichaan0513.A_TosoGame_Live.Mission
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.Main
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTimeUtil
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import org.bukkit.*
@@ -191,7 +192,7 @@ class TimedDevice {
                     MissionManager.endMission(MissionManager.MissionState.TIMED_DEVICE)
                     endMission()
                 } else if (missionTime == 60) {
-                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}時限装置解除ミッション終了まで残り${TimeFormat.formatMin(missionTime)}分")
+                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}時限装置解除ミッション終了まで残り${DateTimeUtil.formatTimestamp(missionTime).rawMinutes}分")
                 }
             }
 

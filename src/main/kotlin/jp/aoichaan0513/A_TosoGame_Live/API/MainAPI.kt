@@ -1,6 +1,7 @@
 package jp.aoichaan0513.A_TosoGame_Live.API
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
+import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -184,6 +185,11 @@ class MainAPI {
 
         fun sendOfflineMessage(sender: CommandSender, name: String) {
             sender.sendMessage("${getPrefix(PrefixType.ERROR)}引数が不正です。${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}$name${ChatColor.RESET}${ChatColor.RED}はオフラインです。")
+        }
+
+        fun sendDebugMessage(sender: CommandSender, message: String) {
+            if (!Main.isDebug) return
+            sender.sendMessage(message)
         }
 
         /**

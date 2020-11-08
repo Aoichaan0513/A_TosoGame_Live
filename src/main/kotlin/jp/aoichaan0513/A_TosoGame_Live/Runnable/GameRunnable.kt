@@ -19,7 +19,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Utils.*
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.HoverEvent
@@ -87,20 +87,21 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
 
             if (gameTime > 0) {
                 if (gameTime < 16) {
-                    Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム終了まで残り${TimeFormat.formatSec(gameTime)}秒")
+                    Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム終了まで残り${DateTimeUtil.formatTimestamp(gameTime).rawSeconds}秒")
                     for (player in Bukkit.getOnlinePlayers()) {
                         player.sendTitle("${ChatColor.DARK_RED}${ChatColor.BOLD}${gameTime}", "${ChatColor.GRAY}ゲーム終了まで", 20, 40, 20)
                         player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_SNARE, 1f, 1f)
                     }
                 }
 
+                val minutes = DateTimeUtil.formatTimestamp(gameTime).rawMinutes
                 if (gameTime % 60 == 0) {
-                    Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム終了まで残り${TimeFormat.formatMin(gameTime)}分")
+                    Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム終了まで残り${minutes}分")
                     for (p in Bukkit.getOnlinePlayers())
                         p.playSound(p.location, Sound.BLOCK_NOTE_BLOCK_SNARE, 1f, 1f)
                 }
 
-                if (TimeFormat.formatMin(gameTime) % 2 != 0 && gameTime % 30 == 0) {
+                if (minutes % 2 != 0 && gameTime % 30 == 0) {
                     for (player in Bukkit.getOnlinePlayers().filter { it.isJailTeam }) {
                         if (!TosoGameAPI.isRespawn) {
                             player.sendMessage("""
@@ -125,13 +126,13 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                 }
 
                 if (gameTime == respawnDenyTime) {
-                    Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.WARNING)}残り${TimeFormat.formatMin(respawnDenyTime)}分になったため途中参加・復活を禁止します。")
+                    Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.WARNING)}残り${DateTimeUtil.formatTimestamp(respawnDenyTime).rawMinutes}分になったため途中参加・復活を禁止します。")
                     for (p in Bukkit.getOnlinePlayers())
                         p.playSound(p.location, Sound.BLOCK_NOTE_BLOCK_SNARE, 1f, 1f)
                 }
             }
 
-            if (gameTime == 0 || Teams.getOnlineCount(OnlineTeam.TOSO_PLAYER) == 0) {
+            if (gameTime == 0 || !Main.isDebug && Teams.getOnlineCount(OnlineTeam.TOSO_PLAYER) == 0) {
                 // ゲーム時間が0になるか、逃走者が0人になった場合
                 if (worldConfig.gameConfig.successMission) {
                     // 生存ミッションが有効の場合
@@ -369,7 +370,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                     }
                 }
             } else if (countDown <= 5) {
-                Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム開始まで残り${TimeFormat.formatSec(countDown)}秒")
+                Bukkit.broadcastMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム開始まで残り${DateTimeUtil.formatTimestamp(countDown).rawSeconds}秒")
                 for (player in Bukkit.getOnlinePlayers()) {
                     player.sendTitle("${ChatColor.DARK_RED}${ChatColor.BOLD}${countDown}", "${ChatColor.GRAY}ゲーム開始まで", 20, 40, 20)
                     player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_SNARE, 1f, 1f)

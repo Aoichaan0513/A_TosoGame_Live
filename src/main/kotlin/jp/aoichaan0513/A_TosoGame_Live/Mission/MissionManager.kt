@@ -10,11 +10,8 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.onInteract
 import jp.aoichaan0513.A_TosoGame_Live.Main
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
-import jp.aoichaan0513.A_TosoGame_Live.Utils.color
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterGroup
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
+import jp.aoichaan0513.A_TosoGame_Live.Utils.*
+
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Bukkit
@@ -233,7 +230,7 @@ class MissionManager {
                                 bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
 
                                 val bossBar = createBossBar(
-                                        "${ChatColor.YELLOW}${ChatColor.BOLD}ハンターゾーンミッション終了まで${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.RESET}${TimeFormat.formatJapan(HunterZone.getMissionTime().toInt())}",
+                                        "${ChatColor.YELLOW}${ChatColor.BOLD}ハンターゾーンミッション終了まで${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.RESET}${DateTimeUtil.formatTimestamp(HunterZone.getMissionTime().toInt()).toJapan}",
                                         if (isMission(MissionState.HUNTER_ZONE)) HunterZone.getMissionTime() / (HunterZone.getInitialMissionTime() / 20) else 1.toDouble(),
                                         MissionState.HUNTER_ZONE.barColor,
                                         BarStyle.SOLID
@@ -255,7 +252,7 @@ class MissionManager {
                                 bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
 
                                 val bossBar = createBossBar(
-                                        "${ChatColor.YELLOW}${ChatColor.BOLD}時限装置解除ミッション終了まで${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.RESET}${TimeFormat.formatJapan(TimedDevice.getMissionTime().toInt())}",
+                                        "${ChatColor.YELLOW}${ChatColor.BOLD}時限装置解除ミッション終了まで${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.RESET}${DateTimeUtil.formatTimestamp(TimedDevice.getMissionTime().toInt()).toJapan}",
                                         if (isMission(MissionState.TIMED_DEVICE)) TimedDevice.getMissionTime() / (TimedDevice.getInitialMissionTime() / 20) else 1.toDouble(),
                                         MissionState.TIMED_DEVICE.barColor,
                                         BarStyle.SOLID
