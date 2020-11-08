@@ -1,5 +1,10 @@
 package jp.aoichaan0513.A_TosoGame_Live
 
+import com.comphenix.protocol.PacketType
+import com.comphenix.protocol.ProtocolLibrary
+import com.comphenix.protocol.events.PacketAdapter
+import com.comphenix.protocol.events.PacketEvent
+import com.comphenix.protocol.wrappers.EnumWrappers
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.ActionBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager
@@ -41,6 +46,7 @@ import java.nio.file.FileSystems
 import java.text.DecimalFormat
 import java.util.*
 
+
 class Main : JavaPlugin(), Listener {
 
     companion object {
@@ -68,6 +74,8 @@ class Main : JavaPlugin(), Listener {
 
         // プレイヤーが座るときの矢のリスト
         val arrowSet = mutableSetOf<Arrow>()
+
+        val tabListPlayerSet = mutableSetOf<UUID>()
 
         val projectVersion = ResourceBundle.getBundle("settings").getString("projectVersion")
         val projectBuildDate = ResourceBundle.getBundle("settings").getString("projectBuildDate")
@@ -175,6 +183,21 @@ class Main : JavaPlugin(), Listener {
 
         runTask()
         RespawnRunnable().runTaskTimer(pluginInstance, 0, 20)
+
+
+        ProtocolLibrary.getProtocolManager().addPacketListener(object : PacketAdapter(this, PacketType.Play.Server.PLAYER_INFO) {
+            override fun onPacketSending(e: PacketEvent) {
+                val p = e.player
+                val packet = e.packet
+
+                if (packet.playerInfoAction.read(0) != EnumWrappers.PlayerInfoAction.REMOVE_PLAYER)
+                    return
+
+                println("${p.name} -> ${tabListPlayerSet.contains(p.uniqueId)}")
+                if (tabListPlayerSet.contains(packet.playerInfoDataLists.read(0)[0].profile.uuid))
+                    e.isCancelled = true
+            }
+        })
 
         Bukkit.getConsoleSender().sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}プラグインを起動しました。")
     }
