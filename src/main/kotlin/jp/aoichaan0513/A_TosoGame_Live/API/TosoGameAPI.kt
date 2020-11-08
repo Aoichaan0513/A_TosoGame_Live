@@ -14,7 +14,6 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Utils.*
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
 import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -88,9 +87,9 @@ class TosoGameAPI {
                             val boneMeta = boneStack.itemMeta!!
                             boneMeta.setDisplayName(ItemUtil.getItemName("骨 (透明化)"))
                             boneMeta.lore = listOf(
-                                    "${ChatColor.YELLOW}クリックで${TimeFormat.formatSec(boneItem.duration)}秒間透明になります。",
+                                    "${ChatColor.YELLOW}クリックで${DateTimeUtil.formatTimestamp(boneItem.duration).rawSeconds}秒間透明になります。",
                                     "",
-                                    "${ChatColor.GREEN}${ChatColor.UNDERLINE}クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatSec(boneItem.duration + 5)}${ChatColor.GRAY}秒"
+                                    "${ChatColor.GREEN}${ChatColor.UNDERLINE}クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(boneItem.duration + 5).rawSeconds}${ChatColor.GRAY}秒"
                             )
                             boneStack.itemMeta = boneMeta
 
@@ -99,9 +98,9 @@ class TosoGameAPI {
                             val featherMeta = featherStack.itemMeta!!
                             featherMeta.setDisplayName(ItemUtil.getItemName("羽 (移動速度上昇)"))
                             featherMeta.lore = listOf(
-                                    "${ChatColor.YELLOW}クリックで${TimeFormat.formatSec(featherItem.duration)}秒間移動速度が上昇します。",
+                                    "${ChatColor.YELLOW}クリックで${DateTimeUtil.formatTimestamp(featherItem.duration).rawSeconds}秒間移動速度が上昇します。",
                                     "",
-                                    "${ChatColor.GREEN}${ChatColor.UNDERLINE}クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatSec(featherItem.duration + 5)}${ChatColor.GRAY}秒"
+                                    "${ChatColor.GREEN}${ChatColor.UNDERLINE}クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(featherItem.duration + 5).rawSeconds}${ChatColor.GRAY}秒"
                             )
                             featherStack.itemMeta = featherMeta
 

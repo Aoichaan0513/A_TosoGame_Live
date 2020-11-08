@@ -200,9 +200,11 @@ class Game(name: String) : ICommand(name) {
             OPGameManager.resetOPGame()
             MissionManager.resetMission()
 
-            for ((key) in MoneyManager.rewardMap) {
-                val playerConfig = PlayerManager.reloadConfig(key)
-                playerConfig.money = playerConfig.money + MoneyManager.getReward(key)
+            if (!Main.isDebug) {
+                for (uuid in MoneyManager.rewardMap.keys) {
+                    val playerConfig = PlayerManager.reloadConfig(uuid)
+                    playerConfig.money = playerConfig.money + MoneyManager.getReward(uuid)
+                }
             }
 
             MoneyManager.resetReward()

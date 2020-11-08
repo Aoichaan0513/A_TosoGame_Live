@@ -11,7 +11,8 @@ import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.ICommand
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.GameRunnable
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTimeUtil
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ParseUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -55,8 +56,8 @@ class Toso(name: String) : ICommand(name) {
                                     val i = args[2].toInt()
                                     GameRunnable.addGameTime(i)
                                     sp.sendMessage("""
-                                        ${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を${ChatColor.GREEN}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(GameRunnable.gameTime)}${ChatColor.RESET}${ChatColor.GRAY}に設定しました。
-                                        ${MainAPI.getPrefix(PrefixType.SECONDARY)}${TimeFormat.formatJapan(i)}追加
+                                        ${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を${ChatColor.GREEN}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(GameRunnable.gameTime).toJapan}${ChatColor.RESET}${ChatColor.GRAY}に設定しました。
+                                        ${MainAPI.getPrefix(PrefixType.SECONDARY)}${DateTimeUtil.formatTimestamp(i).toJapan}追加
                                     """.trimIndent())
                                     return
                                 } else {
@@ -72,8 +73,8 @@ class Toso(name: String) : ICommand(name) {
                                     val i = args[2].toInt()
                                     GameRunnable.removeGameTime(i)
                                     sp.sendMessage("""
-                                        ${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を${ChatColor.GREEN}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(GameRunnable.gameTime)}${ChatColor.RESET}${ChatColor.GRAY}に設定しました。
-                                        ${MainAPI.getPrefix(PrefixType.SECONDARY)}${TimeFormat.formatJapan(i)}削除
+                                        ${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を${ChatColor.GREEN}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(GameRunnable.gameTime).toJapan}${ChatColor.RESET}${ChatColor.GRAY}に設定しました。
+                                        ${MainAPI.getPrefix(PrefixType.SECONDARY)}${DateTimeUtil.formatTimestamp(i).toJapan}削除
                                     """.trimIndent())
                                     return
                                 } else {
@@ -87,7 +88,7 @@ class Toso(name: String) : ICommand(name) {
                             if (args.size != 2) {
                                 if (ParseUtil.isInt(args[2])) {
                                     GameRunnable.setGameTime(args[2].toInt())
-                                    sp.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimeFormat.formatJapan(GameRunnable.gameTime) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。")
+                                    sp.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を${ChatColor.GREEN}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(GameRunnable.gameTime).toJapan}${ChatColor.RESET}${ChatColor.GRAY}に設定しました。")
                                     return
                                 } else {
                                     MainAPI.sendMessage(sp, ErrorMessage.ARGS_INTEGER)
@@ -270,8 +271,8 @@ class Toso(name: String) : ICommand(name) {
                                 val i = args[2].toInt()
                                 GameRunnable.addGameTime(i)
                                 bs.sendMessage("""
-                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を${ChatColor.GREEN}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(GameRunnable.gameTime)}${ChatColor.RESET}${ChatColor.GRAY}に設定しました。
-                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}${TimeFormat.formatJapan(i)}追加
+                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を${ChatColor.GREEN}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(GameRunnable.gameTime).toJapan}${ChatColor.RESET}${ChatColor.GRAY}に設定しました。
+                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}${DateTimeUtil.formatTimestamp(i).toJapan}追加
                                 """.trimIndent())
                                 return
                             } else {
@@ -287,8 +288,8 @@ class Toso(name: String) : ICommand(name) {
                                 val i = args[2].toInt()
                                 GameRunnable.removeGameTime(i)
                                 bs.sendMessage("""
-                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を${ChatColor.GREEN}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(GameRunnable.gameTime)}${ChatColor.RESET}${ChatColor.GRAY}に設定しました。
-                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}${TimeFormat.formatJapan(i)}削除
+                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を${ChatColor.GREEN}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(GameRunnable.gameTime).toJapan}${ChatColor.RESET}${ChatColor.GRAY}に設定しました。
+                                    ${MainAPI.getPrefix(PrefixType.SECONDARY)}${DateTimeUtil.formatTimestamp(i).toJapan}削除
                                 """.trimIndent())
                                 return
                             } else {
@@ -302,7 +303,7 @@ class Toso(name: String) : ICommand(name) {
                         if (args.size != 2) {
                             if (ParseUtil.isInt(args[2])) {
                                 GameRunnable.setGameTime(args[2].toInt())
-                                bs.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を" + ChatColor.GREEN + ChatColor.UNDERLINE + TimeFormat.formatJapan(GameRunnable.gameTime) + ChatColor.RESET + ChatColor.GRAY + "に設定しました。")
+                                bs.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム時間を${ChatColor.GREEN}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(GameRunnable.gameTime).toJapan}${ChatColor.RESET}${ChatColor.GRAY}に設定しました。")
                                 return
                             } else {
                                 MainAPI.sendMessage(bs, ErrorMessage.ARGS_INTEGER)

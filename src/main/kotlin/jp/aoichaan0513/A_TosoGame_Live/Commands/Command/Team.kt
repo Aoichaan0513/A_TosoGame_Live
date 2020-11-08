@@ -350,15 +350,17 @@ class Team(name: String) : ICommand(name) {
     }
 
     private fun getTeamDescription(str: String): String {
-        return "${when (str) {
-            "admin" -> "運営"
-            "player" -> "逃走者"
-            "hunter" -> "ハンター"
-            "jail" -> "確保者"
-            "success" -> "生存者"
-            "tuho" -> "通報部隊"
-            else -> ""
-        }}チーム"
+        return "${
+            when (str) {
+                "admin" -> "運営"
+                "player" -> "逃走者"
+                "hunter" -> "ハンター"
+                "jail" -> "確保者"
+                "success" -> "生存者"
+                "tuho" -> "通報部隊"
+                else -> ""
+            }
+        }チーム"
     }
 
 

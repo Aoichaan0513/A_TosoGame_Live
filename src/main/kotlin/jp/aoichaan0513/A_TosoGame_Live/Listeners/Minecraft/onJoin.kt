@@ -42,6 +42,11 @@ class onJoin : Listener {
         e.joinMessage = if (!PlayerManager.loadConfig(p).visibility) "${ChatColor.YELLOW}-> ${ChatColor.GOLD}${p.name}" else ""
         p.sendMessage("${MainAPI.getPrefix(PrefixType.SECONDARY)}リソースパックを適用するには\"${ChatColor.GOLD}${ChatColor.UNDERLINE}/resource${ChatColor.RESET}${ChatColor.GRAY}\"と入力してください。")
 
+        MainAPI.sendDebugMessage(p, """
+            ${MainAPI.getPrefix(PrefixType.ERROR)}${ChatColor.DARK_RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}デバッグモードが有効${ChatColor.RESET}${ChatColor.RED}になっています。
+            ${MainAPI.getPrefix(PrefixType.SECONDARY)}本番環境では必ずデバッグモードを無効にしてください。
+        """.trimIndent())
+
         val worldConfig = Main.worldConfig
         val playerConfig = PlayerManager.loadConfig(p)
 

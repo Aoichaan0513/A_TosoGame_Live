@@ -1,5 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Map
 
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DataClass
 import java.awt.Color
 import java.awt.Image
 import java.awt.geom.AffineTransform

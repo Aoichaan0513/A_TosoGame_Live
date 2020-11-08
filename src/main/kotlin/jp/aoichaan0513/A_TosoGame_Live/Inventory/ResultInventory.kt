@@ -25,10 +25,12 @@ class ResultInventory {
         val arrowRight = "MHF_ArrowRight"
 
         fun getInventory(p: Player, resultType: ResultType, page: Int = 0): Inventory {
-            val inv = Bukkit.createInventory(null, 9 * 6, "${when (resultType) {
-                ResultType.REWARD -> rewardTitle
-                ResultType.ENSURE -> ensureTitle
-            }}${page + 1}")
+            val inv = Bukkit.createInventory(null, 9 * 6, "${
+                when (resultType) {
+                    ResultType.REWARD -> rewardTitle
+                    ResultType.ENSURE -> ensureTitle
+                }
+            }${page + 1}")
 
             val list = getPlayers(resultType)
 

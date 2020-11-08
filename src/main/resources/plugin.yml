@@ -1,10 +1,9 @@
 name: A_TosoGame_Live
 version: @version@
 api-version: 1.13
-depend:
-  - ProtocolLib
+depend: [ ProtocolLib ]
 main: jp.aoichaan0513.A_TosoGame_Live.Main
-authors: [Aoichaan0513]
+authors: [ Aoichaan0513 ]
 website: https://aoichaan0513.jp
 description: TosoGame (Run for Money) Plugin for Minecraft Java Edition 1.15.2. (Build @projectBuildDate@)
 

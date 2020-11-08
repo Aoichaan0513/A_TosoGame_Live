@@ -3,7 +3,8 @@ package jp.aoichaan0513.A_TosoGame_Live.Inventory
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.Main
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTimeUtil
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -66,10 +67,10 @@ class MapInventory {
                 val itemMeta31 = itemStack31.itemMeta!!
                 itemMeta31.setDisplayName("${ChatColor.BOLD}復活クールタイム")
                 itemMeta31.lore = Arrays.asList(
-                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}イージー${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(difficultyEasyConfig.respawnCoolTime)}${ChatColor.GRAY}/回",
-                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}ノーマル${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(difficultyNormalConfig.respawnCoolTime)}${ChatColor.GRAY}/回",
-                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}ハード${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(difficultyHardConfig.respawnCoolTime)}${ChatColor.GRAY}/回",
-                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}ハードコア${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(difficultyHardCoreConfig.respawnCoolTime)}${ChatColor.GRAY}/回",
+                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}イージー${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(difficultyEasyConfig.respawnCoolTime).toJapan}${ChatColor.GRAY}/回",
+                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}ノーマル${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(difficultyNormalConfig.respawnCoolTime).toJapan}${ChatColor.GRAY}/回",
+                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}ハード${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(difficultyHardConfig.respawnCoolTime).toJapan}${ChatColor.GRAY}/回",
+                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}ハードコア${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(difficultyHardCoreConfig.respawnCoolTime).toJapan}${ChatColor.GRAY}/回",
                         "",
                         "${ChatColor.GOLD}クリックで設定変更"
                 )
@@ -104,7 +105,7 @@ class MapInventory {
                 val itemMeta2 = itemStack2.itemMeta!!
                 itemMeta2.setDisplayName("${ChatColor.BOLD}カウントダウン")
                 itemMeta2.lore = Arrays.asList(
-                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}設定値${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(worldConfig.gameConfig.countDown)}",
+                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}設定値${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(worldConfig.gameConfig.countDown).toJapan}",
                         "${ChatColor.GOLD}左クリックで設定変更",
                         "${ChatColor.GOLD}右クリックでリセット"
                 )
@@ -115,7 +116,7 @@ class MapInventory {
                 val itemMeta3 = itemStack3.itemMeta!!
                 itemMeta3.setDisplayName("${ChatColor.BOLD}ゲーム時間")
                 itemMeta3.lore = Arrays.asList(
-                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}設定値${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(worldConfig.gameConfig.game)}",
+                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}設定値${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(worldConfig.gameConfig.game).toJapan}",
                         "${ChatColor.GOLD}左クリックで設定変更",
                         "${ChatColor.GOLD}右クリックでリセット"
                 )
@@ -126,7 +127,7 @@ class MapInventory {
                 val itemMeta4 = itemStack4.itemMeta!!
                 itemMeta4.setDisplayName("${ChatColor.BOLD}復活禁止")
                 itemMeta4.lore = Arrays.asList(
-                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}設定値${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(worldConfig.gameConfig.respawnDeny)}",
+                        "${ChatColor.GOLD}${ChatColor.UNDERLINE}設定値${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(worldConfig.gameConfig.respawnDeny).toJapan}",
                         "${ChatColor.GOLD}左クリックで設定変更",
                         "${ChatColor.GOLD}右クリックでリセット"
                 )

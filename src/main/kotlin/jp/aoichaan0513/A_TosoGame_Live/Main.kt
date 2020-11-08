@@ -27,7 +27,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Listeners.Discord.onMessage
 import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.*
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTimeUtil
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import net.dv8tion.jda.api.JDA
@@ -64,6 +64,9 @@ class Main : JavaPlugin(), Listener {
 
         val FILE_SEPARATOR = FileSystems.getDefault().separator
         val CHARSET = Charsets.UTF_8
+
+        var isDebug = false
+            private set
 
         private var commands = hashMapOf<String, ICommand>()
         private var listeners = listOf<Listener>()
@@ -104,7 +107,6 @@ class Main : JavaPlugin(), Listener {
             loadBuiltinMission("4.txt")
 
             MissionManager.initMissions()
-            return
         }
 
         private fun loadFile(folderName: String, fileName: String) {
@@ -163,6 +165,7 @@ class Main : JavaPlugin(), Listener {
 
         saveDefaultConfig()
         mainConfig = config
+        isDebug = config.getBoolean("isDebug", false)
 
         Teams.setScoreboard()
 
@@ -182,8 +185,6 @@ class Main : JavaPlugin(), Listener {
         BossBarManager.showBar()
 
         runTask()
-        RespawnRunnable().runTaskTimer(pluginInstance, 0, 20)
-
 
         ProtocolLibrary.getProtocolManager().addPacketListener(object : PacketAdapter(this, PacketType.Play.Server.PLAYER_INFO) {
             override fun onPacketSending(e: PacketEvent) {
@@ -406,6 +407,20 @@ class Main : JavaPlugin(), Listener {
                 }
             }
         }, 0, 0)
+
+        if (isDebug) {
+            val period = (20 * 60 * 5).toLong()
+            server.scheduler.runTaskTimerAsynchronously(pluginInstance, Runnable {
+                for (player in Bukkit.getOnlinePlayers()) {
+                    player.sendMessage("""
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.DARK_RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}デバッグモードが有効${ChatColor.RESET}${ChatColor.RED}になっています。
+                        ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}本番環境では必ずデバッグモードを無効にしてください。
+                    """.trimIndent())
+                }
+            }, period, period)
+        }
+
+        RespawnRunnable().runTaskTimer(pluginInstance, 0, 20)
     }
 
     private fun getActionbarMessage(p: Player, decimalFormat: DecimalFormat): String {
@@ -443,7 +458,7 @@ class Main : JavaPlugin(), Listener {
 
         val respawnMessage = if (GameManager.isGame() && p.isJailTeam) {
             if (TosoGameAPI.isRespawn && RespawnRunnable.isAllowRespawn(p))
-                "${if (respawnAutoTime != null && respawnAutoTime > 0) "${ChatColor.GOLD}${ChatColor.UNDERLINE}自動復活${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(respawnAutoTime)}" else ""}${if (respawnAutoTime != null && respawnAutoTime > 0 && respawnCoolTime != null && respawnCoolTime > 0) separator else ""}${if (respawnCoolTime != null && respawnCoolTime > 0) "${ChatColor.GOLD}${ChatColor.UNDERLINE}復活可能${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(respawnCoolTime)}" else ""}"
+                "${if (respawnAutoTime != null && respawnAutoTime > 0) "${ChatColor.GOLD}${ChatColor.UNDERLINE}自動復活${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(respawnAutoTime).toJapan}" else ""}${if (respawnAutoTime != null && respawnAutoTime > 0 && respawnCoolTime != null && respawnCoolTime > 0) separator else ""}${if (respawnCoolTime != null && respawnCoolTime > 0) "${ChatColor.GOLD}${ChatColor.UNDERLINE}復活可能${ChatColor.GRAY}まで残り${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(respawnCoolTime).toJapan}" else ""}"
             else
                 "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}復活不可"
 

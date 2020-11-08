@@ -11,7 +11,8 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
 import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Team
 import jp.aoichaan0513.A_TosoGame_Live.Main
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTimeUtil
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ItemUtil
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import org.bukkit.Bukkit
@@ -133,7 +134,7 @@ class MainInventory {
             itemMetaSpec.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}観戦モード切り替え")
             itemMetaSpec.lore = listOf(
                     "${ChatColor.YELLOW}クリックして${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}観戦モード${ChatColor.RESET}${ChatColor.YELLOW}を切り替えます。",
-                    "${ChatColor.GRAY}この機能は${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(worldConfig.gameConfig.respawnDeny)}以下${ChatColor.RESET}${ChatColor.GRAY}・${ChatColor.BOLD}${ChatColor.UNDERLINE}牢獄${ChatColor.RESET}${ChatColor.GRAY}にいる場合のみ使用可能です。"
+                    "${ChatColor.GRAY}この機能は${ChatColor.BOLD}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(worldConfig.gameConfig.respawnDeny).toJapan}以下${ChatColor.RESET}${ChatColor.GRAY}・${ChatColor.BOLD}${ChatColor.UNDERLINE}牢獄${ChatColor.RESET}${ChatColor.GRAY}にいる場合のみ使用可能です。"
             )
             itemStackSpec.itemMeta = itemMetaSpec
             inv.setItem(Item.SPEC_MODE.index, itemStackSpec)
@@ -203,9 +204,9 @@ class MainInventory {
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}レート${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyEasyConfig.rate}${ChatColor.GRAY}円/秒",
                     "",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}体力システム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyEasyConfig.health) "有効" else "無効"}",
-                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}自動復活${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyEasyConfig.respawnAutoTime > -1) TimeFormat.formatJapan(difficultyEasyConfig.respawnAutoTime) else "無効"}",
+                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}自動復活${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyEasyConfig.respawnAutoTime > -1) DateTimeUtil.formatTimestamp(difficultyEasyConfig.respawnAutoTime).toJapan else "無効"}",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活可能回数${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyEasyConfig.respawnDenyCount}${ChatColor.GRAY}回",
-                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(difficultyEasyConfig.respawnCoolTime)}${ChatColor.GRAY}/回",
+                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(difficultyEasyConfig.respawnCoolTime).toJapan}${ChatColor.GRAY}/回",
                     "",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}ゲーム開始時のアイテム",
                     "${ChatColor.BLUE}骨 (透明化)${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyEasyConfig.getBone(GameType.START).count}${ChatColor.GRAY}個 (${difficultyEasyConfig.getBone(GameType.START).duration}秒)",
@@ -234,9 +235,9 @@ class MainInventory {
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}レート${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyNormalConfig.rate}${ChatColor.GRAY}円/秒",
                     "",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}体力システム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyNormalConfig.health) "有効" else "無効"}",
-                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}自動復活${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyNormalConfig.respawnAutoTime > -1) TimeFormat.formatJapan(difficultyNormalConfig.respawnAutoTime) else "無効"}",
+                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}自動復活${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyNormalConfig.respawnAutoTime > -1) DateTimeUtil.formatTimestamp(difficultyNormalConfig.respawnAutoTime).toJapan else "無効"}",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活可能回数${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyNormalConfig.respawnDenyCount}${ChatColor.GRAY}回",
-                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(difficultyNormalConfig.respawnCoolTime)}${ChatColor.GRAY}/回",
+                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(difficultyNormalConfig.respawnCoolTime).toJapan}${ChatColor.GRAY}/回",
                     "",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}ゲーム開始時のアイテム",
                     "${ChatColor.BLUE}骨 (透明化)${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyNormalConfig.getBone(GameType.START).count}${ChatColor.GRAY}個 (${difficultyNormalConfig.getBone(GameType.START).duration}秒)",
@@ -265,9 +266,9 @@ class MainInventory {
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}レート${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyHardConfig.rate}${ChatColor.GRAY}円/秒",
                     "",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}体力システム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyHardConfig.health) "有効" else "無効"}",
-                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}自動復活${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyHardConfig.respawnAutoTime > -1) TimeFormat.formatJapan(difficultyHardConfig.respawnAutoTime) else "無効"}",
+                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}自動復活${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyHardConfig.respawnAutoTime > -1) DateTimeUtil.formatTimestamp(difficultyHardConfig.respawnAutoTime).toJapan else "無効"}",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活可能回数${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyHardConfig.respawnDenyCount}${ChatColor.GRAY}回",
-                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(difficultyHardConfig.respawnCoolTime)}${ChatColor.GRAY}/回",
+                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(difficultyHardConfig.respawnCoolTime).toJapan}${ChatColor.GRAY}/回",
                     "",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}ゲーム開始時のアイテム",
                     "${ChatColor.BLUE}骨 (透明化)${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyHardConfig.getBone(GameType.START).count}${ChatColor.GRAY}個 (${difficultyHardConfig.getBone(GameType.START).duration}秒)",
@@ -296,9 +297,9 @@ class MainInventory {
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}レート${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyHardCoreConfig.rate}${ChatColor.GRAY}円/秒",
                     "",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}体力システム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyHardCoreConfig.health) "有効" else "無効"}",
-                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}自動復活${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyHardCoreConfig.respawnAutoTime > -1) TimeFormat.formatJapan(difficultyHardCoreConfig.respawnAutoTime) else "無効"}",
+                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}自動復活${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${if (difficultyHardCoreConfig.respawnAutoTime > -1) DateTimeUtil.formatTimestamp(difficultyHardCoreConfig.respawnAutoTime).toJapan else "無効"}",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活可能回数${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyHardCoreConfig.respawnDenyCount}${ChatColor.GRAY}回",
-                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${TimeFormat.formatJapan(difficultyHardCoreConfig.respawnCoolTime)}${ChatColor.GRAY}/回",
+                    "${ChatColor.BLUE}${ChatColor.UNDERLINE}復活クールタイム${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${DateTimeUtil.formatTimestamp(difficultyHardCoreConfig.respawnCoolTime).toJapan}${ChatColor.GRAY}/回",
                     "",
                     "${ChatColor.BLUE}${ChatColor.UNDERLINE}ゲーム開始時のアイテム",
                     "${ChatColor.BLUE}骨 (透明化)${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${difficultyHardCoreConfig.getBone(GameType.START).count}${ChatColor.GRAY}個 (${difficultyHardCoreConfig.getBone(GameType.START).duration}秒)",

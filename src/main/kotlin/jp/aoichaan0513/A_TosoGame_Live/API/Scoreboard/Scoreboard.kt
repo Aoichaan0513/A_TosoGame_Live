@@ -8,7 +8,7 @@ import jp.aoichaan0513.A_TosoGame_Live.API.TosoGameAPI
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.GameRunnable
-import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTime.TimeFormat
+import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTimeUtil
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import org.bukkit.Bukkit
@@ -148,9 +148,9 @@ class Scoreboard {
             return when (GameManager.gameState) {
                 GameState.READY -> when (OPGameManager.opGameState) {
                     OPGameManager.OPGameState.DICE -> "${ChatColor.YELLOW}OPG${ChatColor.RESET}${ChatColor.GRAY}: " to "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}サイコロ"
-                    else -> "${ChatColor.YELLOW}残り${ChatColor.RESET}${ChatColor.GRAY}: " to "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(GameRunnable.countDown)}"
+                    else -> "${ChatColor.YELLOW}残り${ChatColor.RESET}${ChatColor.GRAY}: " to "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(GameRunnable.countDown).toJapan}"
                 }
-                GameState.GAME -> "${ChatColor.RED}残り${ChatColor.RESET}${ChatColor.GRAY}: " to "${ChatColor.DARK_RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${TimeFormat.formatJapan(GameRunnable.gameTime)}"
+                GameState.GAME -> "${ChatColor.RED}残り${ChatColor.RESET}${ChatColor.GRAY}: " to "${ChatColor.DARK_RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}${DateTimeUtil.formatTimestamp(GameRunnable.gameTime).toJapan}"
                 GameState.END -> "" to "${ChatColor.GRAY}${ChatColor.BOLD}   ゲーム終了  ${ChatColor.RESET}"
                 else -> "" to "${ChatColor.GREEN}${ChatColor.BOLD}  ゲーム準備中… ${ChatColor.RESET}"
             }
