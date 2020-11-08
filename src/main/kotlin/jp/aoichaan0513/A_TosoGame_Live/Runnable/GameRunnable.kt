@@ -1,6 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.Runnable
 
-import jp.aoichaan0513.A_TosoGame_Live.API.Enums.Advancement
+import jp.aoichaan0513.A_TosoGame_Live.API.Advancement.Advancement
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager

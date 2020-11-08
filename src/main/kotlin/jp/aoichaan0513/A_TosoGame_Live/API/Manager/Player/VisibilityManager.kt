@@ -1,5 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player
 
+import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isHunterGroup
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
@@ -17,7 +18,7 @@ class VisibilityManager {
 
 
         fun hidePlayers(p: Player) {
-            // アイテム・コマンドで確保者が周りを非表示にした時
+            // 確保者が周りを非表示にした時
             val jailPlayer = jailHidePlayerMap[p.uniqueId]
             if (p.isJailTeam) {
                 if (jailPlayer != null) {
@@ -51,10 +52,13 @@ class VisibilityManager {
                     } else {
                         // 逃走者が透明を使用した時
                         if (p.isJailTeam || p.isHunterGroup) {
-                            if (isHide(player, VisibilityType.ITEM))
+                            if (isHide(player, VisibilityType.ITEM)) {
+                                Main.tabListPlayerSet.add(player.uniqueId)
                                 p.hidePlayer(player)
-                            else
+                                Main.tabListPlayerSet.remove(player.uniqueId)
+                            } else {
                                 p.showPlayer(player)
+                            }
                         } else {
                             p.showPlayer(player)
                         }

@@ -1,6 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player
 
-import jp.aoichaan0513.A_TosoGame_Live.API.Enums.Advancement
+import jp.aoichaan0513.A_TosoGame_Live.API.Advancement.Advancement
 import jp.aoichaan0513.A_TosoGame_Live.API.Enums.ItemType
 import jp.aoichaan0513.A_TosoGame_Live.API.Interfaces.IConfig
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
