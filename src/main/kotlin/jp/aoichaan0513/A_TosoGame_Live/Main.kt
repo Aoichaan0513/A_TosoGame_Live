@@ -28,6 +28,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.*
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTimeUtil
+import jp.aoichaan0513.A_TosoGame_Live.Utils.getValue
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import net.dv8tion.jda.api.JDA
@@ -35,6 +36,8 @@ import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.requests.GatewayIntent
 import org.bukkit.*
+import org.bukkit.block.data.Bisected
+import org.bukkit.block.data.type.Stairs
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Player
@@ -386,7 +389,7 @@ class Main : JavaPlugin(), Listener {
             Scoreboard.updateScoreboard()
 
             for (player in Bukkit.getOnlinePlayers())
-                ActionBarManager.sendActionBar(player, getActionbarMessage(player, decimalFormat))
+                ActionBarManager.send(player, getActionBarMessage(player, decimalFormat))
         }, 0, 0)
         server.scheduler.runTaskTimer(pluginInstance, Runnable {
             for (player in Bukkit.getOnlinePlayers()) {
@@ -411,25 +414,22 @@ class Main : JavaPlugin(), Listener {
         if (isDebug) {
             val period = (20 * 60 * 5).toLong()
             server.scheduler.runTaskTimerAsynchronously(pluginInstance, Runnable {
-                for (player in Bukkit.getOnlinePlayers()) {
-                    player.sendMessage("""
-                        ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.DARK_RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}デバッグモードが有効${ChatColor.RESET}${ChatColor.RED}になっています。
-                        ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}本番環境では必ずデバッグモードを無効にしてください。
-                    """.trimIndent())
-                }
+                Bukkit.broadcastMessage("""
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${ChatColor.DARK_RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}デバッグモードが有効${ChatColor.RESET}${ChatColor.RED}になっています。
+                    ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}本番環境では必ずデバッグモードを無効にしてください。
+                """.trimIndent())
             }, period, period)
         }
 
         RespawnRunnable().runTaskTimer(pluginInstance, 0, 20)
     }
 
-    private fun getActionbarMessage(p: Player, decimalFormat: DecimalFormat): String {
-        val separator = "${ChatColor.RESET}${ChatColor.GRAY} / ${ChatColor.RESET}"
+    private fun getActionBarMessage(p: Player, decimalFormat: DecimalFormat): String {
+        val actionBarBuilder = ActionBarManager.getOrSet(p)
 
-        val isHiddenMessage = if (PlayerManager.loadConfig(p).visibility) "${ChatColor.RED}姿を非表示中" else ""
+        val separator = ActionBarManager.DEFAULT_SEPARATOR
 
-        val target = p.spectatorTarget
-        val spectatorMessage = if (p.gameMode == org.bukkit.GameMode.SPECTATOR && target != null && target is Player) "${ChatColor.GRAY}${target.name} に憑依中" else ""
+        val hiddenMessage = if (PlayerManager.loadConfig(p).visibility) "${ChatColor.RED}姿を非表示中" else ""
 
         val invisibleMessage = if (p.isPlayerGroup) {
             if (p.hasPotionEffect(PotionEffectType.INVISIBILITY))
@@ -453,6 +453,12 @@ class Main : JavaPlugin(), Listener {
             ""
         }
 
+        val targetBlock = p.getTargetBlockExact(3, FluidCollisionMode.NEVER)
+        val chairMessage = (targetBlock?.blockData is Stairs && (targetBlock.blockData as Stairs).half == Bisected.Half.BOTTOM && targetBlock.location.clone().add(0.0, -1.0, 0.0).block.type == Material.BEDROCK).getValue("${ChatColor.GOLD}${ChatColor.UNDERLINE}右クリックして椅子に座る", "")
+
+        val target = p.spectatorTarget
+        val spectatorMessage = if (p.gameMode == org.bukkit.GameMode.SPECTATOR && target != null && target is Player) "${ChatColor.GRAY}${target.name} に憑依中" else ""
+
         val respawnAutoTime = RespawnRunnable.autoTimeMap[p.uniqueId]
         val respawnCoolTime = RespawnRunnable.coolTimeMap[p.uniqueId]
 
@@ -466,6 +472,7 @@ class Main : JavaPlugin(), Listener {
             ""
         }
 
-        return "${if (isHiddenMessage.isNotEmpty()) "$isHiddenMessage${if (spectatorMessage.isNotEmpty() || invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}${if (spectatorMessage.isNotEmpty()) "$spectatorMessage${if (invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}$invisibleMessage${if (invisibleMessage.isNotEmpty() && speedMessage.isNotEmpty()) separator else ""}$speedMessage${if (respawnMessage.isNotEmpty()) "$respawnMessage${if (invisibleMessage.isNotEmpty() || invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}"
+        // "${if (hiddenMessage.isNotEmpty()) "$hiddenMessage${if (spectatorMessage.isNotEmpty() || invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}${if (spectatorMessage.isNotEmpty()) "$spectatorMessage${if (invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}$invisibleMessage${if (invisibleMessage.isNotEmpty() && speedMessage.isNotEmpty()) separator else ""}$speedMessage${if (respawnMessage.isNotEmpty()) "$respawnMessage${if (invisibleMessage.isNotEmpty() || invisibleMessage.isNotEmpty() || speedMessage.isNotEmpty()) separator else ""}" else ""}"
+        return actionBarBuilder.clear().addAll(setOf(hiddenMessage, chairMessage, invisibleMessage, speedMessage, spectatorMessage, respawnMessage)).build()
     }
 }

@@ -37,7 +37,7 @@ class Btp(name: String) : ICommand(name) {
                     magmaCube?.isInvulnerable = true
                     magmaCube?.isGlowing = true
                     magmaCube?.size = 2
-                    magmaCube?.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 9999, 255, false, false))
+                    magmaCube?.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 200000, 255, false, false))
 
                     for (p in Bukkit.getOnlinePlayers().filter { !it.isAdminTeam }) {
                         p.gameMode = GameMode.SPECTATOR

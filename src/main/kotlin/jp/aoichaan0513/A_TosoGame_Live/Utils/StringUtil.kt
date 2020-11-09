@@ -30,6 +30,10 @@ fun <T> Array<T>.toString(action: (T) -> String, empty: String, separator: Strin
     return this.toList().toString(action, empty, separator)
 }
 
+fun <T> Iterable<T>.toString(action: (T) -> String, empty: String, separator: String = ", "): String {
+    return this.toList().toString(action, empty, separator)
+}
+
 fun <T> Collection<T>.toString(action: (T) -> String, empty: String, separator: String = ", "): String {
     val stringBuilder = StringBuilder()
     if (this.isEmpty()) return empty
