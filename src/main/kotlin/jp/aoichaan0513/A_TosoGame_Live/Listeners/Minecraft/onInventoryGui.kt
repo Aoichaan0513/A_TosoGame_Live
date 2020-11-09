@@ -71,7 +71,7 @@ class onInventoryGui : Listener {
             MainInventory.Item.PLAYER_SETTINGS -> {
                 if (GameManager.isGame(GameState.NONE)) {
                     p.openInventory(PlayerSettingsInventory.getInventory(p))
-                    ActionBarManager.sendActionBar(p, "${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}プレイヤー設定アプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
+                    ActionBarManager.send(p, "${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}プレイヤー設定アプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
                     return
                 }
                 MainAPI.sendMessage(p, ErrorMessage.NOT_GAME)
@@ -79,13 +79,13 @@ class onInventoryGui : Listener {
             MainInventory.Item.MAP_SETTINGS -> {
                 if (!TosoGameAPI.isAdmin(p)) return
                 p.openInventory(MapInventory.editInventory)
-                ActionBarManager.sendActionBar(p, "${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップ設定アプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
+                ActionBarManager.send(p, "${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップ設定アプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
             }
             MainInventory.Item.CALL_APP -> {
                 /*
                 if (Teams.hasJoinedTeams(p) && DiscordManager.integrationMap.isNotEmpty()) {
                     p.openInventory(CallInventory.getInventory(p))
-                    ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}電話アプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
+                    ActionBarManager.send(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}電話アプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
                     return
                 }
                 */
@@ -93,7 +93,7 @@ class onInventoryGui : Listener {
             }
             MainInventory.Item.MISSION_APP -> {
                 p.openInventory(MissionInventory.getInventory(MissionManager.MissionType.MISSION))
-                ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ミッションアプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
+                ActionBarManager.send(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ミッションアプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
             }
             MainInventory.Item.MAP_APP -> {
                 if (p.isAdminTeam || p.isPlayerGroup) {
@@ -266,7 +266,7 @@ class onInventoryGui : Listener {
             val itemMeta = itemStack.itemMeta
             if (itemMeta == null || !itemMeta.displayName.equals("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム")) return
             p.openInventory(MainInventory.getInventory(p))
-            ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
+            ActionBarManager.send(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
         } else if (slot in 0..2 && itemStack.type == Material.RED_CONCRETE) {
             val itemMeta = itemStack.itemMeta
             if (itemMeta == null || !itemMeta.displayName.equals("${ChatColor.RED}${ChatColor.BOLD}${ChatColor.UNDERLINE}ミッション")) return
@@ -340,7 +340,7 @@ class onInventoryGui : Listener {
                 val itemMeta = itemStack.itemMeta
                 if (itemMeta == null || !itemMeta.displayName.equals("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム")) return
                 p.openInventory(MainInventory.getInventory(p))
-                ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
+                ActionBarManager.send(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
             }
         }
     }
@@ -388,7 +388,7 @@ class onInventoryGui : Listener {
                 val itemMeta = itemStack.itemMeta
                 if (itemMeta == null || !itemMeta.displayName.equals("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム")) return
                 p.openInventory(MainInventory.getInventory(p))
-                ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
+                ActionBarManager.send(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
             }
         }
     }
@@ -409,7 +409,7 @@ class onInventoryGui : Listener {
         when (PlayerSettingsInventory.Item.getItem(itemStack, slot)) {
             PlayerSettingsInventory.Item.INVENTORY_SETTINGS -> {
                 p.openInventory(PlayerSettingsInventory.getInventorySettingsInventory(p))
-                ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}インベントリ設定${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
+                ActionBarManager.send(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}インベントリ設定${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
             }
             PlayerSettingsInventory.Item.BOOK_FOREGROUND -> {
                 val playerConfig = PlayerManager.loadConfig(p)
@@ -425,7 +425,7 @@ class onInventoryGui : Listener {
             }
             PlayerSettingsInventory.Item.HOME -> {
                 p.openInventory(MainInventory.getInventory(p))
-                ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
+                ActionBarManager.send(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
             }
         }
     }
@@ -449,7 +449,7 @@ class onInventoryGui : Listener {
             Material.WHITE_STAINED_GLASS_PANE -> {
                 if (itemMeta == null || !itemMeta.displayName.equals("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム")) return
                 p.openInventory(MainInventory.getInventory(p))
-                ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
+                ActionBarManager.send(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
             }
             else -> {
                 if (slot !in 9..17 && slot != 27 || itemMeta == null || !itemMeta.hasCustomModelData()) return
@@ -480,13 +480,13 @@ class onInventoryGui : Listener {
                 if (!itemSelectInventoryMap.containsKey(p.uniqueId) || itemMeta == null || !itemMeta.displayName.equals("${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム")) return
 
                 p.openInventory(MainInventory.getInventory(p))
-                ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
+                ActionBarManager.send(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ホーム画面${ChatColor.RESET}${ChatColor.YELLOW}を表示しました。")
 
                 itemSelectInventoryMap.remove(p.uniqueId)
             }
             Material.BARRIER -> {
                 p.openInventory(PlayerSettingsInventory.getInventorySettingsInventory(p))
-                ActionBarManager.sendActionBar(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}設定をキャンセル${ChatColor.RESET}${ChatColor.YELLOW}しました。")
+                ActionBarManager.send(p, "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}設定をキャンセル${ChatColor.RESET}${ChatColor.YELLOW}しました。")
 
                 itemSelectInventoryMap.remove(p.uniqueId)
             }
@@ -997,7 +997,7 @@ class onInventoryGui : Listener {
             }
             16 -> {
                 p.openInventory(MapInventory.editInventory)
-                ActionBarManager.sendActionBar(p, "${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップ設定アプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
+                ActionBarManager.send(p, "${ChatColor.BLUE}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップ設定アプリ${ChatColor.RESET}${ChatColor.YELLOW}を開きました。")
             }
         }
     }
