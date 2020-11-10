@@ -91,7 +91,7 @@ class onMove : Listener {
             if (p.isJailTeam || !p.isSprinting
                     || p.isOnGround || to.y < from.y + 0.3) return
             e.setTo(from)
-            ActionBarManager.sendActionBar(p, "${ChatColor.YELLOW}⚠ ダッシュジャンプはできません。")
+            ActionBarManager.send(p, "${ChatColor.YELLOW}⚠ ダッシュジャンプはできません。")
         }
     }
 

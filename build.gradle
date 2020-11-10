@@ -68,6 +68,9 @@ dependencies {
     implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.3.9'
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-script-util'
 
+    implementation files('libs/Kotlin_Utils-1.0.0.jar')
+    implementation files('libs/ActionBarBuilder-1.0.1.jar')
+
     // Minecraft
     compileOnly group: 'org.spigotmc', name: 'spigot-api', version: spigotVersion
     compileOnly files('libs/Spigot-1.15.2.jar')
