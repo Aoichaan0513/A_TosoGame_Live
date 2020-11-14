@@ -1,6 +1,7 @@
 package jp.aoichaan0513.A_TosoGame_Live.API.Manager
 
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager.GameState
+import jp.aoichaan0513.A_TosoGame_Live.Commands.Command.Team
 import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.Dice
@@ -90,7 +91,9 @@ class BossBarManager {
                     bossBar.addPlayer(p)
                 }
                 else -> {
-                    bossBar.setTitle("${ChatColor.GREEN}${ChatColor.BOLD}ゲーム準備中…$debugMessage")
+                    val hunterMessage = if (Team.isHunterRandom) "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}ハンター募集中${ChatColor.RESET}${ChatColor.GRAY} / ${ChatColor.RESET}" else ""
+                    val tuhoMessage = if (Team.isTuhoRandom) "${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}通報部隊募集中${ChatColor.RESET}${ChatColor.GRAY} / ${ChatColor.RESET}" else ""
+                    bossBar.setTitle("$hunterMessage$tuhoMessage${ChatColor.GREEN}${ChatColor.BOLD}ゲーム準備中…$debugMessage")
                     bossBar.progress = 1.0
                     bossBar.color = BarColor.GREEN
                     bossBar.addPlayer(p)

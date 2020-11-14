@@ -168,7 +168,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
 
                             Bukkit.broadcastMessage("""
                                 ${MainAPI.getPrefix(PrefixType.SECONDARY)}ゲーム終了
-                                ${MainAPI.getPrefix(PrefixType.WARNING)}今回の生存者は${OnlineTeam.TOSO_SUCCESS.team.entries}です。
+                                ${MainAPI.getPrefix(PrefixType.WARNING)}今回の生存者は${OnlineTeam.TOSO_SUCCESS.team.entries.toString({ "${ChatColor.YELLOW}$it" }, "", "${ChatColor.GRAY}, ${ChatColor.RESET}")}${ChatColor.GOLD}です。
                             """.trimIndent())
 
                             // ブロックにテレポートするメッセージを送信

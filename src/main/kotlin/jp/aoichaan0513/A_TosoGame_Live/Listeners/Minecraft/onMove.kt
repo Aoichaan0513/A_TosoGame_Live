@@ -138,10 +138,8 @@ class onMove : Listener {
         val z1 = loc1.blockZ.coerceAtMost(loc2.blockZ)
         val z2 = loc1.blockZ.coerceAtLeast(loc2.blockZ)
 
-        // val isXJoinedArea = loc.blockX in x1..x2
         val isXJoinedArea = loc.blockX in if (isOutside) (x1 + 1) until x2 else x1..x2
         val isYJoinedArea = loc.blockY in y1..y2
-        // val isZJoinedArea = loc.blockZ in z1..z2
         val isZJoinedArea = loc.blockZ in if (isOutside) (z1 + 1) until z2 else z1..z2
 
         return isXJoinedArea && isYJoinedArea && isZJoinedArea

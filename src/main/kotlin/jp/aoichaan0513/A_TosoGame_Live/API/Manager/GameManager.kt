@@ -17,14 +17,18 @@ class GameManager {
         fun startGame(countDown: Int, gameTime: Int) {
             if (timer != null) return
             timer = GameRunnable(countDown, gameTime).runTaskTimer(Main.pluginInstance, 0L, 20L)
+
             gameState = GameState.READY
+            BossBarManager.showBar()
         }
 
         fun endGame() {
             if (timer == null) return
             timer!!.cancel()
             timer = null
+
             gameState = GameState.END
+            BossBarManager.showBar()
 
             MissionManager.endMissions()
 

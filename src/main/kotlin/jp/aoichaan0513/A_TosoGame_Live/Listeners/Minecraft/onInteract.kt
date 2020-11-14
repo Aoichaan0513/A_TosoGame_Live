@@ -362,8 +362,9 @@ class onInteract : Listener {
                                                 if (!p.isPlayerTeam || !MissionManager.isMission(MissionManager.MissionState.SUCCESS) || successBlockLoc == null) return
                                                 if (block.location.blockX == successBlockLoc!!.blockX && block.location.blockY == successBlockLoc!!.blockY && block.location.blockZ == successBlockLoc!!.blockZ) {
                                                     Teams.joinTeam(Teams.OnlineTeam.TOSO_SUCCESS, p)
+                                                    p.playSound(p.location, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f)
                                                     p.sendMessage("""
-                                                        ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを生存者に追加しました。
+                                                        ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたを${ChatColor.BLUE}${ChatColor.UNDERLINE}生存者${ChatColor.RESET}${ChatColor.GRAY}に追加しました。
                                                         ${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}サーバーから退出した場合は逃走者になります。
                                                     """.trimIndent())
                                                 }
@@ -500,8 +501,8 @@ class onInteract : Listener {
 
                     TimedDevice.addClearedNumberSet(damager)
 
-                    damager.playSound(damager.location, Sound.ENTITY_PLAYER_LEVELUP, 1F, 1F)
-                    player.playSound(damager.location, Sound.ENTITY_PLAYER_LEVELUP, 1F, 1F)
+                    damager.playSound(damager.location, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f)
+                    player.playSound(damager.location, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f)
 
                     damager.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}同じ番号のカードキーを所持していたため${ChatColor.BOLD}${ChatColor.UNDERLINE}${player.name}${ChatColor.RESET}${ChatColor.GREEN}との認証に成功しました。")
                     player.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}同じ番号のカードキーを所持していたため${ChatColor.BOLD}${ChatColor.UNDERLINE}${damager.name}${ChatColor.RESET}${ChatColor.GREEN}との認証に成功しました。")

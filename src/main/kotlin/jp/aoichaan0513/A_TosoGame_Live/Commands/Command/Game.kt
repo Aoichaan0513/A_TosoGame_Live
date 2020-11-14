@@ -22,12 +22,11 @@ import jp.aoichaan0513.A_TosoGame_Live.Mission.TimedDevice
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.Dice
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
-import jp.aoichaan0513.A_TosoGame_Live.Utils.ParseUtil
-import jp.aoichaan0513.A_TosoGame_Live.Utils.isAdminTeam
-import jp.aoichaan0513.A_TosoGame_Live.Utils.setSidebar
+import jp.aoichaan0513.A_TosoGame_Live.Utils.*
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
+import org.bukkit.Sound
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -65,6 +64,7 @@ class Game(name: String) : ICommand(name) {
 
     private fun runCommand(sender: CommandSender, cmd: Command, label: String, args: Array<String>) {
         if (!MainAPI.isPlayer(sender) || TosoGameAPI.isAdmin(sender as Player)) {
+            val test = (args.isNotEmpty()).getValue(args.toString({ it }, "", " "), null)
             when (label) {
                 "game" -> {
                     if (args.isNotEmpty()) {
@@ -74,6 +74,7 @@ class Game(name: String) : ICommand(name) {
                             "opgame" -> runOPGame(sender, args.getOrNull(1))
                             "reset" -> runReset(sender)
                             "result" -> runResult(sender, label, args.getOrNull(1))
+                            "alert" -> runAlert(sender, (args.size > 1).getValue(args.toList().subList(1, args.size).toString({ it }, "", " "), null))
                             else -> sendHelpMessage(sender, label)
                         }
                         return
@@ -86,6 +87,7 @@ class Game(name: String) : ICommand(name) {
                 "opgame" -> runOPGame(sender, args.getOrNull(0))
                 "reset" -> runReset(sender)
                 "result" -> runResult(sender, label, args.getOrNull(0))
+                "alert" -> runAlert(sender, args.isNotEmpty().getValue(args.toString({ it }, "", " "), null))
             }
             return
         } else {
@@ -286,6 +288,15 @@ class Game(name: String) : ICommand(name) {
             return
         }
         MainAPI.sendMessage(sender, MainAPI.ErrorMessage.NOT_PLAYER)
+    }
+
+    private fun runAlert(sender: CommandSender, arg: String?) {
+        if (!arg.isNullOrBlank()) {
+            Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${arg.color()}")
+            TosoGameAPI.sendNotificationSound(Sound.BLOCK_NOTE_BLOCK_HARP, pitch = 1f)
+            return
+        }
+        MainAPI.sendMessage(sender, MainAPI.ErrorMessage.ARGS)
     }
 
 

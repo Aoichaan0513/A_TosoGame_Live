@@ -28,7 +28,6 @@ import jp.aoichaan0513.A_TosoGame_Live.Listeners.Minecraft.*
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.DateTimeUtil
-import jp.aoichaan0513.A_TosoGame_Live.Utils.getValue
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import net.dv8tion.jda.api.JDA
@@ -197,7 +196,6 @@ class Main : JavaPlugin(), Listener {
                 if (packet.playerInfoAction.read(0) != EnumWrappers.PlayerInfoAction.REMOVE_PLAYER)
                     return
 
-                println("${p.name} -> ${tabListPlayerSet.contains(p.uniqueId)}")
                 if (tabListPlayerSet.contains(packet.playerInfoDataLists.read(0)[0].profile.uuid))
                     e.isCancelled = true
             }
@@ -388,8 +386,19 @@ class Main : JavaPlugin(), Listener {
         server.scheduler.runTaskTimerAsynchronously(pluginInstance, Runnable {
             Scoreboard.updateScoreboard()
 
-            for (player in Bukkit.getOnlinePlayers())
+            for (player in Bukkit.getOnlinePlayers()) {
                 ActionBarManager.send(player, getActionBarMessage(player, decimalFormat))
+
+                val mapConfig = worldConfig.mapConfig
+                player.setPlayerListHeaderFooter(
+                        "${ChatColor.RED}${ChatColor.BOLD}Run${ChatColor.RESET}${ChatColor.GRAY} for ${ChatColor.DARK_RED}${ChatColor.BOLD}Money",
+                        """
+                            ${ChatColor.AQUA}──────────${ChatColor.RESET}${ChatColor.GOLD}${ChatColor.BOLD}${ChatColor.UNDERLINE}マップ情報${ChatColor.RESET}${ChatColor.AQUA}──────────
+                            ${ChatColor.GOLD}${ChatColor.UNDERLINE}名前${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${mapConfig.name}
+                            ${ChatColor.GOLD}${ChatColor.UNDERLINE}製作者${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}${mapConfig.authors}
+                        """.trimIndent()
+                )
+            }
         }, 0, 0)
         server.scheduler.runTaskTimer(pluginInstance, Runnable {
             for (player in Bukkit.getOnlinePlayers()) {
@@ -454,7 +463,12 @@ class Main : JavaPlugin(), Listener {
         }
 
         val targetBlock = p.getTargetBlockExact(3, FluidCollisionMode.NEVER)
-        val chairMessage = (targetBlock?.blockData is Stairs && (targetBlock.blockData as Stairs).half == Bisected.Half.BOTTOM && targetBlock.location.clone().add(0.0, -1.0, 0.0).block.type == Material.BEDROCK).getValue("${ChatColor.GOLD}${ChatColor.UNDERLINE}右クリックして椅子に座る", "")
+        val chairMessage = if (targetBlock?.blockData is Stairs && (targetBlock.blockData as Stairs).half == Bisected.Half.BOTTOM && targetBlock.location.clone().add(0.0, -1.0, 0.0).block.type == Material.BEDROCK &&
+                arrowSet.none { it.location.blockX == targetBlock.location.blockX && it.location.blockY == targetBlock.location.blockY && it.location.blockZ == targetBlock.location.blockZ }) {
+            "${ChatColor.GOLD}${ChatColor.UNDERLINE}右クリックして椅子に座る"
+        } else {
+            ""
+        }
 
         val target = p.spectatorTarget
         val spectatorMessage = if (p.gameMode == org.bukkit.GameMode.SPECTATOR && target != null && target is Player) "${ChatColor.GRAY}${target.name} に憑依中" else ""

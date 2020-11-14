@@ -1,6 +1,7 @@
 package jp.aoichaan0513.A_TosoGame_Live.Commands.Command
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
@@ -10,6 +11,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Utils.*
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.Sound
 import org.bukkit.command.BlockCommandSender
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
@@ -116,7 +118,7 @@ class Team(name: String) : ICommand(name) {
                                                 MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${player.name}が${teamName}になりました。")
                                                 v++
                                             } else {
-                                                sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${player.name}はすでに${teamName}に所属しています。")
+                                                sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}${player.name}はすでに${teamName}になっています。")
                                             }
                                             continue
                                         } else {
@@ -148,14 +150,19 @@ class Team(name: String) : ICommand(name) {
                     Main.hunterShuffleSet.clear()
                     isHunterRandom = true
 
+                    BossBarManager.showBar()
                     sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンター募集を開始しました。")
                     if (GameManager.isGame(GameManager.GameState.GAME)) {
-                        for (player in Bukkit.getOnlinePlayers().filter { it.isJailTeam })
+                        for (player in Bukkit.getOnlinePlayers().filter { it.isJailTeam }) {
+                            player.playSound(player.location, Sound.BLOCK_ANVIL_LAND, 1f, 1f)
                             player.sendMessage("""
                                 ${MainAPI.getPrefix(ChatColor.YELLOW)}ハンターを${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}募集します。
                                 ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターを希望の方は20秒以内に"${ChatColor.UNDERLINE}/h${ChatColor.RESET}${ChatColor.GRAY}"と入力してください。
                             """.trimIndent())
+                        }
                     } else {
+                        for (player in Bukkit.getOnlinePlayers())
+                            player.playSound(player.location, Sound.BLOCK_ANVIL_LAND, 1f, 1f)
                         Bukkit.broadcastMessage("""
                             ${MainAPI.getPrefix(ChatColor.YELLOW)}ハンターを${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}募集します。
                             ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}ハンターを希望の方は20秒以内に"${ChatColor.UNDERLINE}/h${ChatColor.RESET}${ChatColor.GRAY}"と入力してください。
@@ -184,10 +191,12 @@ class Team(name: String) : ICommand(name) {
                                 sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${c}人${ChatColor.RESET}${ChatColor.GRAY}をハンターに追加しました。")
                                 Main.hunterShuffleSet.clear()
                             } else {
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}ハンターを希望する方がいなかったため選出をキャンセルしました。")
+                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}ハンターへの応募がないため抽選をキャンセルしました。")
                                 Main.hunterShuffleSet.clear()
                             }
+
                             isHunterRandom = false
+                            BossBarManager.showBar()
                         }
                         c--
                     }, 0, 20)
@@ -200,14 +209,19 @@ class Team(name: String) : ICommand(name) {
                     Main.tuhoShuffleSet.clear()
                     isTuhoRandom = true
 
+                    BossBarManager.showBar()
                     sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}通報部隊募集を開始しました。")
                     if (GameManager.isGame(GameManager.GameState.GAME)) {
-                        for (player in Bukkit.getOnlinePlayers().filter { it.isJailTeam })
+                        for (player in Bukkit.getOnlinePlayers().filter { it.isJailTeam }) {
+                            player.playSound(player.location, Sound.BLOCK_ANVIL_LAND, 1f, 1f)
                             player.sendMessage("""
                                 ${MainAPI.getPrefix(ChatColor.YELLOW)}通報部隊を${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}募集します。
                                 ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}通報部隊を希望の方は20秒以内に"${ChatColor.UNDERLINE}/h${ChatColor.RESET}${ChatColor.GRAY}"と入力してください。
                             """.trimIndent())
+                        }
                     } else {
+                        for (player in Bukkit.getOnlinePlayers())
+                            player.playSound(player.location, Sound.BLOCK_ANVIL_LAND, 1f, 1f)
                         Bukkit.broadcastMessage("""
                             ${MainAPI.getPrefix(ChatColor.YELLOW)}通報部隊を${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}募集します。
                             ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}通報部隊を希望の方は20秒以内に"${ChatColor.UNDERLINE}/h${ChatColor.RESET}${ChatColor.GRAY}"と入力してください。
@@ -236,10 +250,12 @@ class Team(name: String) : ICommand(name) {
                                 sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${c}人${ChatColor.RESET}${ChatColor.GRAY}を通報部隊に追加しました。")
                                 Main.tuhoShuffleSet.clear()
                             } else {
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}通報部隊を希望する方がいなかったため選出をキャンセルしました。")
+                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}通報部隊への応募がないため抽選をキャンセルしました。")
                                 Main.tuhoShuffleSet.clear()
                             }
+
                             isTuhoRandom = false
+                            BossBarManager.showBar()
                         }
                         c--
                     }, 0, 20)

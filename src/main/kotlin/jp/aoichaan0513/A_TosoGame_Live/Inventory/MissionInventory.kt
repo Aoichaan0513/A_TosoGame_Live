@@ -95,10 +95,9 @@ class MissionInventory {
                 })
 
                 itemMetaMissionDetail.lore = if (descriptionFirst.length > 15) {
-                    descriptionFirst.lastIndexOf("\n")
-                    listOf("${ChatColor.RESET}${descriptionFirst.substring(0, 15)}…", "${ChatColor.GRAY}${ChatColor.UNDERLINE}続きはここをクリック")
+                    listOf("${ChatColor.RESET}${descriptionFirst.substring(0, 15).replace("\n", " ")}…", "${ChatColor.GRAY}${ChatColor.UNDERLINE}続きはここをクリック")
                 } else {
-                    listOf("${ChatColor.RESET}${descriptionFirst.substring(0, descriptionFirst.length)}")
+                    listOf("${ChatColor.RESET}${descriptionFirst.replace("\n", " ")}")
                 }
 
                 itemStackMissionDetail.itemMeta = itemMetaMissionDetail

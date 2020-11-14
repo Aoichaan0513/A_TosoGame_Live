@@ -25,6 +25,7 @@ class Join(name: String) : ICommand(name) {
                             if (!p.isPlayerTeam) {
                                 p.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
+                                p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                                 sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
                                 MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                                 continue
@@ -41,6 +42,7 @@ class Join(name: String) : ICommand(name) {
                 if (!sp.isPlayerTeam) {
                     sp.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
+                    sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${sp.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                     MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${sp.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                     return
                 }
@@ -59,6 +61,7 @@ class Join(name: String) : ICommand(name) {
                     if (!p.isPlayerTeam) {
                         p.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
+                        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                         bs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
                         MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                         continue
@@ -81,6 +84,7 @@ class Join(name: String) : ICommand(name) {
                     if (!p.isPlayerTeam) {
                         p.setTeam(Teams.OnlineTeam.TOSO_PLAYER, false)
 
+                        p.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                         cs.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}を逃走者に追加しました。")
                         MainAPI.broadcastAdminMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SUCCESS)}${ChatColor.BOLD}${ChatColor.UNDERLINE}${p.name}${ChatColor.RESET}${ChatColor.GREEN}がゲームに参加しました。")
                         continue

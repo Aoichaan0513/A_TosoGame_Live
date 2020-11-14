@@ -20,6 +20,7 @@ commands:
       - opgame
       - reset
       - result
+      - alert
   mission:
     description: Mission Management Command.
   team:

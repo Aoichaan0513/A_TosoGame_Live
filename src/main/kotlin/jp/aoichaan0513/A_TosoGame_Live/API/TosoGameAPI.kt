@@ -236,12 +236,12 @@ class TosoGameAPI {
             """.trimIndent())
         }
 
-        fun sendNotificationSound() {
+        fun sendNotificationSound(sound: Sound = Sound.BLOCK_NOTE_BLOCK_PLING, volume: Float = 1f, pitch: Float = 2f) {
             for (p in Bukkit.getOnlinePlayers())
-                sendNotificationSound(p)
+                sendNotificationSound(p, sound, volume, pitch)
         }
 
-        private fun sendNotificationSound(p: Player) {
+        private fun sendNotificationSound(p: Player, sound: Sound = Sound.BLOCK_NOTE_BLOCK_PLING, volume: Float = 1f, pitch: Float = 2f) {
             /*
             new BukkitRunnable() {
                 int count = 0;
@@ -262,7 +262,7 @@ class TosoGameAPI {
 
                 override fun run() {
                     if (c in 18..26 || c in 1..9)
-                        p.playSound(p.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 2f)
+                        p.playSound(p.location, sound, volume, pitch)
                     if (c < 0)
                         cancel()
                     c--

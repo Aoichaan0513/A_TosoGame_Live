@@ -160,7 +160,6 @@ class onJoin : Listener {
         for (player in Bukkit.getOnlinePlayers())
             player.setSidebar()
 
-        p.setPlayerListHeaderFooter("${ChatColor.RED}${ChatColor.BOLD}Run${ChatColor.RESET}${ChatColor.GRAY} for ${ChatColor.DARK_RED}${ChatColor.BOLD}Money", "")
         TosoGameAPI.sendInformationText(p)
 
         val scoreboard = Scoreboard.getBoard(p)
