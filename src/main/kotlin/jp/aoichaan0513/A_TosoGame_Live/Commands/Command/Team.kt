@@ -184,16 +184,16 @@ class Team(name: String) : ICommand(name) {
                                 if (list.isNotEmpty()) {
                                     Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}ハンターを${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}選出しています…")
 
-                                    var c = 0
+                                    var v = 0
                                     for (i in 0 until count.coerceAtMost(list.size)) {
                                         val p = list[i]
                                         p.setTeam(Teams.OnlineTeam.TOSO_HUNTER, worldConfig = worldConfig)
 
-                                        c++
+                                        v++
                                         Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}がハンターになりました。")
                                     }
 
-                                    sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${c}人${ChatColor.RESET}${ChatColor.GRAY}をハンターに追加しました。")
+                                    sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${v}人${ChatColor.RESET}${ChatColor.GRAY}をハンターに追加しました。")
                                     Main.hunterShuffleSet.clear()
                                 } else {
                                     Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}ハンターへの応募がないため抽選をキャンセルしました。")
@@ -249,16 +249,16 @@ class Team(name: String) : ICommand(name) {
                                 if (list.isNotEmpty()) {
                                     Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}通報部隊を${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}選出しています…")
 
-                                    var c = 0
+                                    var v = 0
                                     for (i in 0 until count.coerceAtMost(list.size)) {
-                                        val p = list.removeAt(i)
+                                        val p = list[i]
                                         p.setTeam(Teams.OnlineTeam.TOSO_TUHO, worldConfig = worldConfig)
 
-                                        c++
+                                        v++
                                         Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}が通報部隊になりました。")
                                     }
 
-                                    sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${c}人${ChatColor.RESET}${ChatColor.GRAY}を通報部隊に追加しました。")
+                                    sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${v}人${ChatColor.RESET}${ChatColor.GRAY}を通報部隊に追加しました。")
                                     Main.tuhoShuffleSet.clear()
                                 } else {
                                     Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}通報部隊への応募がないため抽選をキャンセルしました。")
