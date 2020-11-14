@@ -2,6 +2,7 @@ package jp.aoichaan0513.A_TosoGame_Live.API.Advancement
 
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI.PrefixType
+import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
 import jp.aoichaan0513.A_TosoGame_Live.Utils.ReflectionUtil
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.HoverEvent
@@ -23,6 +24,7 @@ enum class Advancement {
     FIRST_HUNTER(1, Material.DIAMOND_CHESTPLATE, "初めてのハンター", listOf("${ChatColor.WHITE}ハンターの選出を果たす。")),
     FIRST_GAME_CLEAR(2, Material.EMERALD_BLOCK, Sound.UI_TOAST_CHALLENGE_COMPLETE, "初めての逃走成功", listOf("${ChatColor.WHITE}逃走成功を果たす。")),
     FIRST_HUNTER_TOUCH(3, "初めての確保", listOf("${ChatColor.WHITE}逃走者を確保する。")),
+    LUCKY_SNOWBALL(4, Material.SNOWBALL, "幸運の持ち主", listOf("${ChatColor.WHITE}オープニングゲームが成功し、さらにランダムで雪玉が配られる。")),
 
     UPDATE_2_0_0(1000, "生まれ変わった逃走中", listOf("${ChatColor.WHITE}新しくなった逃走中に参加する。")),
 
@@ -119,6 +121,15 @@ enum class Advancement {
     companion object {
         fun getAdvancement(id: Int): Advancement {
             return values().firstOrNull { it.id == id } ?: UNKNOWN
+        }
+
+        fun addAdvancement(p: Player, advancement: Advancement) {
+            val playerConfig = PlayerManager.loadConfig(p)
+            if (playerConfig.advancementConfig.hasAdvancement(advancement))
+                return
+
+            playerConfig.advancementConfig.addAdvancement(advancement)
+            advancement.sendMessage(p)
         }
     }
 }

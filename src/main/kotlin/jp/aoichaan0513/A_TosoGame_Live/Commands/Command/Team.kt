@@ -17,6 +17,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitRunnable
 
 class Team(name: String) : ICommand(name) {
 
@@ -169,37 +170,44 @@ class Team(name: String) : ICommand(name) {
                         """.trimIndent())
                     }
 
-                    var c = 20
-                    Bukkit.getScheduler().runTaskTimer(Main.pluginInstance, Runnable {
-                        if (c == 10) {
-                            Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}ハンターの募集終了まで${ChatColor.GOLD}${ChatColor.UNDERLINE}残り10秒${ChatColor.RESET}${ChatColor.YELLOW}です。")
-                        } else if (c == 0) {
-                            val list = MainAPI.getOnlinePlayers(Main.hunterShuffleSet).shuffled().toMutableList()
+                    object : BukkitRunnable() {
 
-                            if (list.isNotEmpty()) {
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}ハンターを${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}選出しています…")
+                        var c = 20
 
-                                var c = 0
-                                for (i in 0 until count.coerceAtMost(list.size)) {
-                                    val p = list[i]
-                                    p.setTeam(Teams.OnlineTeam.TOSO_HUNTER, worldConfig = worldConfig)
+                        override fun run() {
+                            if (c == 10) {
+                                Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}ハンターの募集終了まで${ChatColor.GOLD}${ChatColor.UNDERLINE}残り10秒${ChatColor.RESET}${ChatColor.YELLOW}です。")
+                            } else if (c == 0) {
+                                // 3
+                                val list = MainAPI.getOnlinePlayers(Main.hunterShuffleSet).shuffled().toMutableList()
 
-                                    c++
-                                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}がハンターになりました。")
+                                if (list.isNotEmpty()) {
+                                    Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}ハンターを${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}選出しています…")
+
+                                    var c = 0
+                                    for (i in 0 until count.coerceAtMost(list.size)) {
+                                        val p = list[i]
+                                        p.setTeam(Teams.OnlineTeam.TOSO_HUNTER, worldConfig = worldConfig)
+
+                                        c++
+                                        Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}がハンターになりました。")
+                                    }
+
+                                    sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${c}人${ChatColor.RESET}${ChatColor.GRAY}をハンターに追加しました。")
+                                    Main.hunterShuffleSet.clear()
+                                } else {
+                                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}ハンターへの応募がないため抽選をキャンセルしました。")
+                                    Main.hunterShuffleSet.clear()
                                 }
 
-                                sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${c}人${ChatColor.RESET}${ChatColor.GRAY}をハンターに追加しました。")
-                                Main.hunterShuffleSet.clear()
-                            } else {
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}ハンターへの応募がないため抽選をキャンセルしました。")
-                                Main.hunterShuffleSet.clear()
-                            }
+                                isHunterRandom = false
+                                BossBarManager.showBar()
 
-                            isHunterRandom = false
-                            BossBarManager.showBar()
+                                cancel()
+                            }
+                            c--
                         }
-                        c--
-                    }, 0, 20)
+                    }.runTaskTimer(Main.pluginInstance, 0, 20)
                     return
                 }
                 sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}ハンター募集中のため実行できません。")
@@ -228,37 +236,43 @@ class Team(name: String) : ICommand(name) {
                         """.trimIndent())
                     }
 
-                    var c = 20
-                    Bukkit.getScheduler().runTaskTimer(Main.pluginInstance, Runnable {
-                        if (c == 10) {
-                            Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}通報部隊の募集終了まで${ChatColor.GOLD}${ChatColor.UNDERLINE}残り10秒${ChatColor.RESET}${ChatColor.YELLOW}です。")
-                        } else if (c == 0) {
-                            val list = MainAPI.getOnlinePlayers(Main.tuhoShuffleSet).shuffled().toMutableList()
+                    object : BukkitRunnable() {
 
-                            if (list.isNotEmpty()) {
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}通報部隊を${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}選出しています…")
+                        var c = 20
 
-                                var c = 0
-                                for (i in 0 until count.coerceAtMost(list.size)) {
-                                    val p = list.removeAt(i)
-                                    p.setTeam(Teams.OnlineTeam.TOSO_TUHO, worldConfig = worldConfig)
+                        override fun run() {
+                            if (c == 10) {
+                                Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}通報部隊の募集終了まで${ChatColor.GOLD}${ChatColor.UNDERLINE}残り10秒${ChatColor.RESET}${ChatColor.YELLOW}です。")
+                            } else if (c == 0) {
+                                val list = MainAPI.getOnlinePlayers(Main.tuhoShuffleSet).shuffled().toMutableList()
 
-                                    c++
-                                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}が通報部隊になりました。")
+                                if (list.isNotEmpty()) {
+                                    Bukkit.broadcastMessage("${MainAPI.getPrefix(ChatColor.YELLOW)}通報部隊を${ChatColor.GOLD}${ChatColor.UNDERLINE}${count}人${ChatColor.RESET}${ChatColor.YELLOW}選出しています…")
+
+                                    var c = 0
+                                    for (i in 0 until count.coerceAtMost(list.size)) {
+                                        val p = list.removeAt(i)
+                                        p.setTeam(Teams.OnlineTeam.TOSO_TUHO, worldConfig = worldConfig)
+
+                                        c++
+                                        Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${p.name}が通報部隊になりました。")
+                                    }
+
+                                    sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${c}人${ChatColor.RESET}${ChatColor.GRAY}を通報部隊に追加しました。")
+                                    Main.tuhoShuffleSet.clear()
+                                } else {
+                                    Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}通報部隊への応募がないため抽選をキャンセルしました。")
+                                    Main.tuhoShuffleSet.clear()
                                 }
 
-                                sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}${ChatColor.GREEN}${ChatColor.UNDERLINE}${c}人${ChatColor.RESET}${ChatColor.GRAY}を通報部隊に追加しました。")
-                                Main.tuhoShuffleSet.clear()
-                            } else {
-                                Bukkit.broadcastMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}通報部隊への応募がないため抽選をキャンセルしました。")
-                                Main.tuhoShuffleSet.clear()
-                            }
+                                isTuhoRandom = false
+                                BossBarManager.showBar()
 
-                            isTuhoRandom = false
-                            BossBarManager.showBar()
+                                cancel()
+                            }
+                            c--
                         }
-                        c--
-                    }, 0, 20)
+                    }.runTaskTimer(Main.pluginInstance, 0, 20)
                     return
                 }
                 sender.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.ERROR)}通報部隊募集中のため実行できません。")

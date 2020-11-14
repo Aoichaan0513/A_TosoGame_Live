@@ -26,9 +26,7 @@ class MainAPI {
         }
 
         fun getOnlinePlayers(collection: Collection<UUID>): Set<Player> {
-            val set = mutableSetOf<Player>()
-            collection.filter { Bukkit.getPlayer(it)?.isOnline ?: false }.forEach { set.add(Bukkit.getPlayer(it)!!) }
-            return set
+            return collection.filter { Bukkit.getPlayer(it)?.isOnline ?: false }.map { Bukkit.getPlayer(it)!! }.toSet()
         }
 
 
@@ -59,11 +57,11 @@ class MainAPI {
         }
 
         fun isOnline(name: String): Boolean {
-            return isOnline(Bukkit.getPlayerExact(name))
+            return isOnline(Bukkit.getOfflinePlayer(name))
         }
 
         fun isOnline(uuid: UUID): Boolean {
-            return isOnline(Bukkit.getPlayer(uuid))
+            return isOnline(Bukkit.getOfflinePlayer(uuid))
         }
 
         fun isPlayed(p: Player): Boolean {

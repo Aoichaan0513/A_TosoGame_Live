@@ -111,7 +111,7 @@ class Dice {
                                         itemMeta.setDisplayName("${ChatColor.GREEN}雪玉 (移動禁止)")
                                         itemMeta.lore = listOf("${ChatColor.YELLOW}ハンターに当てるとその周りに檻を貼り20秒間動けなくします。")
                                         itemStack.itemMeta = itemMeta
-                                        player.inventory.addItem(ItemStack(Material.SNOWBALL))
+                                        player.inventory.addItem(itemStack)
                                     }
                                 }, 20 * 31)
 
