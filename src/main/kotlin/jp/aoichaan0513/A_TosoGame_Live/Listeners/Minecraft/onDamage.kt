@@ -4,7 +4,6 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Advancement.Advancement
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.VisibilityManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
@@ -57,11 +56,7 @@ class onDamage : Listener {
                         ${MainAPI.getPrefix(MainAPI.PrefixType.SECONDARY)}あなたは${damager.name}に確保されました。3秒後に牢獄へテレポートします。
                     """.trimIndent())
 
-                    val playerConfig = PlayerManager.loadConfig(damager)
-                    if (!playerConfig.advancementConfig.hasAdvancement(Advancement.FIRST_HUNTER_TOUCH)) {
-                        playerConfig.advancementConfig.addAdvancement(Advancement.FIRST_HUNTER_TOUCH)
-                        Advancement.FIRST_HUNTER_TOUCH.sendMessage(damager)
-                    }
+                    Advancement.FIRST_HUNTER_TOUCH.addAdvancement(damager)
 
                     Teams.joinTeam(Teams.OnlineTeam.TOSO_JAIL, player)
                     player.gameMode = GameMode.ADVENTURE

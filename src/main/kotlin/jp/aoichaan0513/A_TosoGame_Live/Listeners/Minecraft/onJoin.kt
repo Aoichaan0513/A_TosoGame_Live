@@ -52,15 +52,10 @@ class onJoin : Listener {
 
         playerConfig.bookForegroundColor = PlayerConfig.BookForegroundColor.BLACK
 
-        if (playerConfig.advancementConfig.hasAdvancement(Advancement.FIRST_JOIN) && !playerConfig.advancementConfig.hasAdvancement(Advancement.UPDATE_2_0_0)) {
-            playerConfig.advancementConfig.addAdvancement(Advancement.UPDATE_2_0_0)
-            Advancement.UPDATE_2_0_0.sendMessage(p)
-        }
+        if (playerConfig.advancementConfig.hasAdvancement(Advancement.FIRST_JOIN) && !playerConfig.advancementConfig.hasAdvancement(Advancement.UPDATE_2_0_0))
+            Advancement.UPDATE_2_0_0.addAdvancement(p)
 
-        if (!playerConfig.advancementConfig.hasAdvancement(Advancement.FIRST_JOIN)) {
-            playerConfig.advancementConfig.addAdvancement(Advancement.FIRST_JOIN)
-            Advancement.FIRST_JOIN.sendMessage(p)
-        }
+        Advancement.FIRST_JOIN.addAdvancement(p)
 
         val difficulty = playerConfig.difficulty
         if (!DifficultyManager.isDifficulty(p))

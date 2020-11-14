@@ -1,5 +1,6 @@
 package jp.aoichaan0513.A_TosoGame_Live.OPGame
 
+import jp.aoichaan0513.A_TosoGame_Live.API.Advancement.Advancement
 import jp.aoichaan0513.A_TosoGame_Live.API.MainAPI
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
@@ -112,6 +113,7 @@ class Dice {
                                         itemMeta.lore = listOf("${ChatColor.YELLOW}ハンターに当てるとその周りに檻を貼り20秒間動けなくします。")
                                         itemStack.itemMeta = itemMeta
                                         player.inventory.addItem(itemStack)
+                                        Advancement.LUCKY_SNOWBALL.addAdvancement(player)
                                     }
                                 }, 20 * 31)
 

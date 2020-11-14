@@ -7,7 +7,6 @@ import jp.aoichaan0513.A_TosoGame_Live.API.Manager.BossBarManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.GameManager.GameState
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.MoneyManager
-import jp.aoichaan0513.A_TosoGame_Live.API.Manager.Player.PlayerManager
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldConfig
 import jp.aoichaan0513.A_TosoGame_Live.API.Manager.World.WorldManager.GameType
 import jp.aoichaan0513.A_TosoGame_Live.API.Scoreboard.Teams
@@ -19,7 +18,6 @@ import jp.aoichaan0513.A_TosoGame_Live.Main
 import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Utils.*
-
 import net.md_5.bungee.api.chat.ClickEvent
 import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.HoverEvent
@@ -147,11 +145,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
 
                             for (p in Bukkit.getOnlinePlayers()) {
                                 if (p.isSuccessTeam) {
-                                    val playerConfig = PlayerManager.loadConfig(p)
-                                    if (!playerConfig.advancementConfig.hasAdvancement(Advancement.FIRST_GAME_CLEAR)) {
-                                        playerConfig.advancementConfig.addAdvancement(Advancement.FIRST_GAME_CLEAR)
-                                        Advancement.FIRST_GAME_CLEAR.sendMessage(p)
-                                    }
+                                    Advancement.FIRST_GAME_CLEAR.addAdvancement(p)
 
                                     p.playSound(p.location, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f)
                                     p.addPotionEffect(PotionEffect(PotionEffectType.GLOWING, 200000, 1, false, false))
@@ -270,11 +264,7 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
                             if (p.isPlayerTeam)
                                 Teams.joinTeam(OnlineTeam.TOSO_SUCCESS, p)
 
-                            val playerConfig = PlayerManager.loadConfig(p)
-                            if (!playerConfig.advancementConfig.hasAdvancement(Advancement.FIRST_GAME_CLEAR)) {
-                                playerConfig.advancementConfig.addAdvancement(Advancement.FIRST_GAME_CLEAR)
-                                Advancement.FIRST_GAME_CLEAR.sendMessage(p)
-                            }
+                            Advancement.FIRST_GAME_CLEAR.addAdvancement(p)
 
                             if (p.isSuccessTeam) {
                                 p.playSound(p.location, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f)

@@ -68,7 +68,16 @@ enum class Advancement {
         this.descriptions = descriptions
     }
 
-    fun sendMessage(p: Player) {
+    fun addAdvancement(p: Player) {
+        val playerConfig = PlayerManager.loadConfig(p)
+        if (playerConfig.advancementConfig.hasAdvancement(this))
+            return
+
+        playerConfig.advancementConfig.addAdvancement(this)
+        sendMessage(p)
+    }
+
+    private fun sendMessage(p: Player) {
         val itemStack = ItemStack(material)
         val itemMeta = itemStack.itemMeta!!
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS)
@@ -121,15 +130,6 @@ enum class Advancement {
     companion object {
         fun getAdvancement(id: Int): Advancement {
             return values().firstOrNull { it.id == id } ?: UNKNOWN
-        }
-
-        fun addAdvancement(p: Player, advancement: Advancement) {
-            val playerConfig = PlayerManager.loadConfig(p)
-            if (playerConfig.advancementConfig.hasAdvancement(advancement))
-                return
-
-            playerConfig.advancementConfig.addAdvancement(advancement)
-            advancement.sendMessage(p)
         }
     }
 }
