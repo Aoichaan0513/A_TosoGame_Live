@@ -61,7 +61,7 @@ dependencies {
     compileOnly group: 'com.comphenix.protocol', name: 'ProtocolLib', version: '4.5.0'
 
     implementation group: 'jp.aoichaan0513', name: 'Kotlin_Utils', version: '1.1.2'
-    implementation group: 'jp.aoichaan0513', name: 'ActionBarBuilder', version: '1.1.0'
+    implementation group: 'jp.aoichaan0513', name: 'ActionBarBuilder', version: '1.1.1'
 
     // Discord
     implementation group: 'net.dv8tion', name: 'JDA', version: '4.2.0_222'
