@@ -34,15 +34,37 @@ abstract class ICommand(private val name: String) : TabExecutor {
         return null
     }
 
-    fun getTabList(str: String, set: Set<String>): List<String> {
-        return (if (str.isEmpty()) set else set.filter { it.toLowerCase().startsWith(str.toLowerCase()) }).toList()
-    }
+    /**
+     * タブ補完用の拡張関数
+     *
+     * @param arg 文字列
+     * @param collection Stringを要素としたコレクション
+     * @return List<String> (Immutable, Not Nullable)
+     *
+     * @author Aoichaan0513
+     */
+    fun getTabList(arg: String, collection: Collection<String>) =
+            (if (arg.isBlank()) collection else collection.filter { it.startsWith(arg, true) }).toList()
 
-    fun getTabList(str: String, collection: Collection<String>): List<String> {
-        return getTabList(str, collection.toSet())
-    }
+    /**
+     * タブ補完用の拡張関数
+     *
+     * @param arg 文字列
+     * @param iterable Stringを要素とした反復可能要素
+     * @return List<String> (Immutable, Not Nullable)
+     *
+     * @author Aoichaan0513
+     */
+    fun getTabList(arg: String, iterable: Iterable<String>) = getTabList(arg, iterable.toSet())
 
-    fun getTabList(str: String, vararg args: String): List<String> {
-        return getTabList(str, args.toSet())
-    }
+    /**
+     * タブ補完用の拡張関数
+     *
+     * @param arg 文字列
+     * @param array Stringを要素とした配列
+     * @return List<String> (Immutable, Not Nullable)
+     *
+     * @author Aoichaan0513
+     */
+    fun getTabList(arg: String, vararg array: String) = getTabList(arg, array.toSet())
 }
