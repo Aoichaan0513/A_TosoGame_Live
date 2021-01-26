@@ -23,8 +23,6 @@ import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerTeam
-import jp.aoichaan0513.A_TosoGame_Live.Utils.setSidebar
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
@@ -152,8 +150,10 @@ class onJoin : Listener {
             }
         }
 
+        /*
         for (player in Bukkit.getOnlinePlayers())
             player.setSidebar()
+        */
 
         TosoGameAPI.sendInformationText(p)
 
