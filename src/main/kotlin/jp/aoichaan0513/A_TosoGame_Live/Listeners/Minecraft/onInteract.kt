@@ -517,51 +517,64 @@ class onInteract : Listener {
     @EventHandler
     fun onAnimation(e: PlayerAnimationEvent) {
         val p = e.player
+        val inv = p.inventory
+        val mainHand = inv.itemInMainHand
+        val offHand = inv.itemInOffHand
 
-        if (e.animationType != PlayerAnimationType.ARM_SWING || !p.isPlayerGroup && !p.isJailTeam)
+        if (e.animationType != PlayerAnimationType.ARM_SWING || !p.isPlayerGroup && !p.isJailTeam
+                || mainHand.toString().contains("AIR", true) && offHand.toString().contains("AIR", true))
             return
 
         val blocks = p.getLineOfSight(Material.values().toSet(), 5).filterNotNull()
-        blocks.firstOrNull { !it.type.toString().contains("AIR", true) } ?: return
 
-        val worldConfig = Main.worldConfig
-        val difficultyConfig = worldConfig.getDifficultyConfig(p)
+        Bukkit.getScheduler().runTaskAsynchronously(Main.pluginInstance, Runnable {
+            blocks.firstOrNull { !it.type.toString().contains("AIR", true) } ?: return@Runnable
 
-        val itemGameType = RespawnRunnable.getGameType(p)
+            val worldConfig = Main.worldConfig
+            val difficultyConfig = worldConfig.getDifficultyConfig(p)
 
-        if (p.isPlayerGroup) {
-            if (p.inventory.itemInMainHand.type == Material.BONE) {
-                bone(p, true, difficultyConfig, itemGameType)
-            } else if (p.inventory.itemInOffHand.type == Material.BONE) {
-                bone(p, false, difficultyConfig, itemGameType)
-            } else if (p.inventory.itemInMainHand.type == Material.FEATHER) {
-                feather(p, true, difficultyConfig, itemGameType)
-            } else if (p.inventory.itemInOffHand.type == Material.FEATHER) {
-                feather(p, false, difficultyConfig, itemGameType)
-            } else if (p.inventory.itemInMainHand.type == Material.BOOK) {
-                val itemMeta = p.inventory.itemInMainHand.itemMeta
-                if (itemMeta == null || ChatColor.stripColor(itemMeta.displayName) != Main.PHONE_ITEM_NAME) return
+            val itemGameType = RespawnRunnable.getGameType(p)
 
-                e.isCancelled = true
-                p.openInventory(MainInventory.getInventory(p))
-            } else {
-                val itemMeta = p.inventory.itemInOffHand.itemMeta
-                if (itemMeta == null || ChatColor.stripColor(itemMeta.displayName) != Main.PHONE_ITEM_NAME) return
+            if (p.isPlayerGroup) {
+                if (mainHand.type == Material.BONE) {
+                    bone(p, true, difficultyConfig, itemGameType)
+                } else if (offHand.type == Material.BONE) {
+                    bone(p, false, difficultyConfig, itemGameType)
+                } else if (mainHand.type == Material.FEATHER) {
+                    feather(p, true, difficultyConfig, itemGameType)
+                } else if (offHand.type == Material.FEATHER) {
+                    feather(p, false, difficultyConfig, itemGameType)
+                } else if (mainHand.type == Material.BOOK) {
+                    val itemMeta = mainHand.itemMeta
+                    if (itemMeta == null || ChatColor.stripColor(itemMeta.displayName) != Main.PHONE_ITEM_NAME) return@Runnable
 
-                e.isCancelled = true
-                p.openInventory(MainInventory.getInventory(p))
+                    e.isCancelled = true
+
+                    Bukkit.getScheduler().runTask(Main.pluginInstance, Runnable {
+                        p.openInventory(MainInventory.getInventory(p))
+                    })
+                } else {
+                    val itemMeta = offHand.itemMeta
+                    if (itemMeta == null || ChatColor.stripColor(itemMeta.displayName) != Main.PHONE_ITEM_NAME) return@Runnable
+
+                    e.isCancelled = true
+
+                    Bukkit.getScheduler().runTask(Main.pluginInstance, Runnable {
+                        p.openInventory(MainInventory.getInventory(p))
+                    })
+                }
+            } else if (p.isJailTeam) {
+                if (mainHand.type == Material.ENDER_PEARL) {
+                    enderPearl(p, true)
+                } else if (offHand.type == Material.ENDER_PEARL) {
+                    enderPearl(p, false)
+                } else if (mainHand.type == Material.ENDER_EYE) {
+                    enderEye(p, true)
+                } else if (offHand.type == Material.ENDER_EYE) {
+                    enderEye(p, false)
+                }
             }
-        } else if (p.isJailTeam) {
-            if (p.inventory.itemInMainHand.type == Material.ENDER_PEARL) {
-                enderPearl(p, true)
-            } else if (p.inventory.itemInOffHand.type == Material.ENDER_PEARL) {
-                enderPearl(p, false)
-            } else if (p.inventory.itemInMainHand.type == Material.ENDER_EYE) {
-                enderEye(p, true)
-            } else if (p.inventory.itemInOffHand.type == Material.ENDER_EYE) {
-                enderEye(p, false)
-            }
-        }
+        })
     }
 
 
@@ -594,8 +607,10 @@ class onInteract : Listener {
             }
         }
 
-        p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
-        p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, duration, 1, false, false))
+        Bukkit.getScheduler().runTask(Main.pluginInstance, Runnable {
+            p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
+            p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, duration, 1, false, false))
+        })
 
         Main.worldConfig.world.entities
                 .filter { it is Zombie && it.target is Player && it.target?.uniqueId == p.uniqueId }
@@ -627,8 +642,10 @@ class onInteract : Listener {
             }
         }
 
-        p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
-        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, duration, 1, false, false))
+        Bukkit.getScheduler().runTask(Main.pluginInstance, Runnable {
+            p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, duration, 1, false, false))
+        })
     }
 
     private fun enderPearl(p: Player, isMainHand: Boolean) {

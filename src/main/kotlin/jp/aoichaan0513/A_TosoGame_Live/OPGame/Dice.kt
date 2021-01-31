@@ -208,17 +208,10 @@ class Dice {
         }
 
         fun getSnowballPlayers(i: Int): Set<UUID> {
-            val list = mutableListOf<UUID>()
-
-            Bukkit.getOnlinePlayers().filter { it.isPlayerGroup }.forEach { list.add(it.uniqueId) }
-
+            val list = Bukkit.getOnlinePlayers().filter { it.isPlayerGroup }.map { it.uniqueId }
             for (c in 0..2)
                 list.shuffle()
-
-            val set = mutableSetOf<UUID>()
-            for (c in 0 until if (list.size > i) i else list.size)
-                set.add(list[c])
-            return set
+            return list.subList(0, list.size.coerceAtMost(i))
         }
 
         private fun scheduleRunCommand(p: Player) {

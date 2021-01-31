@@ -20,6 +20,7 @@ import jp.aoichaan0513.A_TosoGame_Live.Mission.HunterZone
 import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.OPGame.OPGameManager
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
+import jp.aoichaan0513.A_TosoGame_Live.Utils.PlayerUtil
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isJailTeam
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerGroup
 import jp.aoichaan0513.A_TosoGame_Live.Utils.isPlayerTeam
@@ -89,7 +90,8 @@ class onJoin : Listener {
         }
 
         if (p.isPlayerTeam) {
-            Teams.joinTeam(OnlineTeam.TOSO_PLAYER, p)
+            // Teams.joinTeam(OnlineTeam.TOSO_PLAYER, p)
+            PlayerUtil.setSidebar()
             p.gameMode = GameMode.ADVENTURE
 
             TosoGameAPI.removeOp(p)
@@ -102,7 +104,8 @@ class onJoin : Listener {
                 HunterZone.removeLeavedSet(p)
             }
         } else if (p.isJailTeam) {
-            Teams.joinTeam(OnlineTeam.TOSO_JAIL, p)
+            // Teams.joinTeam(OnlineTeam.TOSO_JAIL, p)
+            PlayerUtil.setSidebar()
             p.gameMode = GameMode.ADVENTURE
 
             TosoGameAPI.setItem(GameType.START, p)
@@ -156,9 +159,9 @@ class onJoin : Listener {
 
         TosoGameAPI.sendInformationText(p)
 
-        val scoreboard = Scoreboard.getBoard(p)
-        Teams.setTeamOption(scoreboard)
-        p.scoreboard = scoreboard
+        // val scoreboard = Scoreboard.getBoard(p)
+        // Teams.setTeamOption(scoreboard)
+        // p.scoreboard = scoreboard
         //  Teams.setTeamOptions()
         return
     }

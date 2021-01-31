@@ -226,17 +226,11 @@ class Teams {
             else OnlineTeam.TOSO_PLAYER
         }
 
-        fun getOnlineCount(team: OnlineTeam): Int {
-            return team.team.entries.filter { Bukkit.getPlayerExact(it) != null }.size
-        }
+        fun getOnlineCount(team: OnlineTeam) = team.team.entries.filter { Bukkit.getPlayerExact(it) != null }.size
 
-        fun hasJoinedTeam(team: OnlineTeam, p: Player): Boolean {
-            return team.team.hasEntry(p.name)
-        }
+        fun hasJoinedTeam(team: OnlineTeam, p: Player) = team.team.hasEntry(p.name)
 
-        fun hasJoinedTeams(p: Player): Boolean {
-            return OnlineTeam.values().any { hasJoinedTeam(it, p) }
-        }
+        fun hasJoinedTeams(p: Player) = OnlineTeam.values().any { hasJoinedTeam(it, p) }
 
         fun joinTeam(team: OnlineTeam, p: Player) {
             team.team.addEntry(p.name)
@@ -248,7 +242,6 @@ class Teams {
             }
 
             PlayerUtil.setSidebar()
-            return
         }
 
         fun leaveTeam(team: OnlineTeam, p: Player) {
@@ -260,7 +253,6 @@ class Teams {
                 team.getTeam(board).removeEntry(p.name)
 
             PlayerUtil.setSidebar()
-            return
         }
 
         fun setTeamOptions() {
