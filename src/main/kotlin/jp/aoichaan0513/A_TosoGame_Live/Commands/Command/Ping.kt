@@ -18,7 +18,7 @@ class Ping(name: String) : ICommand(name) {
             if (TosoGameAPI.isAdmin(sp)) {
                 val p = Bukkit.getPlayerExact(args[0])
                 if (p != null) {
-                    sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}${p.name}'s Pong! ${ChatColor.YELLOW}${getPing(sp)}${ChatColor.GOLD}ms")
+                    sp.sendMessage("${MainAPI.getPrefix(MainAPI.PrefixType.WARNING)}${p.name}'s Pong! ${ChatColor.YELLOW}${getPing(p)}${ChatColor.GOLD}ms")
                     return
                 }
                 MainAPI.sendOfflineMessage(sp, args[0])

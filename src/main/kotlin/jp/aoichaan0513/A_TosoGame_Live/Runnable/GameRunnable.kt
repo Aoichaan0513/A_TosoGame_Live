@@ -61,7 +61,10 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
         }
     }
 
+    val worldConfig = Main.worldConfig
+
     init {
+
         countDown = initialCountDown
         settingCountDown = initialCountDown
         gameTime = initialGameTime
@@ -70,8 +73,6 @@ class GameRunnable(initialCountDown: Int, initialGameTime: Int) : BukkitRunnable
 
     override fun run() {
         if (!GameManager.isGame()) return
-
-        val worldConfig = Main.worldConfig
 
         if (countDown <= 0) {
             gameTime--

@@ -54,13 +54,9 @@ class MissionManager {
 
         var bossBarCount = 10
 
-        fun isMission(id: Int): Boolean {
-            return missionStates.isNotEmpty() && missionStates.contains(id)
-        }
+        fun isMission(id: Int) = missionStates.isNotEmpty() && missionStates.contains(id)
 
-        fun isMission(missionState: MissionState): Boolean {
-            return isMission(missionState.id)
-        }
+        fun isMission(missionState: MissionState) = isMission(missionState.id)
 
         val isMissions
             get() = missionStates.isNotEmpty()
@@ -186,7 +182,7 @@ class MissionManager {
 
         fun setBossBar() {
             if (GameManager.isGame()) {
-                if (bossBarList.filter { it == -1 || isMission(it) }.isEmpty()) return
+                if (bossBarList.none { it == -1 || isMission(it) }) return
 
                 val result = bossBarList.filter { it == -1 || isMission(it) }[0]
 
@@ -199,7 +195,8 @@ class MissionManager {
                             var i = 10
 
                             override fun run() {
-                                if (i < 0) cancel()
+                                if (i < 0)
+                                    cancel()
 
                                 if (isMissions) {
                                     bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
@@ -225,7 +222,8 @@ class MissionManager {
                             var i = 10
 
                             override fun run() {
-                                if (i < 0 || !isMission(MissionState.HUNTER_ZONE) || HunterZone.internalMissionState != InternalMissionState.START) cancel()
+                                if (i < 0 || !isMission(MissionState.HUNTER_ZONE) || HunterZone.internalMissionState != InternalMissionState.START)
+                                    cancel()
 
                                 bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
 
@@ -247,7 +245,8 @@ class MissionManager {
                             var i = 10
 
                             override fun run() {
-                                if (i < 0 || !isMission(MissionState.TIMED_DEVICE) || TimedDevice.internalMissionState != InternalMissionState.START) cancel()
+                                if (i < 0 || !isMission(MissionState.TIMED_DEVICE) || TimedDevice.internalMissionState != InternalMissionState.START)
+                                    cancel()
 
                                 bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
 
@@ -269,7 +268,9 @@ class MissionManager {
                             var i = 10
 
                             override fun run() {
-                                if (i < 0 || !isMission(result)) cancel()
+                                // println("timeout -> ${i < 0}, isMission -> ${isMission(result)}")
+                                if (i < 0 || !isMission(result))
+                                    cancel()
 
                                 bossBar?.players?.filter { it.isHunterGroup }?.forEach { bossBar?.removePlayer(it) }
 

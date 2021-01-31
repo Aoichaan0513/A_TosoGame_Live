@@ -209,12 +209,12 @@ class TosoGameAPI {
 
         // テレポート
         fun teleport(p: Player, location: Location) {
-            Bukkit.getScheduler().runTask(Main.pluginInstance, Runnable { p.teleport(location) })
+            Bukkit.getScheduler().runTaskLater(Main.pluginInstance, Runnable { p.teleport(location) }, 1)
         }
 
         fun teleport(p: Player, collection: Collection<Location>) {
             if (collection.isEmpty()) return
-            Bukkit.getScheduler().runTask(Main.pluginInstance, Runnable { p.teleport(collection.shuffled(ThreadLocalRandom.current())[0]) })
+            Bukkit.getScheduler().runTaskLater(Main.pluginInstance, Runnable { p.teleport(collection.shuffled(ThreadLocalRandom.current())[0]) }, 1)
         }
 
         // 通知・サウンド

@@ -96,6 +96,7 @@ class onJoin : Listener {
 
             if (OPGameManager.opGameState != OPGameManager.OPGameState.NONE)
                 TosoGameAPI.teleport(p, worldConfig.opGameLocationConfig.gOPLocations.values)
+
             if (HunterZone.containsLeavedSet(p)) {
                 TosoGameAPI.teleport(p, worldConfig.respawnLocationConfig.locations.values)
                 HunterZone.removeLeavedSet(p)
@@ -105,7 +106,6 @@ class onJoin : Listener {
             p.gameMode = GameMode.ADVENTURE
 
             TosoGameAPI.setItem(GameType.START, p)
-            TosoGameAPI.setPotionEffect(p)
             TosoGameAPI.removeOp(p)
 
             RespawnRunnable.setAutoTime(p)
@@ -131,7 +131,6 @@ class onJoin : Listener {
                     p.gameMode = GameMode.ADVENTURE
 
                     TosoGameAPI.setItem(GameType.START, p)
-                    TosoGameAPI.setPotionEffect(p)
                     TosoGameAPI.removeOp(p)
 
                     TosoGameAPI.teleport(p, worldConfig.jailLocationConfig.locations.values)

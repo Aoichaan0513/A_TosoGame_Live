@@ -8,17 +8,13 @@ class PlayerManager {
 
         private val hashMap = mutableMapOf<UUID, PlayerConfig>()
 
-        fun loadConfig(uuid: UUID): PlayerConfig {
-            if (!hashMap.containsKey(uuid)) {
-                val playerConfig = PlayerConfig(uuid)
-                hashMap[uuid] = playerConfig
-            }
-            return hashMap[uuid]!!
+        fun loadConfig(uuid: UUID) = hashMap[uuid] ?: kotlin.run {
+            val playerConfig = PlayerConfig(uuid)
+            hashMap[uuid] = playerConfig
+            playerConfig
         }
 
-        fun loadConfig(p: Player): PlayerConfig {
-            return loadConfig(p.uniqueId)
-        }
+        fun loadConfig(p: Player) = loadConfig(p.uniqueId)
 
         fun reloadConfig(uuid: UUID): PlayerConfig {
             val playerConfig = PlayerConfig(uuid)
@@ -26,9 +22,7 @@ class PlayerManager {
             return hashMap[uuid]!!
         }
 
-        fun reloadConfig(p: Player): PlayerConfig {
-            return reloadConfig(p.uniqueId)
-        }
+        fun reloadConfig(p: Player) = reloadConfig(p.uniqueId)
 
         fun reloadConfig() {
             for (uuid in hashMap.keys)

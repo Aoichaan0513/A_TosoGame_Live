@@ -34,6 +34,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerAnimationEvent
+import org.bukkit.event.player.PlayerAnimationType
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.potion.PotionEffect
@@ -517,8 +518,11 @@ class onInteract : Listener {
     fun onAnimation(e: PlayerAnimationEvent) {
         val p = e.player
 
+        if (e.animationType != PlayerAnimationType.ARM_SWING || !p.isPlayerGroup && !p.isJailTeam)
+            return
+
         val blocks = p.getLineOfSight(Material.values().toSet(), 5).filterNotNull()
-        val block = blocks.firstOrNull { !it.type.toString().contains("AIR", true) } ?: return
+        blocks.firstOrNull { !it.type.toString().contains("AIR", true) } ?: return
 
         val worldConfig = Main.worldConfig
         val difficultyConfig = worldConfig.getDifficultyConfig(p)
@@ -534,6 +538,18 @@ class onInteract : Listener {
                 feather(p, true, difficultyConfig, itemGameType)
             } else if (p.inventory.itemInOffHand.type == Material.FEATHER) {
                 feather(p, false, difficultyConfig, itemGameType)
+            } else if (p.inventory.itemInMainHand.type == Material.BOOK) {
+                val itemMeta = p.inventory.itemInMainHand.itemMeta
+                if (itemMeta == null || ChatColor.stripColor(itemMeta.displayName) != Main.PHONE_ITEM_NAME) return
+
+                e.isCancelled = true
+                p.openInventory(MainInventory.getInventory(p))
+            } else {
+                val itemMeta = p.inventory.itemInOffHand.itemMeta
+                if (itemMeta == null || ChatColor.stripColor(itemMeta.displayName) != Main.PHONE_ITEM_NAME) return
+
+                e.isCancelled = true
+                p.openInventory(MainInventory.getInventory(p))
             }
         } else if (p.isJailTeam) {
             if (p.inventory.itemInMainHand.type == Material.ENDER_PEARL) {
@@ -549,12 +565,10 @@ class onInteract : Listener {
     }
 
 
-    private fun getAttachmentFace(directional: Directional): BlockFace {
-        return when ((directional as FaceAttachable).attachedFace) {
-            FaceAttachable.AttachedFace.CEILING -> BlockFace.UP
-            FaceAttachable.AttachedFace.WALL -> directional.facing.oppositeFace
-            FaceAttachable.AttachedFace.FLOOR -> BlockFace.DOWN
-        }
+    private fun getAttachmentFace(directional: Directional) = when ((directional as FaceAttachable).attachedFace) {
+        FaceAttachable.AttachedFace.CEILING -> BlockFace.UP
+        FaceAttachable.AttachedFace.WALL -> directional.facing.oppositeFace
+        FaceAttachable.AttachedFace.FLOOR -> BlockFace.DOWN
     }
 
     private fun bone(p: Player, isMainHand: Boolean, difficultyConfig: WorldConfig.DifficultyConfig, itemGameType: WorldManager.GameType) {

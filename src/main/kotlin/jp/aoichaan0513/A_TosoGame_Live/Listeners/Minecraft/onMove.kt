@@ -28,10 +28,10 @@ class onMove : Listener {
         val from = e.from
         val to = e.to!!
 
-        if (p.isAdminTeam) return
+        if (p.isAdminTeam || equalsTwoLocation(from, to)) return
 
         val worldConfig = Main.worldConfig
-        val mapBorder = worldConfig.mapBorderConfig
+        // val mapBorder = worldConfig.mapBorderConfig
         val hunterZoneBorder = worldConfig.hunterZoneBorderConfig
 
         if (isBorderAttack(to, worldConfig.mapBorderConfig)) {
@@ -144,4 +144,7 @@ class onMove : Listener {
 
         return isXJoinedArea && isYJoinedArea && isZJoinedArea
     }
+
+    private fun equalsTwoLocation(loc1: Location, loc2: Location) =
+            loc1.blockX == loc2.blockX && loc1.blockY == loc2.blockY && loc1.blockZ == loc2.blockZ
 }
