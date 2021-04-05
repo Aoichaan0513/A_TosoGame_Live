@@ -17,6 +17,9 @@ isVisibility: false
 # 本のベース文字色
 bookForegroundColor: "black"
 
+# 本のテーマ
+bookTheme: 1001
+
 # アイテム配置
 inventory:
   map: 40

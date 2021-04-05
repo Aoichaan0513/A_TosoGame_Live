@@ -95,6 +95,13 @@ class PlayerConfig(val uuid: UUID) {
             save()
         }
 
+    var bookTheme: Int
+        get() = config.getInt("bookTheme", 1001)
+        set(bookTheme) {
+            config["bookTheme"] = bookTheme
+            save()
+        }
+
     inner class InventoryConfig(f: File, c: YamlConfiguration) : IConfig(f, c) {
         private val PATH = "inventory"
 

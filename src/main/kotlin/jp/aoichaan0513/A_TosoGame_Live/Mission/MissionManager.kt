@@ -71,7 +71,7 @@ class MissionManager {
             val itemStack = ItemStack(ItemType.BOOK.material)
             val itemMeta = itemStack.itemMeta!!
             itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS)
-            itemMeta.setCustomModelData(1001)
+            itemMeta.setCustomModelData(PlayerManager.loadConfig(p).bookTheme)
             itemMeta.setDisplayName("${ChatColor.AQUA}${ChatColor.BOLD}${Main.PHONE_ITEM_NAME}")
             itemMeta.lore = Arrays.asList(
                     "${ChatColor.GOLD}${ChatColor.UNDERLINE}左クリック${ChatColor.RESET}${ChatColor.GRAY}: ${ChatColor.YELLOW}ホーム画面",
@@ -92,8 +92,9 @@ class MissionManager {
         fun setBook(p: Player): ItemStack? {
             if (p.isHunterGroup) return null
 
-            val itemStack = p.inventory.contents.firstOrNull { it != null && it.type == ItemType.BOOK.material && it.itemMeta != null && it.itemMeta!!.hasCustomModelData() && it.itemMeta!!.customModelData == 1001 }
-                    ?: addBook(p)
+            val itemStack = p.inventory.contents.filterNotNull().firstOrNull {
+                it.type == ItemType.BOOK.material && ChatColor.stripColor(it.itemMeta?.displayName) == Main.PHONE_ITEM_NAME
+            } ?: addBook(p)
             p.updateInventory()
             return itemStack
         }

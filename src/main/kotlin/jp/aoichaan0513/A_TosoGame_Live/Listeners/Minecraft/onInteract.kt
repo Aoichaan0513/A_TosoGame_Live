@@ -16,7 +16,6 @@ import jp.aoichaan0513.A_TosoGame_Live.Mission.MissionManager
 import jp.aoichaan0513.A_TosoGame_Live.Mission.TimedDevice
 import jp.aoichaan0513.A_TosoGame_Live.Runnable.RespawnRunnable
 import jp.aoichaan0513.A_TosoGame_Live.Utils.*
-
 import net.wesjd.anvilgui.AnvilGUI
 import org.bukkit.*
 import org.bukkit.block.BlockFace
@@ -41,7 +40,6 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
-import java.util.function.BiFunction
 
 
 class onInteract : Listener {
@@ -182,7 +180,7 @@ class onInteract : Listener {
 
                                 e.isCancelled = true
 
-                                AnvilGUI(Main.pluginInstance, p, "整数を入力…", BiFunction { player, reply ->
+                                AnvilGUI(Main.pluginInstance, p, "整数を入力…") { player, reply ->
                                     if (ParseUtil.isInt(reply)) {
                                         val i = reply.toInt()
                                         worldConfig.hunterDoorConfig.setDoor(i, clickedBlock)
@@ -191,7 +189,7 @@ class onInteract : Listener {
                                         MainAPI.sendMessage(player, MainAPI.ErrorMessage.ARGS_INTEGER)
                                     }
                                     null
-                                })
+                                }
                                 return
                             }
                         } else if (p.isPlayerGroup) {

@@ -8,10 +8,8 @@ class PlayerManager {
 
         private val hashMap = mutableMapOf<UUID, PlayerConfig>()
 
-        fun loadConfig(uuid: UUID) = hashMap[uuid] ?: kotlin.run {
-            val playerConfig = PlayerConfig(uuid)
-            hashMap[uuid] = playerConfig
-            playerConfig
+        fun loadConfig(uuid: UUID) = hashMap[uuid] ?: PlayerConfig(uuid).also {
+            hashMap[uuid] = it
         }
 
         fun loadConfig(p: Player) = loadConfig(p.uniqueId)
